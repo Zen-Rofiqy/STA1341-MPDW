@@ -1,1 +1,16 @@
+---
+title: "Prak01"
+author: "Angga Fathan Rofiqy"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  html_document: default
+---
 
+# Kamu
+
+## Aku
+
+### Dia
+
+Hahahahaha
