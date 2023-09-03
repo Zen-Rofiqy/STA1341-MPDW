@@ -1,6 +1,7 @@
 # Dataset MAANG Stock Prices  
 Link Dataset :  
 https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
+  
 Dataset ini merupakan koleksi data harga saham historis dari beberapa raksasa teknologi paling berpengaruh di dunia: 
 Microsoft, Apple, Amazon, Nvidia, Google, Netflix, dan Meta (sebelumnya dikenal sebagai Facebook). 
 Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin 
