@@ -1,5 +1,5 @@
-Agar memudahkan untuk dibaca..  
-Daripada liatin rmd nya, mending liat rpubs nya.. XD    
+Agar _memudahkan_ untuk dibaca..  
+Daripada liatin rmd nya, mending liat `rpubs` nya.. XD    
 Yuk mampir ke :  
 https://rpubs.com/ZenR_Prog/MPDW-Prak01
 
