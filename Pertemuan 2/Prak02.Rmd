@@ -1,0 +1,211 @@
+---
+title: "Prak02"
+author: "Angga Fathan Rofiqy"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Setting
+
+Abaikan bagian ini. Lansung saja loncat ke `1. Tentang Data` .
+
+### Install_load Function
+
+```{r}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+```
+
+### R Path Function
+
+```{r}
+path <- function(){
+  gsub  ( "\\\\",  "/",  readClipboard ()  )
+}
+#Copy path
+#Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+```{r}
+#Export chart
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 2/Chart"
+```
+
+### Import Data
+
+```{r}
+install_load('rio')
+raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Pertemuan%202/salesdaily.csv")
+```
+
+### Assign Variable
+
+```{r}
+install_load('dplyr')
+data <- raw.data[,2:9] %>% 
+  rename_all(~ c('y', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7'))
+```
+
+# Regresi
+
+### Model Regresi 
+
+```{r}
+model <- lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7, data)
+summary(model)
+```
+
+### Plot
+
+```{r}
+#sisaan dan fitted value
+sisaan<- residuals(model)
+fitValue<- predict(model)
+
+#Diagnostik dengan eksploratif
+par(mfrow = c(2,2))
+qqnorm(sisaan)
+qqline(sisaan, col = "steelblue", lwd = 2)
+plot(fitValue, sisaan, col = "steelblue", pch = 20, 
+     xlab = "Sisaan", ylab = "Fitted Values", main = "Sisaan vs Fitted Values")
+abline(a = 0, b = 0, lwd = 2)
+hist(sisaan, col = "steelblue")
+plot(1:length(sisaan), sisaan, col = "steelblue", pch = 20, 
+     xlab = "Sisaan", 
+     ylab = "Order", main = "Sisaan vs Order")
+lines(1:length(sisaan), sisaan, col = "red")
+abline(a = 0, b = 0, lwd = 2)
+```
+
+### Dengan ggplot2
+
+```{r}
+install_load('ggplot2','cowplot')
+# Membuat QQ Plot
+qq_plot <- ggplot(data, aes(sample = y)) +
+  geom_qq() +
+  geom_qq_line(color = "red") +
+  labs(x = "Theoretical Quantiles", y = "Sample Quantiles") +
+  ggtitle("QQ Plot")
+
+# Membuat plot sisaan vs Fitted Values dengan ggplot2
+plot1 <- ggplot(data, aes(x = fitted(model), y = residuals(model))) +
+  geom_point(col = "steelblue", pch = 20) +
+  geom_abline(intercept = 0, slope = 0, color = "red", linetype = "dashed", size = 1) +
+  labs(x = "Fitted Values", y = "Residuals") +
+  ggtitle("Residuals vs Fitted Values")
+
+# Membuat histogram sisaan dengan ggplot2
+plot2 <- ggplot(data, aes(x = residuals(model))) +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "white") +
+  labs(x = "Residuals", y = "Frequency") +
+  ggtitle("Histogram of Residuals")
+
+# Membuat plot sisaan vs Order dengan ggplot2
+plot3 <- ggplot(data, aes(x = 1:length(residuals(model)), y = residuals(model))) +
+  geom_point(col = "steelblue", pch = 20) +
+  geom_abline(intercept = 0, slope = 0, color = "red", linetype = "dashed", size = 1) +
+  labs(x = "Order", y = "Residuals") +
+  ggtitle("Residuals vs Order")
+
+# Menggabungkan semua plot dengan cowplot
+plot_grid(qq_plot, plot1, plot2, plot3, nrow = 2, ncol = 2)
+```
+
+### Melihat Sisaan Menyebar Normal/Tidak
+
+$H_0$ : Sisaan mengikuti sebaran normal
+
+$H_1$ : Sisaan **tidak** mengikuti sebaran normal
+
+```{r}
+shapiro.test(sisaan)
+```
+
+```{r}
+ks.test(sisaan, "pnorm", mean=mean(sisaan), sd=sd(sisaan))
+```
+
+### ACF dan PACF identifikasi autokorelasi
+
+```{r}
+par(mfrow = c(1,2))
+acf(sisaan)
+pacf(sisaan)
+```
+
+### Deteksi autokorelasi dengan uji-Durbin Watson
+
+$H_0$ : Tidak ada autokorelasi
+
+$H_1$ : Ada autokorelasi
+
+```{r}
+install_load('lmtest')
+dwtest(model)
+```
+
+# Penanganan Autokorelasi
+
+### Metode Cochrane-Orcutt
+
+```{r}
+install_load('orcutt')
+modelCO <- cochrane.orcutt(model)
+modelCO
+```
+
+### Rho optimum
+
+```{r}
+rho <- modelCO$rho
+rho
+```
+
+### Transformasi Manual
+
+```{r}
+y.trans  <- data [-1,1] - data [-12,1] * rho
+x1.trans <- data [-1,2] - data [-12,2] * rho
+x2.trans <- data [-1,3] - data [-12,3] * rho
+x3.trans <- data [-1,4] - data [-12,4] * rho
+x4.trans <- data [-1,5] - data [-12,5] * rho
+x5.trans <- data [-1,6] - data [-12,6] * rho
+x6.trans <- data [-1,7] - data [-12,7] * rho
+x7.trans <- data [-1,8] - data [-12,8] * rho
+trans <- as.data.frame(cbind(y.trans, x1.trans, x2.trans, x3.trans, x4.trans, 
+                             x5.trans, x6.trans, x7.trans))
+View(trans)
+modelCOmanual <- lm(y.trans ~ x1.trans + x2.trans + x3.trans + x4.trans + x5.trans + 
+                      x6.trans + x7.trans, trans)
+summary(modelCOmanual)
+```
+
+```{r}
+trans1 <- data %>%
+  mutate(across(everything(), ~ lead(.) - nth(., 12) * rho)) %>%
+  rename_with(~ paste0(.x, ".trans"), everything()) %>%
+  slice(-1)
+View(trans1)
+modelCOmanual1 <- lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7, trans1)
+summary(modelCOmanual1)
+```
