@@ -1,3 +1,5 @@
+Link Data : https://www.kaggle.com/datasets/milanzdravkovic/pharma-sales-data?select=salesdaily.csv  
+
 Agar _memudahkan_ untuk dibaca..  
 Daripada liatin rmd nya, mending liat `rpubs` nya.. XD    
 Yuk mampir ke :  
