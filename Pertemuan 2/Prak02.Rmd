@@ -317,3 +317,25 @@ dwtest(modelHL)
 Hasil uji Durbin-Watson juga menunjukkan bawah nilai DW sebesar $1.4092$ berada pada selang daerah tidak ada autokorelasi, yaitu pada rentang DU \< DW \< 4-DU atau $1.331 < DW < 2.669$ . Hal tersebut juga didukung oleh *p-value* sebesar $0.09404$ , di mana $p.value > \alpha =5\%.$ Artinya tak tolak $H_0$ atau belum cukup bukti menyatakan bahwa ada autokorelasi dalam data nilai IPM dengan metode Hildreth-Lu pada taraf nyata 5%.
 
 Terakhir, akan dibandingkan nilai SSE dari ketiga metode (metode awal, metode Cochrane-Orcutt, dan Hildreth-Lu).
+
+### Perbandingan
+
+```{r}
+sseModelawal <- anova(model)$`Sum Sq`[-1]
+sseModelCO <- anova(modelCOmanual)$`Sum Sq`[-1]
+sseModelHL <- anova(modelHL)$`Sum Sq`[-1]
+mseModelawal <- sseModelawal/nrow(data)
+mseModelCO <- sseModelCO/nrow(data)
+mseModelHL <- sseModelHL/nrow(data)
+akurasi <- matrix(c(sseModelawal,sseModelCO,sseModelHL,
+                    mseModelawal,mseModelCO,mseModelHL),nrow=2,ncol=3,byrow = T)
+colnames(akurasi) <- c("Model Awal", "Model Cochrane-Orcutt", "Model Hildreth-Lu")
+row.names(akurasi) <- c("SSE","MSE")
+akurasi
+```
+
+Berdasarkan hasil tersebut dapat diketahui bahwa hasil penanganan autokorelasi dengan metode Cochrane-Orcutt dan Hildreth-Lu memiliki SSE yang sama, sebesar $0.23975$ dan lebih baik dibandingkan model awal ketika autokorelasi masih terjadi, yaitu sebesar $0.3286364$.
+
+# Kesimpulan
+
+Autokorelasi yang terdapat pada data IPM terjadi akibat adanya korelasi di antara unsur penyusunnya. Indikator IPM yang erat hubungannya dengan perekonomian sangat rawan menjadi penyebab adanya autokorelasi. Adanya autokorelasi menyebabkan model regresi kurang baik karena akan meingkatkan galatnya. Autokorelasi dapat dideteksi secara eksploratif melalui plot sisaan, ACF, dan PACF, serta dengan uji formal Durbin-Watson. Namun, autokorelasi tersebut dapat ditangani dengan metode Cochrane-Orcutt dan Hildreth-Lu. Kedua metode menghasilkan nilai SSE yang sama, artinya keduanya baik untuk digunakan.
