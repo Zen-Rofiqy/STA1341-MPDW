@@ -7,9 +7,15 @@ output: html_document
 
 # Setting
 
-Abaikan bagian ini. Lansung saja loncat ke `1. Tentang Data` .
+Abaikan bagian ini. Lansung saja loncat ke `1. Tentang Data` . `Function` biar gak perlu ganti `backslash` (`\`) jadi `slash` (`/`).
 
-### Install_load Function
+```{r}
+path <- function() gsub  ( "\\\\",  "/",  readClipboard ()  )
+#Copy path, Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+`Function` biar gak perlu repot buat `install("")` atau `load()` *package.*
 
 ```{r}
 #                      -=( Install & Load Package Function )=-
@@ -34,15 +40,138 @@ install_load <- function (package1, ...)  {
 }
 ```
 
-### R Path Function
+`Function` buat deteksi *Outlier.*
 
 ```{r}
-path <- function(){
-  gsub  ( "\\\\",  "/",  readClipboard ()  )
+#                            -=( Is outlier? Funciton )=-
+is_outlier <- function(x) {
+  return(x < quantile(x,0.25) -1.5*IQR(x) | x > quantile(x,0.75) +1.5*IQR(x))
 }
-#Copy path
-#Panggil function di console
-#Copy r path, paste ke var yang diinginkan
+```
+
+`Function` Data untuk *box plot* `function`.
+
+```{r}
+#                      -=( Ggplot Stat Attribute Funciton )=-
+gstat <- function(dt){
+  install_load("dplyr","tibble")
+  
+  #Set Data Frame
+  dt <- data.frame(obs = dt[[1]], dat = dt[[2]], row.names = dt[[1]])
+  
+  #ID/obs outlier (oo)
+  oo <- dt %>%
+  rownames_to_column(var = "outlier") %>%
+  mutate(is_outlier = if_else(is_outlier(dat), dat, as.numeric(NA))) %>%
+  mutate(outlier = if_else(is.na(is_outlier) | is_outlier == max(dat) 
+                           | is_outlier == min(dat), as.numeric(NA), 
+                             as.numeric(outlier)),
+         is_outlier = if_else(is_outlier == max(dat) 
+                              | is_outlier == min(dat), 
+                                as.numeric(NA), is_outlier))
+  
+  #Obs Minimum
+  om <- data.frame(min = ifelse(dt$dat == min(dt$dat), dt$obs, NA), 
+                   min_val = ifelse(dt$dat == min(dt$dat), min(dt$dat), NA))
+  #Obs Maximum
+  omx <- data.frame(max = ifelse(dt$dat == max(dt$dat), dt$obs, NA), 
+                    max_val = ifelse(dt$dat == max(dt$dat), max(dt$dat), NA))
+  #Binding together
+  gs <- cbind(oo, om, omx)
+  
+  #Calc Mean
+  mean <- data.frame(mean = round(mean(dt$dat), 2))
+  
+  #Make it list
+  gs <- list(gs, mean)
+return(gs)
+}
+```
+
+`Variabel` untuk warna pada `function` *box plot.*
+
+```{r}
+#                           -=( Default Color Palette )=-
+colord <- data.frame(
+  f = c('#75bfc8', 'Fill color'),        c = c('#444442', 'Stroke color'),
+  oc = c('#0b5f6a', 'Outlier color'),    min = c('#0b5f6a', 'Minimum value color'),
+  max = c('#0b5f6a', 'Max value color'), med = c('#c3ac8b', 'Median value color'),
+  iqr = c('#c3ac8b', 'IQR3 Value'),      mean = c('#608981', 'Mean Marker'),
+  ooc = c('#0b5f6a', 'Oulier Obs color'), 
+  ovc = c('#0b5f6a', 'Oulier Value color'), v = c('#c3eca2', 'Violin'),
+  meanv = c('#608981', 'Mean Value'),    moc = c('#0b5f6a', 'Min Max Obs'),
+  stringsAsFactors = FALSE
+)
+```
+
+`Variabel` untuk `ggplot` *theme.*
+
+```{r}
+install_load('ggplot2')
+theme1 <- list(
+  guides(fill="none") , #No Legends
+  theme(
+  text = element_text(size = 66),
+  axis.title = element_text(),
+  axis.text.x = element_text(hjust = 0.5, face = "bold", margin = margin(b=50)),
+  plot.title = element_text(hjust = 0.5, face = "bold", margin = margin(b=50)),
+  plot.subtitle = element_text(hjust = 0.5),
+  panel.background = element_rect(fill = 'transparent'),
+  plot.background = element_rect(fill='transparent', color=NA),
+  panel.grid.major = element_line(colour = "grey50"),
+  axis.line = element_line(linewidth = 5, colour = "grey80"))
+)
+```
+
+***Box Plot*** `Function`.
+
+```{r}
+#                           -=( Box Plot Function )=-
+boxp <- function(dt, cp=colord, labs=lab1){ #data, color palette, label
+  install_load('ggplot2')
+  gs <- gstat(dt)
+  b <- ggplot(data=gs[[1]], aes(y="", x=dat)) + 
+        #Violin Plot
+        geom_violin(scale="count", fill=cp$v[1], color=NA, alpha=0.5, 
+                    trim = FALSE) +
+        #Box Plot
+        geom_boxplot(fill=cp$f[1], color=cp$c[1],
+                     outlier.size=15, outlier.color=cp$oc[1], 
+                     alpha=0.7,notch=T, width = 0.25) +
+        #Median Value
+        stat_summary(geom="text", fun=median,
+                     aes(label=sprintf("%1.1f", after_stat(x))),
+                     position=position_nudge(y=0.425), size=16, color=cp$med[1]) +
+        #IQR1 Value
+        stat_summary(geom="text", fun="quantile", fun.args=list(probs=0.25),
+                     aes(label=sprintf("%1.1f", after_stat(x))),
+                     position=position_nudge(y=-0.425), size=16, color=cp$iqr[1]) +
+        #IQR3 Value
+        stat_summary(geom="text", fun="quantile", fun.args=list(probs=0.75),
+                     aes(label=sprintf("%1.1f", after_stat(x))),
+                     position=position_nudge(y=-0.425), size=16, color=cp$iqr[1]) +
+        #Mean Marker
+        stat_summary(fun='mean', geom="point",colour=cp$mean[1], 
+                     shape=18, size=16, alpha=0.75) +
+        #Title
+        ggtitle(labs$title) + 
+        theme(plot.title = element_text(hjust = 0.5)) + #Title Position
+        #Labels
+        ylab(labs$ylab) + xlab(labs$xlab) +
+        #Mean Value
+        geom_text(data = gs[[2]], aes(label = paste0("Mean : ",mean), x = mean),
+                  angle=45, size=16, vjust=-0.5, hjust=0.5, color=cp$mean[1]) + 
+        #Theme
+        theme1
+return(b)
+}
+```
+
+*Default* *label* untuk `function` *box plot.*
+
+```{r}
+#                            -=( Default Label/Title )=-
+lab1 <- data.frame(title='Distribution of Data X', ylab='', xlab='Data X')
 ```
 
 ```{r}
@@ -63,6 +192,12 @@ raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/ma
 install_load('dplyr')
 data <- raw.data[,2:9] %>% 
   rename_all(~ c('y', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7'))
+```
+
+# Explorasi
+
+```{r}
+
 ```
 
 # Regresi
