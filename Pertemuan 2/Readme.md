@@ -3,7 +3,7 @@ Tujuan praktikum kali ini adalah menangani autokorelasi.
   
 ## Tentang Data
 Link Data :  
-https://www.kaggle.com/datasets/milanzdravkovic/pharma-sales-data?select=salesdaily.csv   
+https://www.kaggle.com/datasets/milanzdravkovic/pharma-sales-data?select=salesmonthly.csv   
 Data ini merupakan data penjualan 8 obat di sebuah farmasi.  
 Ada beberapa pilihan data. Data dengan periode per-jam, per-hari, per-minggu, dan per-bulan.  
 Data yang saya gunakan adalah data dengan periode per-hari.  
