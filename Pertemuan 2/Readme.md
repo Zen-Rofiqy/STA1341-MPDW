@@ -6,7 +6,7 @@ Link Data :
 https://www.kaggle.com/datasets/milanzdravkovic/pharma-sales-data?select=salesmonthly.csv   
 Data ini merupakan data penjualan 8 obat di sebuah farmasi.  
 Ada beberapa pilihan data. Data dengan periode per-jam, per-hari, per-minggu, dan per-bulan.  
-Data yang saya gunakan adalah data dengan periode per-hari.  
+Data yang saya gunakan adalah data dengan periode per-bulan.  
 Berikut adalah kode obat yang tersedia dan deskripsinya:  
 1. `M01AB` : Obat antiinflamasi dan antirheumatik non-steroid, derivatif asam asetat.
 2. `M01AE` : Obat antiinflamasi dan antirheumatik non-steroid, derivatif asam propionat.
