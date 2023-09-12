@@ -23,7 +23,7 @@ Berikut adalah kode obat yang tersedia dan deskripsinya:
 7. `R03`   : Obat untuk penyakit saluran napas obstruktif.
 8. `R06`   : Antihistamin untuk penggunaan sistemik.  
 Obat `M01AB` dan `M01AE` merupakan obat yang sama, namun dengan bahan dasar yang berbeda.  
-Saya penasaran _Apakah penjualan obat `M01AB` dipengaruhi oleh penjualan obat `M01AB` dan obat-obat lainnya?_  
+Saya penasaran _"Apakah penjualan obat `M01AB` dipengaruhi oleh penjualan obat `M01AB` dan obat-obat lainnya?"_  
 Sehingga saya memilih Peubah `M01AB` sebagai peubah respon `Y`. Dan peubah lainnya sebagai peubah penjelas `X`.  
   
 
