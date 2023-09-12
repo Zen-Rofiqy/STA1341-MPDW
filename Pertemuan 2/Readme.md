@@ -1,5 +1,11 @@
 ## Tujuan
 Tujuan praktikum kali ini adalah menangani autokorelasi.  
+
+## Link RPUBS
+Agar _memudahkan_ untuk dibaca..  
+Daripada liatin rmd nya, mending liat `rpubs` nya.. XD    
+Yuk mampir ke :  
+https://rpubs.com/ZenR_Prog/MPDW-Prak02  
   
 ## Tentang Data
 Link Data :  
@@ -20,10 +26,5 @@ Obat `M01AB` dan `M01AE` merupakan obat yang sama, namun dengan bahan dasar yang
 Saya penasaran _Apakah penjualan obat `M01AB` dipengaruhi oleh penjualan obat `M01AB` dan obat-obat lainnya?_  
 Sehingga saya memilih Peubah `M01AB` sebagai peubah respon `Y`. Dan peubah lainnya sebagai peubah penjelas `X`.  
   
-## Link RPUBS
-Agar _memudahkan_ untuk dibaca..  
-Daripada liatin rmd nya, mending liat `rpubs` nya.. XD    
-Yuk mampir ke :  
-https://rpubs.com/ZenR_Prog/MPDW-Prak02
 
 
