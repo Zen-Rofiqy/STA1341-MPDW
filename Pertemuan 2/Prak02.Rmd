@@ -197,11 +197,11 @@ summary(model)
 
 Model yang dihasilkan adalah $\hat{y}= 51.27 + 0.46x_1 + 0.16x_2 + 0.01x_3 - 0.03x_4 - 0.08x_5 + 0.02x_6 + 0.023x_7$ . Berdasarkan ringkasan model dapat diketahui bahwa hasil uji F memiliki $p.value ( 6.328 \times10^{-7} ) < \alpha (5\%)$.
 
-Artinya, minimal terdapat satu **variabel yang berpengaruh** nyata terhadap model. Hasil uji-t parsial kedua parameter regresi, yaitu intersep dan koefisien regresi juga menunjukkan hal yang sama, yaitu memiliki $p.value < \alpha (5\%)$ sehingga nyata dalam taraf $5\%$. Selanjutnya dapat dilihat juga nilai $R^2=0.4166$. Artinya, sebesar $41.66\%$ keragaman penjualan obat `M01AB` dapat dijelaskan oleh penjualan 7 obat lainnya. Selanjutnya kita perlu melakukan uji terhadap sisaannya seperti berikut ini.
+Artinya, minimal terdapat satu **variabel yang berpengaruh** nyata terhadap model. Hasil uji-t parsial kedua parameter regresi, yaitu intersep dan koefisien regresi juga menunjukkan hal yang sama, yaitu memiliki $p.value < \alpha (5\%)$ sehingga nyata dalam taraf $5\%$. Selanjutnya dapat dilihat juga nilai $R^2=0.4758$. Artinya, sebesar $47.58\%$ keragaman penjualan obat `M01AB` dapat dijelaskan oleh penjualan 7 obat lainnya. Selanjutnya kita perlu melakukan uji terhadap sisaannya seperti berikut ini.
 
 ### Plot Sisaan & Q-Q Plot
 
-```{r dpi=300, fig2, fig.height = 9, fig.width = 16, fig.align = "center"}
+```{r dpi=300, fig3, fig.height = 9, fig.width = 16, fig.align = "center"}
 sisaan<- residuals(model)
 fitValue<- predict(model)
 
@@ -228,11 +228,11 @@ lines(1:length(sisaan), sisaan, col = "red")
 abline(a = 0, b = 0, lwd = 2)
 ```
 
-Dua plot di samping kiri digunakan untuk melihat apakah sisaan menyebar normal. Normal Q-Q Plot di atas menunjukkan bahwa sisaan cenderung tidak menyebar normal, tetapi histogram dari sisaan tidak menunjukkan demikian, melainkan sedikit menjulur ke kanan. Selanjutnya, dua plot di samping kanan digunakan untuk melihat autokorelasi. Terlihat ada pola pada sisaan yang ditunjukkan oleh Plot Sisaan vs *Fitted Value* dan terutama pada Plot Sisaan vs *Order* yang terlihat dengan garis warna merahnya yang membentuk pola. Ini merupakan tanda adanya autokorelasi.
+Dua plot di samping kiri digunakan untuk melihat apakah sisaan menyebar normal. Normal Q-Q Plot di atas menunjukkan bahwa sisaan cenderung menyebar normal dan histogram dari sisaan menunjukkan hal yang serupa. Selanjutnya, dua plot di samping kanan digunakan untuk melihat autokorelasi. Terlihat ada pola pada sisaan yang ditunjukkan oleh Plot Sisaan vs *Fitted Value* dan terutama pada Plot Sisaan vs *Order* yang terlihat dengan garis warna merahnya yang membentuk pola. Ini merupakan tanda adanya autokorelasi.
 
 ### Dengan ggplot2
 
-```{r dpi=300, fig3, fig.height = 9, fig.width = 16, fig.align = "center"}
+```{r dpi=300, fig4, fig.height = 9, fig.width = 16, fig.align = "center"}
 install_load('ggplot2','cowplot')
 # Membuat QQ Plot
 qq_plot <- ggplot(data, aes(sample = y)) +
@@ -285,7 +285,7 @@ shapiro.test(sisaan)
 ks.test(sisaan, "pnorm", mean=mean(sisaan), sd=sd(sisaan))
 ```
 
-Berdasarkan uji formal Saphiro-Wilk dan Kolmogorov-Smirnov didapatkan nilai $p.value < \alpha (5\%)$. Artinya, **tidak cukup bukti** untuk menyatakan sisaan berdistribusi normal.
+Berdasarkan uji formal Saphiro-Wilk dan Kolmogorov-Smirnov didapatkan nilai $p.value > \alpha (5\%)$. Artinya, **cukup bukti** untuk menyatakan sisaan berdistribusi normal.
 
 ### ACF dan PACF identifikasi autokorelasi
 
@@ -295,7 +295,7 @@ acf(sisaan)
 pacf(sisaan)
 ```
 
-Berdasarkan plot ACF dan PACF, terlihat semua dalam rentang batas dan hanya ada 1 yang signifikan pada plot ACF. Namun, untuk lebih memastikan akan dilakukan uji formal dengan uji Durbin Watson.
+Berdasarkan plot ACF dan PACF, terlihat semua dalam rentang batas dan hanya ada satu yang signifikan (terindikasi adanya autokorelasi) pada plot ACF dan ada satu pada Plot PACF Namun, untuk lebih memastikan akan dilakukan uji formal dengan uji Durbin Watson.
 
 ### Deteksi autokorelasi dengan uji-Durbin Watson
 
@@ -313,9 +313,7 @@ install_load('lmtest')
 dwtest(model)
 ```
 
-# @HELP
-
-Berdasarkan hasil DW Test, didapatkan nilai $DW = 1.9482$ dan $p.value = 0.112$. **Berdasarkan tabel Durbin-Watson diperoleh nilai** $DL = 0.9771$ **dan** $DU = 1.331$**.** Nilai DW masih berada di antara nilai DL dan DU. Artinya, berada di daerah inkonklusif, tidak dapat dikatakan berada di daerah autokorelasi positif maupun bebas dari autokorelasi. Namun, dengan nilai $p.value > 0.05$ dapat disimpulkan bahwa **tak tolak** $H_0$, cukup bukti mengatakan adanya autokorelasi. Oleh karena itu, diperlukan penangan autokorelasi. Penanganan yang akan digunakan menggunakan dua metode, yaitu Cochrane-Orcutt dan Hildret-Lu.
+Berdasarkan hasil DW Test, didapatkan nilai $DW = 1.2495$ dan $p.value = 0.0001048$. Dengan nilai $p.value < 0.05$ dapat disimpulkan bahwa **tolak** $H_0$, cukup bukti mengatakan adanya autokorelasi. Oleh karena itu, diperlukan penanganan autokorelasi. Penanganan yang akan digunakan menggunakan dua metode, yaitu Cochrane-Orcutt dan Hildret-Lu.
 
 # Penanganan Autokorelasi
 
@@ -329,7 +327,7 @@ modelCO <- cochrane.orcutt(model)
 modelCO
 ```
 
-Hasil keluaran model setelah dilakukan penanganan adalah sebagai berikut. $y_i=-1062.042646+0.559755x_t$ Hasil juga menunjukkan bahwa nilai DW dan p-value meningkat menjadi $1.49014$ dan $0.09403$. Nilai DW sudah berada pada rentang $DU < DW < 4-DU$ atau $1.331 < DW < 2.669$. Hal tersebut juga didukung dengan nilai $p.value > 0.05$, artinya belum cukup bukti menyatakan bahwa sisaan terdapat autokorelasi pada taraf nyata $5\%$. Untuk nilai $\hat{\rho}$ optimum yang digunakan adalah $0.3409214$. Nilai tersebut dapat diketahui dengan *syntax* berikut.
+Hasil keluaran model setelah dilakukan penanganan adalah sebagai berikut. $y_i= 26.693862  +  0.318248x_1   + 0.378026   - 0.000166x_3   + 0.097630x_4   - 0.029786x_5   +  0.020880x_6 +    0.175696x_7$ Hasil juga menunjukkan bahwa nilai DW dan p-value meningkat dari $1.048 \times 10^{-4}$ menjadi $0.3785$, dengan nilai $p.value > 0.05$, artinya belum cukup bukti menyatakan bahwa sisaan terdapat autokorelasi pada taraf nyata $5\%$.
 
 ### Rho optimum
 
@@ -337,6 +335,8 @@ Hasil keluaran model setelah dilakukan penanganan adalah sebagai berikut. $y_i=-
 rho <- modelCO$rho
 rho
 ```
+
+Untuk nilai $\hat{\rho}$ optimum yang digunakan adalah $0.6236433$.
 
 ### Transformasi Manual
 
@@ -348,7 +348,7 @@ modelCOmanual <- lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7, trans)
 summary(modelCOmanual)
 ```
 
-Hasil model transformasi bukan merupakan model sesungguhnya. Koefisien regresi masih perlu dicari kembali mengikuti ${\beta_0}^*=\beta_0+\hat{\rho}\beta_0$ dan $\beta_1^*=\beta_1$.
+Hasil model transformasi bukan merupakan model sesungguhnya. Koefisien regresi masih perlu dicari kembali mengikuti ${\beta_0}^*=\beta_0+\hat{\rho}\beta_0$ dan untuk koefisen selanjutnya mengikuti $\beta_1^*=\beta_1$, $\beta_2^*=\beta_2$, $\beta_3^*=\beta_3$, $\beta_4^*=\beta_4$, $\beta_5^*=\beta_5$, $\beta_6^*=\beta_6$, $\beta_7^*=\beta_7$.
 
 ### Mencari Penduga Koefisien Regresi setelah Transformasi ke Persamaan Awal
 
@@ -374,18 +374,34 @@ Penanganan kedua adalah menggunakan metode Hildreth-Lu. Metode ini akan mencari 
 
 ```{r}
 hildreth.lu.func<- function(r, model){
-  x <- model.matrix(model)[,-1]
+  x1 <- model.matrix(model)[,2]
+  x2 <- model.matrix(model)[,3]
+  x3 <- model.matrix(model)[,4]
+  x4 <- model.matrix(model)[,5]
+  x5 <- model.matrix(model)[,6]
+  x6 <- model.matrix(model)[,7]
+  x7 <- model.matrix(model)[,8]
+  
   y <- model.response(model.frame(model))
+  
   n <- length(y)
   t <- 2:n
-  y <- y[t]-r*y[t-1]
-  x <- x[t]-r*x[t-1]
   
-  return(lm(y~x))
+  y <- y[t]-r*y[t-1]
+  
+  x1 <- x1[t]-r*x1[t-1]
+  x2 <- x2[t]-r*x2[t-1]
+  x3 <- x3[t]-r*x3[t-1]
+  x4 <- x4[t]-r*x4[t-1]
+  x5 <- x5[t]-r*x5[t-1]
+  x6 <- x6[t]-r*x6[t-1]
+  x7 <- x7[t]-r*x7[t-1]
+  
+  return(lm(y~x1+x2+x3+x4+x5+x6+x7))
 }
 ```
 
-### Pencariab rho yang meminimumkan SSE
+### Pencarin rho yang meminimumkan SSE
 
 ```{r}
 r <- c(seq(0.1,0.9, by= 0.1))
@@ -395,14 +411,22 @@ tab <- data.frame("rho" = r, "SSE" = sapply(r,
 kable(round(tab, 4)) %>% kable_styling()
 ```
 
-Pertama-tama akan dicari di mana kira-kira $\rho$ yang menghasilkan SSE minimum. Pada hasil di atas terlihat $\rho$ minimum ketika $0.3$. Namun, hasil tersebut masih kurang teliti sehingga akan dicari kembali $\rho$ yang lebih optimum dengan ketelitian yang lebih. Jika sebelumnya jarak antar $\rho$ yang dicari adalah $0.1$, kali ini jarak antar $\rho$ adalah $0.001$ dan dilakukan pada selang $0.2$ sampai dengan $0.5$.
+```{r}
+min(tab$SSE)
+```
+
+Pertama-tama akan dicari di mana kira-kira $\rho$ yang menghasilkan SSE minimum. Pada hasil di atas terlihat $\rho$ minimum ketika $0.6$. Namun, hasil tersebut masih kurang teliti sehingga akan dicari kembali $\rho$ yang lebih optimum dengan ketelitian yang lebih. Jika sebelumnya jarak antar $\rho$ yang dicari adalah $0.1$, kali ini jarak antar $\rho$ adalah $0.001$ dan dilakukan pada selang $0.4$ sampai dengan $0.5$.
 
 ### Rho optimal di sekitar $0.4$
 
 ```{r}
-rOpt <- seq(0.2,0.5, by= 0.001)
+rOpt <- seq(0.4,0.5, by= 0.001)
 tabOpt <- data.frame("rho" = rOpt, "SSE" = sapply(rOpt, function(i){deviance(hildreth.lu.func(i, model))}))
 kable(head(tabOpt[order(tabOpt$SSE),])) %>% kable_styling()
+```
+
+```{r}
+min(tabOpt$SSE)
 ```
 
 ### Grafik SSE optimum
@@ -411,22 +435,22 @@ kable(head(tabOpt[order(tabOpt$SSE),])) %>% kable_styling()
 par(mfrow = c(1,1))
 plot(tab$SSE ~ tab$rho , type = "l", xlab = "Rho", ylab = "SSE")
 abline(v = tabOpt[tabOpt$SSE==min(tabOpt$SSE),"rho"], lty = 2, col="red",lwd=2)
-text(x=0.341, y=0.2397500, labels = "rho=0.341", cex = 0.8)
+text(x=0.500, y=28563.52, labels = "rho=0.500", cex = 0.8)
 ```
 
-Perhitungan yang dilakukan aplikasi `R` menunjukkan bahwa nilai $\rho$ optimum, yaitu saat SSE terkecil terdapat pada nilai $\rho=0.341$ Hal tersebut juga ditunjukkan pada plot. Selanjutnya, model dapat didapatkan dengan mengevaluasi nilai $\rho$ ke dalam fungsi `hildreth.lu.func`, serta dilanjutkan dengan pengujian autokorelasi dengan uji Durbin-Watson. Namun, setelah pengecekan tersebut tidak lupa koefisien regresi tersebut digunakan untuk transformasi balik. Persamaan hasil transformasi itulah yang menjadi persamaan sesungguhnya.
+Perhitungan yang dilakukan aplikasi `R` menunjukkan bahwa nilai $\rho$ optimum, yaitu saat SSE terkecil terdapat pada nilai $\rho=0.500$ Hal tersebut juga ditunjukkan pada plot. Selanjutnya, model dapat didapatkan dengan mengevaluasi nilai $\rho$ ke dalam fungsi `hildreth.lu.func`, serta dilanjutkan dengan pengujian autokorelasi dengan uji Durbin-Watson. Namun, setelah pengecekan tersebut tidak lupa koefisien regresi tersebut digunakan untuk transformasi balik. Persamaan hasil transformasi itulah yang menjadi persamaan sesungguhnya.
 
 ### Model terbaik
 
 ```{r}
-modelHL <- hildreth.lu.func(0.341, model)
+modelHL <- hildreth.lu.func(0.500, model)
 summary(modelHL)
 ```
 
 ### Transformasi Balik
 
 ```{r}
-cat("y = ", coef(modelHL)[1]/(1-0.341), "+", coef(modelHL)[2],"x", sep = "")
+cat("y = ", coef(modelHL)[1]/(1-0.500), "+", coef(modelHL)[2],"x", sep = "")
 ```
 
 Setelah dilakukan tranformasi balik, didapatkan model dengan metode Hildreth-Lu sebagai berikut.
@@ -439,16 +463,16 @@ $y_i=−1062.032+0.5597492x_t$
 dwtest(modelHL)
 ```
 
-Hasil uji Durbin-Watson juga menunjukkan bawah nilai DW sebesar $1.4092$ berada pada selang daerah tidak ada autokorelasi, yaitu pada rentang DU \< DW \< 4-DU atau $1.331 < DW < 2.669$ . Hal tersebut juga didukung oleh *p-value* sebesar $0.09404$ , di mana $p.value > \alpha =5\%.$ Artinya tak tolak $H_0$ atau belum cukup bukti menyatakan bahwa ada autokorelasi dalam data nilai IPM dengan metode Hildreth-Lu pada taraf nyata 5%.
+Hasil uji Durbin-Watson juga menunjukkan bawah nilai DW sebesar $1.7683$ berada pada selang daerah tidak ada autokorelasi. Hal tersebut juga didukung oleh *p-value* sebesar $0.1576$ , di mana $p.value > \alpha (5\%).$ Artinya tak tolak $H_0$ atau belum cukup bukti menyatakan bahwa ada autokorelasi dalam data nilai penjualan obat dengan metode Hildreth-Lu pada taraf nyata 5%.
 
 Terakhir, akan dibandingkan nilai SSE dari ketiga metode (metode awal, metode Cochrane-Orcutt, dan Hildreth-Lu).
 
 ### Perbandingan
 
 ```{r}
-sseModelawal <- anova(model)$`Sum Sq`[-1]
-sseModelCO <- anova(modelCOmanual)$`Sum Sq`[-1]
-sseModelHL <- anova(modelHL)$`Sum Sq`[-1]
+sseModelawal <- anova(model)$`Sum Sq`[-c(1:7)]
+sseModelCO <- anova(modelCOmanual)$`Sum Sq`[-c(1:7)]
+sseModelHL <- anova(modelHL)$`Sum Sq`[-c(1:7)]
 mseModelawal <- sseModelawal/nrow(data)
 mseModelCO <- sseModelCO/nrow(data)
 mseModelHL <- sseModelHL/nrow(data)
@@ -459,8 +483,8 @@ row.names(akurasi) <- c("SSE","MSE")
 akurasi
 ```
 
-Berdasarkan hasil tersebut dapat diketahui bahwa hasil penanganan autokorelasi dengan metode Cochrane-Orcutt dan Hildreth-Lu memiliki SSE yang sama, sebesar $0.23975$ dan lebih baik dibandingkan model awal ketika autokorelasi masih terjadi, yaitu sebesar $0.3286364$.
+Berdasarkan hasil tersebut dapat diketahui bahwa hasil penanganan autokorelasi dengan metode Cochrane-Orcutt dan Hildreth-Lu memiliki SSE yang sama, sebesar $28252.6084$ dan lebih baik dibandingkan model awal ketika autokorelasi masih terjadi, yaitu sebesar $28563.5224$.
 
 # Kesimpulan
 
-Autokorelasi yang terdapat pada data IPM terjadi akibat adanya korelasi di antara unsur penyusunnya. Indikator IPM yang erat hubungannya dengan perekonomian sangat rawan menjadi penyebab adanya autokorelasi. Adanya autokorelasi menyebabkan model regresi kurang baik karena akan meingkatkan galatnya. Autokorelasi dapat dideteksi secara eksploratif melalui plot sisaan, ACF, dan PACF, serta dengan uji formal Durbin-Watson. Namun, autokorelasi tersebut dapat ditangani dengan metode Cochrane-Orcutt dan Hildreth-Lu. Kedua metode menghasilkan nilai SSE yang sama, artinya keduanya baik untuk digunakan.
+Adanya autokorelasi menyebabkan model regresi kurang baik karena akan meingkatkan galatnya. Autokorelasi dapat dideteksi secara eksploratif melalui plot sisaan, ACF, dan PACF, serta dengan uji formal Durbin-Watson. Namun, autokorelasi tersebut dapat ditangani dengan metode Cochrane-Orcutt dan Hildreth-Lu. Kedua metode menghasilkan nilai SSE yang sama, artinya keduanya baik untuk digunakan.
