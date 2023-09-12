@@ -1,6 +1,4 @@
-# STA1341-MPDW
-File Tugas Praktikum 1 ada di folder `Pertemuan 1` dengan nama file `Prak01.rmd`  
-File Data ada di folder `Data`  
+# STA1341-MPDW  
   
 Kalo mau download Semua file di repo pake ini:  
 https://download-directory.github.io/
