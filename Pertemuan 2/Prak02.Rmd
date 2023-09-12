@@ -230,7 +230,7 @@ Artinya, minimal terdapat satu **variabel yang berpengaruh** nyata terhadap mode
 
 ### Plot
 
-```{#sisaan dan fitted value}
+```{r dpi=300, fig2, fig.height = 9, fig.width = 16, fig.align = "center"}
 sisaan<- residuals(model)
 fitValue<- predict(model)
 
@@ -369,33 +369,12 @@ rho
 
 ### Transformasi Manual
 
-Selanjutnya akan dilakukan transformasi secara manual dengan syntax berikut ini.
+Selanjutnya akan dilakukan transformasi secara manual dengan : `data tanpa amatan pertama` - `data tanpa amatan terakhir` $\times$ `rho`
 
 ```{r}
-y.trans  <- data [-1,1] - data [-12,1] * rho
-x1.trans <- data [-1,2] - data [-12,2] * rho
-x2.trans <- data [-1,3] - data [-12,3] * rho
-x3.trans <- data [-1,4] - data [-12,4] * rho
-x4.trans <- data [-1,5] - data [-12,5] * rho
-x5.trans <- data [-1,6] - data [-12,6] * rho
-x6.trans <- data [-1,7] - data [-12,7] * rho
-x7.trans <- data [-1,8] - data [-12,8] * rho
-trans <- as.data.frame(cbind(y.trans, x1.trans, x2.trans, x3.trans, x4.trans, 
-                             x5.trans, x6.trans, x7.trans))
-View(trans)
-modelCOmanual <- lm(y.trans ~ x1.trans + x2.trans + x3.trans + x4.trans + x5.trans + 
-                      x6.trans + x7.trans, trans)
+trans <- data[-1,] - data[-nrow(data),] * rho
+modelCOmanual <- lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7, trans)
 summary(modelCOmanual)
-```
-
-```{r}
-trans1 <- data %>%
-  mutate(across(everything(), ~ lead(.) - nth(., 12) * rho)) %>%
-  rename_with(~ paste0(.x, ".trans"), everything()) %>%
-  slice(-1)
-View(trans1)
-modelCOmanual1 <- lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7, trans1)
-summary(modelCOmanual1)
 ```
 
 Hasil model transformasi bukan merupakan model sesungguhnya. Koefisien regresi masih perlu dicari kembali mengikuti ${\beta_0}^*=\beta_0+\hat{\rho}\beta_0$ dan $\beta_1^*=\beta_1$.
@@ -403,14 +382,14 @@ Hasil model transformasi bukan merupakan model sesungguhnya. Koefisien regresi m
 ### Mencari Penduga Koefisien Regresi setelah Transformasi ke Persamaan Awal
 
 ```{r}
-b0bintang <- modelCOmanual$coefficients[-2]
-b0 <- b0bintang/(1-rho)
-b1 <- modelCOmanual$coefficients[-1]
-b0
-```
-
-```{r}
-b1
+#Mencari Penduga Koefisien Regresi setelah Transformasi ke Persamaan Awal
+b0bintang <- coef(modelCOmanual) %>%
+  as.data.frame() %>%
+  t() %>%
+  as_tibble() %>%
+  setNames(c("b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7"))
+b0bintang$b0 <- b0bintang$b0/(1 - rho)
+knitr::kable(b0bintang) %>% kableExtra::kable_styling()
 ```
 
 Hasil perhitungan koefisien regresi tersebut akan menghasilkan hasil yang sama dengan model yang dihasilkan menggunakan *packages*.
