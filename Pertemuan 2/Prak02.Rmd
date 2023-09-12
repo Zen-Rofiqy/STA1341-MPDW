@@ -123,11 +123,6 @@ return(b)
 lab1 <- data.frame(title='Distribution of Data X', ylab='', xlab='Data X')
 ```
 
-```{r}
-#Export chart
-export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 2/Chart"
-```
-
 # A. Tentang Data
 
 Dataset ini dibangun dari dataset awal yang terdiri dari $600.000$ data transaksi yang dikumpulkan dalam waktu 6 tahun (periode 2014-2019), yang mencatat tanggal dan waktu penjualan, nama merek obat farmasi, dan jumlah yang terjual. Data ini diekspor dari sistem *Point-of-Sale* di apotek individu. Kelompok obat yang dipilih dari dataset (57 obat) diklasifikasikan ke dalam kategori berikut dalam Sistem Klasifikasi Anatomi Terapeutik Kimia (ATC):
@@ -315,7 +310,7 @@ dwtest(model)
 
 Berdasarkan hasil DW Test, didapatkan nilai $DW = 1.2495$ dan $p.value = 0.0001048$. Dengan nilai $p.value < 0.05$ dapat disimpulkan bahwa **tolak** $H_0$, cukup bukti mengatakan adanya autokorelasi. Oleh karena itu, diperlukan penanganan autokorelasi. Penanganan yang akan digunakan menggunakan dua metode, yaitu Cochrane-Orcutt dan Hildret-Lu.
 
-# Penanganan Autokorelasi
+# D. Penanganan Autokorelasi
 
 ### Metode Cochrane-Orcutt
 
@@ -366,7 +361,7 @@ kable(b0bintang) %>% kable_styling()
 
 Hasil perhitungan koefisien regresi tersebut akan menghasilkan hasil yang sama dengan model yang dihasilkan menggunakan *packages*.
 
-# Metode Hildreth-Lu
+# E. Metode Hildreth-Lu
 
 Penanganan kedua adalah menggunakan metode Hildreth-Lu. Metode ini akan mencari nilai SSE terkecil dan dapat dicari secara manual maupun menggunakan packages. Jika menggunakan packages, gunakan `library` *packages* `HORM`.
 
@@ -485,6 +480,6 @@ akurasi
 
 Berdasarkan hasil tersebut dapat diketahui bahwa hasil penanganan autokorelasi dengan metode Cochrane-Orcutt dan Hildreth-Lu memiliki SSE yang sama, sebesar $28252.6084$ dan lebih baik dibandingkan model awal ketika autokorelasi masih terjadi, yaitu sebesar $28563.5224$.
 
-# Kesimpulan
+# II. Kesimpulan
 
 Adanya autokorelasi menyebabkan model regresi kurang baik karena akan meingkatkan galatnya. Autokorelasi dapat dideteksi secara eksploratif melalui plot sisaan, ACF, dan PACF, serta dengan uji formal Durbin-Watson. Namun, autokorelasi tersebut dapat ditangani dengan metode Cochrane-Orcutt dan Hildreth-Lu. Kedua metode menghasilkan nilai SSE yang sama, artinya keduanya baik untuk digunakan.
