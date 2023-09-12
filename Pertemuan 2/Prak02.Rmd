@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-# Setting
+# I. Setting
 
 Abaikan bagian ini. Lansung saja loncat ke `1. Tentang Data` . `Function` biar gak perlu ganti `backslash` (`\`) jadi `slash` (`/`).
 
@@ -40,66 +40,15 @@ install_load <- function (package1, ...)  {
 }
 ```
 
-`Function` buat deteksi *Outlier.*
-
-```{r}
-#                            -=( Is outlier? Funciton )=-
-is_outlier <- function(x) {
-  return(x < quantile(x,0.25) -1.5*IQR(x) | x > quantile(x,0.75) +1.5*IQR(x))
-}
-```
-
-`Function` Data untuk *box plot* `function`.
-
-```{r}
-#                      -=( Ggplot Stat Attribute Funciton )=-
-gstat <- function(dt){
-  install_load("dplyr","tibble")
-  
-  #Set Data Frame
-  dt <- data.frame(obs = dt[[1]], dat = dt[[2]], row.names = dt[[1]])
-  
-  #ID/obs outlier (oo)
-  oo <- dt %>%
-  rownames_to_column(var = "outlier") %>%
-  mutate(is_outlier = if_else(is_outlier(dat), dat, as.numeric(NA))) %>%
-  mutate(outlier = if_else(is.na(is_outlier) | is_outlier == max(dat) 
-                           | is_outlier == min(dat), as.numeric(NA), 
-                             as.numeric(outlier)),
-         is_outlier = if_else(is_outlier == max(dat) 
-                              | is_outlier == min(dat), 
-                                as.numeric(NA), is_outlier))
-  
-  #Obs Minimum
-  om <- data.frame(min = ifelse(dt$dat == min(dt$dat), dt$obs, NA), 
-                   min_val = ifelse(dt$dat == min(dt$dat), min(dt$dat), NA))
-  #Obs Maximum
-  omx <- data.frame(max = ifelse(dt$dat == max(dt$dat), dt$obs, NA), 
-                    max_val = ifelse(dt$dat == max(dt$dat), max(dt$dat), NA))
-  #Binding together
-  gs <- cbind(oo, om, omx)
-  
-  #Calc Mean
-  mean <- data.frame(mean = round(mean(dt$dat), 2))
-  
-  #Make it list
-  gs <- list(gs, mean)
-return(gs)
-}
-```
-
 `Variabel` untuk warna pada `function` *box plot.*
 
 ```{r}
 #                           -=( Default Color Palette )=-
 colord <- data.frame(
-  f = c('#75bfc8', 'Fill color'),        c = c('#444442', 'Stroke color'),
-  oc = c('#0b5f6a', 'Outlier color'),    min = c('#0b5f6a', 'Minimum value color'),
-  max = c('#0b5f6a', 'Max value color'), med = c('#c3ac8b', 'Median value color'),
-  iqr = c('#c3ac8b', 'IQR3 Value'),      mean = c('#608981', 'Mean Marker'),
-  ooc = c('#0b5f6a', 'Oulier Obs color'), 
-  ovc = c('#0b5f6a', 'Oulier Value color'), v = c('#c3eca2', 'Violin'),
-  meanv = c('#608981', 'Mean Value'),    moc = c('#0b5f6a', 'Min Max Obs'),
+  f = c('#75bfc8', 'Fill color'),       c = c('#444442', 'Stroke color'),
+  oc = c('#0b5f6a', 'Outlier color'),   med = c('#c3ac8b', 'Median value color'),
+  iqr = c('#c3ac8b', 'IQR3 Value'),     mean = c('#608981', 'Mean Marker'),
+  v = c('#c3eca2', 'Violin'),
   stringsAsFactors = FALSE
 )
 ```
@@ -129,8 +78,7 @@ theme1 <- list(
 #                           -=( Box Plot Function )=-
 boxp <- function(dt, cp=colord, labs=lab1){ #data, color palette, label
   install_load('ggplot2')
-  gs <- gstat(dt)
-  b <- ggplot(data=gs[[1]], aes(y="", x=dat)) + 
+  b <- ggplot(data=dt, aes(y="", x=y)) + 
         #Violin Plot
         geom_violin(scale="count", fill=cp$v[1], color=NA, alpha=0.5, 
                     trim = FALSE) +
@@ -159,7 +107,8 @@ boxp <- function(dt, cp=colord, labs=lab1){ #data, color palette, label
         #Labels
         ylab(labs$ylab) + xlab(labs$xlab) +
         #Mean Value
-        geom_text(data = gs[[2]], aes(label = paste0("Mean : ",mean), x = mean),
+        geom_text(data = data.frame(mean = round(mean(dt$y), 2))
+                    , aes(label = paste0("Mean : ",mean), x = mean),
                   angle=45, size=16, vjust=-0.5, hjust=0.5, color=cp$mean[1]) + 
         #Theme
         theme1
@@ -179,6 +128,23 @@ lab1 <- data.frame(title='Distribution of Data X', ylab='', xlab='Data X')
 export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 2/Chart"
 ```
 
+# A. Tentang Data
+
+Dataset ini dibangun dari dataset awal yang terdiri dari $600.000$ data transaksi yang dikumpulkan dalam waktu 6 tahun (periode 2014-2019), yang mencatat tanggal dan waktu penjualan, nama merek obat farmasi, dan jumlah yang terjual. Data ini diekspor dari sistem *Point-of-Sale* di apotek individu. Kelompok obat yang dipilih dari dataset (57 obat) diklasifikasikan ke dalam kategori berikut dalam Sistem Klasifikasi Anatomi Terapeutik Kimia (ATC):
+
+1.  M01AB - Produk antiinflamasi dan antirheumatik, non-steroid, Turunan asam asetat dan substansi terkait
+2.  M01AE - Produk antiinflamasi dan antirheumatik, non-steroid, Turunan asam propionat
+3.  N02BA - Analgesik dan antipiretik lainnya, Asam salisilat dan turunannya N02BE/B -
+4.  Analgesik dan antipiretik lainnya, Pirazolona dan Anilida
+5.  N05B - Obat psikoleptik, Obat ansiolitik
+6.  N05C - Obat psikoleptik, Obat hipnotik dan sedatif
+7.  R03 - Obat untuk penyakit saluran napas obstruktif
+8.  R06 - Antihistamin untuk penggunaan sistemik
+
+Data penjualan diambil ulang dalam periode per jam, per hari, per minggu, dan per bulan. Data sudah diproses sebelumnya, termasuk deteksi dan penanganan outlier serta pengisian data yang hilang.
+
+Data yang akan saya gunakan adalah data dalam periode per bulan. Obat `M01AB` dan `M01AE` merupakan obat yang sama, namun dengan bahan dasar yang berbeda. Saya penasaran "*Apakah penjualan obat `M01AB` dipengaruhi oleh penjualan obat `M01AB` dan obat-obat lainnya?"* Sehingga saya memilih Peubah `M01AB` sebagai peubah respon `Y`. Dan peubah lainnya sebagai peubah penjelas `X`.
+
 ### Import Data
 
 ```{r}
@@ -194,28 +160,33 @@ data <- raw.data[,2:9] %>%
   rename_all(~ c('y', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7'))
 ```
 
-```{r}
-y  <- raw.data[,4]
-x1 <- raw.data[,2]
-x2 <- raw.data[,3]
-x3 <- raw.data[,5]
-x4 <- raw.data[,6]
-dt <- as.data.frame(cbind(y,x1,x2,x3,x4))
-```
+# B. Explorasi
 
-# Explorasi
+### Sebaran Peubah Respon
 
 ```{r dpi=300, fig1, fig.height = 17, fig.width = 50, fig.align = "center"}
-boxp( dt =
-  data %>%
-    mutate(Index = 1:nrow(.)) %>%
-    filter(!is.na(y)) %>%
-    select(Index, y),
+boxp( dt = data,
   labs = data.frame(title='Sebaran Peubah y', ylab='', xlab='Obat M01AB')
   )
 ```
 
-# Regresi
+### Matriks Korelasi
+
+```{r dpi=300, fig2, fig.height = 9, fig.width = 16, fig.align = "center"}
+install_load('psych')
+pairs.panels(data,
+             method = "pearson", # correlation method
+             hist.col = "#00AFBB", #Coloring histogram
+             density = TRUE,  # show density plots
+             ellipses = TRUE, # show correlation ellipses
+             smooth = TRUE, #show loess smooths
+             pch = 20, #Scatter = cirlce / dot
+             rug = TRUE, #Rug under histogram
+             stars = TRUE #Significance of corr
+             )
+```
+
+# C. Regresi
 
 ### Model Regresi
 
@@ -224,11 +195,11 @@ model <- lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7, data)
 summary(model)
 ```
 
-Model yang dihasilkan adalah $\hat{y}= 2.85 + 0.17x_1 + 0.11x_2 + 0.02x_3 + -0.0005x_4 + 0.02x_5 + 0.02x_6 + 0.012x_7$ . Berdasarkan ringkasan model dapat diketahui bahwa hasil uji F memiliki $p.value ( 2.2\times10^{-16} ) < \alpha (5\%)$.
+Model yang dihasilkan adalah $\hat{y}= 51.27 + 0.46x_1 + 0.16x_2 + 0.01x_3 - 0.03x_4 - 0.08x_5 + 0.02x_6 + 0.023x_7$ . Berdasarkan ringkasan model dapat diketahui bahwa hasil uji F memiliki $p.value ( 6.328 \times10^{-7} ) < \alpha (5\%)$.
 
-Artinya, minimal terdapat satu **variabel yang berpengaruh** nyata terhadap model. Hasil uji-t parsial kedua parameter regresi, yaitu intersep dan koefisien regresi juga menunjukkan hal yang sama, yaitu memiliki $p.value < \alpha (5\%)$ sehingga nyata dalam taraf $5\%$. Selanjutnya dapat dilihat juga nilai $R^2=0.07101$. Artinya, sebesar $71.01\%$ keragaman penjualan obat `M01AB` dapat dijelaskan oleh penjualan 7 obat lainnya. Hasil ini menunjukkan hasil yang bagus, seolah mendapatkan hasil terbaik. Namun, kita perlu melakukan uji terhadap sisaannya seperti berikut ini.
+Artinya, minimal terdapat satu **variabel yang berpengaruh** nyata terhadap model. Hasil uji-t parsial kedua parameter regresi, yaitu intersep dan koefisien regresi juga menunjukkan hal yang sama, yaitu memiliki $p.value < \alpha (5\%)$ sehingga nyata dalam taraf $5\%$. Selanjutnya dapat dilihat juga nilai $R^2=0.4166$. Artinya, sebesar $41.66\%$ keragaman penjualan obat `M01AB` dapat dijelaskan oleh penjualan 7 obat lainnya. Selanjutnya kita perlu melakukan uji terhadap sisaannya seperti berikut ini.
 
-### Plot
+### Plot Sisaan & Q-Q Plot
 
 ```{r dpi=300, fig2, fig.height = 9, fig.width = 16, fig.align = "center"}
 sisaan<- residuals(model)
@@ -265,10 +236,10 @@ Dua plot di samping kiri digunakan untuk melihat apakah sisaan menyebar normal. 
 install_load('ggplot2','cowplot')
 # Membuat QQ Plot
 qq_plot <- ggplot(data, aes(sample = y)) +
-  geom_qq(fill=NA, alpha=0.25) +
+  geom_qq(fill=NA, alpha=0.5) +
   geom_qq_line(color = "steelblue") +
   labs(x = "Theoretical Quantiles", y = "Sample Quantiles") +
-  ggtitle("QQ Plot")
+  ggtitle("QQ Plot") + theme_minimal()
 
 # Membuat plot sisaan vs Fitted Values dengan ggplot2
 plot1 <- ggplot(data, aes(x = fitted(model), y = residuals(model))) +
@@ -276,13 +247,13 @@ plot1 <- ggplot(data, aes(x = fitted(model), y = residuals(model))) +
   geom_abline(intercept = 0, slope = 0, color = "black", 
               size = 0.75, alpha=0.5) +
   labs(x = "Fitted Values", y = "Residuals") +
-  ggtitle("Residuals vs Fitted Values")
+  ggtitle("Residuals vs Fitted Values") + theme_minimal()
 
 # Membuat histogram sisaan dengan ggplot2
 plot2 <- ggplot(data, aes(x = residuals(model))) +
-  geom_histogram(binwidth = 1, fill = "steelblue", color = "black") +
+  geom_histogram(binwidth = 10, fill = "steelblue", color = "black") +
   labs(x = "Residuals", y = "Frequency") +
-  ggtitle("Histogram of Residuals")
+  ggtitle("Histogram of Residuals") + theme_minimal()
 
 # Membuat plot sisaan vs Order dengan ggplot2
 plot3 <- ggplot(data, aes(x = 1:length(residuals(model)), y = residuals(model))) +
@@ -292,7 +263,7 @@ plot3 <- ggplot(data, aes(x = 1:length(residuals(model)), y = residuals(model)))
   geom_line(aes(x = 1:length(residuals(model)), 
                 y = residuals(model)), color = "red", alpha=0.5) + 
   labs(x = "Order", y = "Residuals") +
-  ggtitle("Residuals vs Order")
+  ggtitle("Residuals vs Order") + theme_minimal()
 
 # Menggabungkan semua plot dengan cowplot
 plot_grid(qq_plot, plot1, plot2, plot3, nrow = 2, ncol = 2)
@@ -389,7 +360,8 @@ b0bintang <- coef(modelCOmanual) %>%
   as_tibble() %>%
   setNames(c("b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7"))
 b0bintang$b0 <- b0bintang$b0/(1 - rho)
-knitr::kable(b0bintang) %>% kableExtra::kable_styling()
+install_load('knitr','kableExtra')
+kable(b0bintang) %>% kable_styling()
 ```
 
 Hasil perhitungan koefisien regresi tersebut akan menghasilkan hasil yang sama dengan model yang dihasilkan menggunakan *packages*.
@@ -417,8 +389,10 @@ hildreth.lu.func<- function(r, model){
 
 ```{r}
 r <- c(seq(0.1,0.9, by= 0.1))
-tab <- data.frame("rho" = r, "SSE" = sapply(r, function(i){deviance(hildreth.lu.func(i, model))}))
-round(tab, 4)
+tab <- data.frame("rho" = r, "SSE" = sapply(r, 
+                    function(i)deviance(hildreth.lu.func(i, model)) ) )
+
+kable(round(tab, 4)) %>% kable_styling()
 ```
 
 Pertama-tama akan dicari di mana kira-kira $\rho$ yang menghasilkan SSE minimum. Pada hasil di atas terlihat $\rho$ minimum ketika $0.3$. Namun, hasil tersebut masih kurang teliti sehingga akan dicari kembali $\rho$ yang lebih optimum dengan ketelitian yang lebih. Jika sebelumnya jarak antar $\rho$ yang dicari adalah $0.1$, kali ini jarak antar $\rho$ adalah $0.001$ dan dilakukan pada selang $0.2$ sampai dengan $0.5$.
@@ -428,7 +402,7 @@ Pertama-tama akan dicari di mana kira-kira $\rho$ yang menghasilkan SSE minimum.
 ```{r}
 rOpt <- seq(0.2,0.5, by= 0.001)
 tabOpt <- data.frame("rho" = rOpt, "SSE" = sapply(rOpt, function(i){deviance(hildreth.lu.func(i, model))}))
-head(tabOpt[order(tabOpt$SSE),])
+kable(head(tabOpt[order(tabOpt$SSE),])) %>% kable_styling()
 ```
 
 ### Grafik SSE optimum
