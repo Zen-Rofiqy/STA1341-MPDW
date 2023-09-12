@@ -183,7 +183,7 @@ export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Met
 
 ```{r}
 install_load('rio')
-raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Pertemuan%202/salesdaily.csv")
+raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Pertemuan%202/salesmonthly.csv")
 ```
 
 ### Assign Variable
@@ -194,10 +194,25 @@ data <- raw.data[,2:9] %>%
   rename_all(~ c('y', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7'))
 ```
 
+```{r}
+y  <- raw.data[,4]
+x1 <- raw.data[,2]
+x2 <- raw.data[,3]
+x3 <- raw.data[,5]
+x4 <- raw.data[,6]
+dt <- as.data.frame(cbind(y,x1,x2,x3,x4))
+```
+
 # Explorasi
 
-```{r}
-
+```{r dpi=300, fig1, fig.height = 17, fig.width = 50, fig.align = "center"}
+boxp( dt =
+  data %>%
+    mutate(Index = 1:nrow(.)) %>%
+    filter(!is.na(y)) %>%
+    select(Index, y),
+  labs = data.frame(title='Sebaran Peubah y', ylab='', xlab='Obat M01AB')
+  )
 ```
 
 # Regresi
@@ -209,23 +224,32 @@ model <- lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7, data)
 summary(model)
 ```
 
-Model yang dihasilkan adalah $y_i=-1118+0.5873x_t$ . Berdasarkan ringkasan model dapat diketahui bahwa hasil uji F memiliki $p.value < \alpha (5\%)$. Artinya, minimal terdapat satu variabel yang berpengaruh nyata terhadap model. Hasil uji-t parsial kedua parameter regresi, yaitu intersep dan koefisien regresi juga menunjukkan hal yang sama, yaitu memiliki $p.value < \alpha (5\%)$ sehingga nyata dalam taraf $5\%$. Selanjutnya dapat dilihat juga nilai $R^2=0.9934$. Artinya, sebesar $99.34\%$ keragaman nilai IPM dapat dijelaskan oleh peubah tahun. Hasil ini menunjukkan hasil yang bagus, seolah mendapatkan hasil terbaik. Namun, kita perlu melakukan uji terhadap sisaannya seperti berikut ini.
+Model yang dihasilkan adalah $\hat{y}= 2.85 + 0.17x_1 + 0.11x_2 + 0.02x_3 + -0.0005x_4 + 0.02x_5 + 0.02x_6 + 0.012x_7$ . Berdasarkan ringkasan model dapat diketahui bahwa hasil uji F memiliki $p.value ( 2.2\times10^{-16} ) < \alpha (5\%)$.
+
+Artinya, minimal terdapat satu **variabel yang berpengaruh** nyata terhadap model. Hasil uji-t parsial kedua parameter regresi, yaitu intersep dan koefisien regresi juga menunjukkan hal yang sama, yaitu memiliki $p.value < \alpha (5\%)$ sehingga nyata dalam taraf $5\%$. Selanjutnya dapat dilihat juga nilai $R^2=0.07101$. Artinya, sebesar $71.01\%$ keragaman penjualan obat `M01AB` dapat dijelaskan oleh penjualan 7 obat lainnya. Hasil ini menunjukkan hasil yang bagus, seolah mendapatkan hasil terbaik. Namun, kita perlu melakukan uji terhadap sisaannya seperti berikut ini.
 
 ### Plot
 
-```{r}
-#sisaan dan fitted value
+```{#sisaan dan fitted value}
 sisaan<- residuals(model)
 fitValue<- predict(model)
 
 #Diagnostik dengan eksploratif
-par(mfrow = c(2,2))
+par(mfrow = c(2,2)) #Buat 4 plot
+
+#Q-Q Plot
 qqnorm(sisaan)
 qqline(sisaan, col = "steelblue", lwd = 2)
+
+#Sisaan vs Fitted Values
 plot(fitValue, sisaan, col = "steelblue", pch = 20, 
      xlab = "Sisaan", ylab = "Fitted Values", main = "Sisaan vs Fitted Values")
 abline(a = 0, b = 0, lwd = 2)
+
+#Histogram
 hist(sisaan, col = "steelblue")
+
+#Sisaan vs Order
 plot(1:length(sisaan), sisaan, col = "steelblue", pch = 20, 
      xlab = "Sisaan", 
      ylab = "Order", main = "Sisaan vs Order")
@@ -233,42 +257,48 @@ lines(1:length(sisaan), sisaan, col = "red")
 abline(a = 0, b = 0, lwd = 2)
 ```
 
-Dua plot di samping kiri digunakan untuk melihat apakah sisaan menyebar normal. Normal Q-Q Plot di atas menunjukkan bahwa sisaan cenderung menyebar normal, tetapi histogram dari sisaan tidak menunjukkan demikian. Selanjutnya, dua plot di samping kanan digunakan untuk melihat autokorelasi. Plot Sisaan vs *Fitted Value* dan Plot Sisaan vs *Order* menunjukkan adanya pola pada sisaan. Untuk lebih lanjut akan digunakan uji formal melihat normalitas sisaan dan plot ACF dan PACF untuk melihat apakah ada autokorelasi atau tidak.
+Dua plot di samping kiri digunakan untuk melihat apakah sisaan menyebar normal. Normal Q-Q Plot di atas menunjukkan bahwa sisaan cenderung tidak menyebar normal, tetapi histogram dari sisaan tidak menunjukkan demikian, melainkan sedikit menjulur ke kanan. Selanjutnya, dua plot di samping kanan digunakan untuk melihat autokorelasi. Terlihat ada pola pada sisaan yang ditunjukkan oleh Plot Sisaan vs *Fitted Value* dan terutama pada Plot Sisaan vs *Order* yang terlihat dengan garis warna merahnya yang membentuk pola. Ini merupakan tanda adanya autokorelasi.
 
 ### Dengan ggplot2
 
-```{r}
+```{r dpi=300, fig3, fig.height = 9, fig.width = 16, fig.align = "center"}
 install_load('ggplot2','cowplot')
 # Membuat QQ Plot
 qq_plot <- ggplot(data, aes(sample = y)) +
-  geom_qq() +
-  geom_qq_line(color = "red") +
+  geom_qq(fill=NA, alpha=0.25) +
+  geom_qq_line(color = "steelblue") +
   labs(x = "Theoretical Quantiles", y = "Sample Quantiles") +
   ggtitle("QQ Plot")
 
 # Membuat plot sisaan vs Fitted Values dengan ggplot2
 plot1 <- ggplot(data, aes(x = fitted(model), y = residuals(model))) +
   geom_point(col = "steelblue", pch = 20) +
-  geom_abline(intercept = 0, slope = 0, color = "red", linetype = "dashed", size = 1) +
+  geom_abline(intercept = 0, slope = 0, color = "black", 
+              size = 0.75, alpha=0.5) +
   labs(x = "Fitted Values", y = "Residuals") +
   ggtitle("Residuals vs Fitted Values")
 
 # Membuat histogram sisaan dengan ggplot2
 plot2 <- ggplot(data, aes(x = residuals(model))) +
-  geom_histogram(binwidth = 1, fill = "steelblue", color = "white") +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "black") +
   labs(x = "Residuals", y = "Frequency") +
   ggtitle("Histogram of Residuals")
 
 # Membuat plot sisaan vs Order dengan ggplot2
 plot3 <- ggplot(data, aes(x = 1:length(residuals(model)), y = residuals(model))) +
   geom_point(col = "steelblue", pch = 20) +
-  geom_abline(intercept = 0, slope = 0, color = "red", linetype = "dashed", size = 1) +
+  geom_abline(intercept = 0, slope = 0, color = "black", 
+              size = 1, alpha=0.5) +
+  geom_line(aes(x = 1:length(residuals(model)), 
+                y = residuals(model)), color = "red", alpha=0.5) + 
   labs(x = "Order", y = "Residuals") +
   ggtitle("Residuals vs Order")
 
 # Menggabungkan semua plot dengan cowplot
 plot_grid(qq_plot, plot1, plot2, plot3, nrow = 2, ncol = 2)
 ```
+
+Untuk lebih lanjut akan digunakan uji formal melihat normalitas sisaan dan plot ACF dan PACF untuk melihat apakah ada autokorelasi atau tidak.
 
 ### Melihat Sisaan Menyebar Normal/Tidak
 
@@ -284,7 +314,7 @@ shapiro.test(sisaan)
 ks.test(sisaan, "pnorm", mean=mean(sisaan), sd=sd(sisaan))
 ```
 
-Berdasarkan uji formal Saphiro-Wilk dan Kolmogorov-Smirnov didapatkan nilai $p.value > \alpha (5\%)$. Artinya, cukup bukti untuk menyatakan sisaan berdistribusi normal.
+Berdasarkan uji formal Saphiro-Wilk dan Kolmogorov-Smirnov didapatkan nilai $p.value < \alpha (5\%)$. Artinya, **tidak cukup bukti** untuk menyatakan sisaan berdistribusi normal.
 
 ### ACF dan PACF identifikasi autokorelasi
 
@@ -294,20 +324,27 @@ acf(sisaan)
 pacf(sisaan)
 ```
 
-Berdasarkan plot ACF dan PACF, terlihat semua dalam rentang batas dan tidak ada yang signifikan. Namun, untuk lebih memastikan akan dilakukan uji formal dengan uji Durbin Watson.
+Berdasarkan plot ACF dan PACF, terlihat semua dalam rentang batas dan hanya ada 1 yang signifikan pada plot ACF. Namun, untuk lebih memastikan akan dilakukan uji formal dengan uji Durbin Watson.
 
 ### Deteksi autokorelasi dengan uji-Durbin Watson
 
 $H_0$ : Tidak ada autokorelasi
 
-$H_1$ : Ada autokorelasi
+$H_1$ : Ada autokorelasi\
+
+```{r}
+install_load('randtests')
+runs.test(model$residuals)
+```
 
 ```{r}
 install_load('lmtest')
 dwtest(model)
 ```
 
-Berdasarkan hasil DW Test, didapatkan nilai $DW = 1.2644$ dan $p.value = 0.03741$. Berdasarkan tabel Durbin-Watson diperoleh nilai $DL = 0.9771$ dan $DU = 1.331$. Nilai DW masih berada di antara nilai DL dan DU. Artinya, berada di daerah inkonklusif, tidak dapat dikatakan berada di daerah autokorelasi positif maupun bebas dari autokorelasi. Namun, dengan nilai $p.value < 0.05$ dapat disimpulkan bahwa tolak H0, cukup bukti mengatakan adanya autokorelasi. Oleh karena itu, diperlukan penangan autokorelasi. Penanganan yang akan digunakan menggunakan dua metode, yaitu Cochrane-Orcutt dan Hildret-Lu.
+# @HELP
+
+Berdasarkan hasil DW Test, didapatkan nilai $DW = 1.9482$ dan $p.value = 0.112$. **Berdasarkan tabel Durbin-Watson diperoleh nilai** $DL = 0.9771$ **dan** $DU = 1.331$**.** Nilai DW masih berada di antara nilai DL dan DU. Artinya, berada di daerah inkonklusif, tidak dapat dikatakan berada di daerah autokorelasi positif maupun bebas dari autokorelasi. Namun, dengan nilai $p.value > 0.05$ dapat disimpulkan bahwa **tak tolak** $H_0$, cukup bukti mengatakan adanya autokorelasi. Oleh karena itu, diperlukan penangan autokorelasi. Penanganan yang akan digunakan menggunakan dua metode, yaitu Cochrane-Orcutt dan Hildret-Lu.
 
 # Penanganan Autokorelasi
 
