@@ -15,9 +15,10 @@ Berikut adalah kode obat yang tersedia dan deskripsinya:
 5. `N05B`  : Obat psikoleptik, ansiolitik.
 6. `N05C`  : Obat psikoleptik, obat tidur dan penenang.
 7. `R03`   : Obat untuk penyakit saluran napas obstruktif.
-8. `R06`   : Antihistamin untuk penggunaan sistemik.
-Saya memilih Peubah `M01AB` sebagai peubah respon `Y`. Dan peubah lainnya sebagai peubah penjelas `X`.  
-Sehingga saya akan melihat _Apakah penjualan obat lain di farmasi ini memperngaruhi penjualan obat `M01AB`?_  
+8. `R06`   : Antihistamin untuk penggunaan sistemik.  
+Obat `M01AB` dan `M01AE` merupakan obat yang sama, namun dengan bahan dasar yang berbeda.  
+Saya penasaran _Apakah penjualan obat `M01AB` dipengaruhi oleh penjualan obat `M01AB` dan obat-obat lainnya?_  
+Sehingga saya memilih Peubah `M01AB` sebagai peubah respon `Y`. Dan peubah lainnya sebagai peubah penjelas `X`.  
   
 ## Link RPUBS
 Agar _memudahkan_ untuk dibaca..  
