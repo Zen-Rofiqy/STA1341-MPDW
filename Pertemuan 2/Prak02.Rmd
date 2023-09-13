@@ -322,7 +322,7 @@ modelCO <- cochrane.orcutt(model)
 modelCO
 ```
 
-Hasil keluaran model setelah dilakukan penanganan adalah sebagai berikut. $y_i= 26.693862  +  0.318248x_1   + 0.378026   - 0.000166x_3   + 0.097630x_4   - 0.029786x_5   +  0.020880x_6 +    0.175696x_7$ Hasil juga menunjukkan bahwa nilai DW dan p-value meningkat dari $1.048 \times 10^{-4}$ menjadi $0.3785$, dengan nilai $p.value > 0.05$, artinya belum cukup bukti menyatakan bahwa sisaan terdapat autokorelasi pada taraf nyata $5\%$.
+Hasil keluaran model setelah dilakukan penanganan adalah sebagai berikut. $y_i= 26.693862 + 0.318248x_1 + 0.378026 - 0.000166x_3 + 0.097630x_4 - 0.029786x_5 + 0.020880x_6 + 0.175696x_7$ Hasil juga menunjukkan bahwa nilai DW dan p-value meningkat dari $1.048 \times 10^{-4}$ menjadi $0.3785$, dengan nilai $p.value > 0.05$, artinya belum cukup bukti menyatakan bahwa sisaan terdapat autokorelasi pada taraf nyata $5\%$.
 
 ### Rho optimum
 
