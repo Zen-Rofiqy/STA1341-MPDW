@@ -67,7 +67,7 @@ Namun ada beberapa perbedaan, diantaranya: `N05B` lebih fokus pada **obat penena
 
 **Tujuan Praktikum** kali ini adalah membuat Model Regresi dengan Peubah Lag terbaik. ***Lag*** secara bahasa sendiri memiliki arti **keterlambatan.** Bisa dikatakan ***Lag*** mengacu pada nilai suatu variabel pada **waktu sebelumnya** dalam rangkaian data waktu.
 
-Kali ini saya akan melihat *"Apakah **penjualan** obat penenang `N05B`* *pada **periode*** ***waktu saat inidipengaruhi*** *oleh penjualan obat tidur `N05C`* *pada **periode waktu sebelumnya?**"* Atau *"Apakah **penjualan** obat tidur `N05C`**periodesebelumnya** memiliki **pengaruh signifikan** terhadap **penjualan** obat penenang `N05B`* *pada **periode*** ***waktu saat ini* ?***.*
+Kali ini saya akan melihat *"Apakah **penjualan** obat penenang `N05B`* *pada **periode*** ***waktu saat inidipengaruhi*** *oleh penjualan obat tidur `N05C`* *pada **periode waktu sebelumnya?**"* Atau *"Apakah **penjualan** obat tidur `N05C`**periodesebelumnya** memiliki **pengaruh signifikan** terhadap **penjualan** obat penenang `N05B`* *pada **periode*** ***waktu saat ini*** **?***.*
 
 ### Import Data
 
@@ -411,4 +411,4 @@ Berdasarkan plot tersebut, terlihat bahwa plot yang paling mendekati data aktual
 
 # C. Kesimpulan
 
-Penjualan obat tidur `N05C` periode sebelumnya **memiliki pengaruh signifikan** terhadap penjualan obat penenang `N05B` pada periode waktu saat ini obat. Model Regresi terbaik degan Peubah Lag nya adalah **Model Regresi Autoregressive.** Dengan urutan kebaikan model dari yang terbaik adalah **`Autoregressive`** (`MAPE` = $0.3$ ; *"Sangat Baik"*), **`DLM 2`** (`MAPE` = $0.45$ ; "*Sangat Baik"*), **`DLM 1`** (`MAPE` = $15.06$ ; "*Baik*"), dan **`Koyck`** (`MAPE` = $17.5$ ; *"Baik"*).
+Penjualan obat tidur `N05C` periode sebelumnya **memiliki pengaruh signifikan** terhadap penjualan obat penenang `N05B` pada periode waktu saat ini obat. Model Regresi terbaik degan Peubah Lag nya adalah **Model Regresi Autoregressive.** Dengan urutan kebaikan model dari yang terbaik adalah **`Autoregressive`** (`MAPE` = $0.3$ ; *"Sangat Baik"*), **`DLM 2`** (`MAPE` = $0.45$ ; "*Sangat Baik"*), **`DLM 1`** (`MAPE` = $15.06$ ;"*Baik*"), dan **`Koyck`** (`MAPE` = $17.5$ ; *"Baik"*).
