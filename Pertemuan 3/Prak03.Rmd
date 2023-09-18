@@ -7,8 +7,6 @@ output:
     theme: yeti
     toc: true
     toc_float: true
-  word_document: default
-  pdf_document: default
 ---
 
 # I. Setting
@@ -46,131 +44,55 @@ install_load <- function (package1, ...)  {
 }
 ```
 
-`Variabel` untuk warna pada `function` *box plot.*
-
-```{r}
-#                           -=( Default Color Palette )=-
-colord <- data.frame(
-  f = c('#75bfc8', 'Fill color'),       c = c('#444442', 'Stroke color'),
-  oc = c('#0b5f6a', 'Outlier color'),   med = c('#c3ac8b', 'Median value color'),
-  iqr = c('#c3ac8b', 'IQR3 Value'),     mean = c('#608981', 'Mean Marker'),
-  v = c('#c3eca2', 'Violin'),
-  stringsAsFactors = FALSE
-)
-```
-
-`Variabel` untuk `ggplot` *theme.*
-
-```{r}
-install_load('ggplot2')
-theme1 <- list(
-  guides(fill="none") , #No Legends
-  theme(
-  text = element_text(size = 66),
-  axis.title = element_text(),
-  axis.text.x = element_text(hjust = 0.5, face = "bold", margin = margin(b=50)),
-  plot.title = element_text(hjust = 0.5, face = "bold", margin = margin(b=50)),
-  plot.subtitle = element_text(hjust = 0.5),
-  panel.background = element_rect(fill = 'transparent'),
-  plot.background = element_rect(fill='transparent', color=NA),
-  panel.grid.major = element_line(colour = "grey50"),
-  axis.line = element_line(linewidth = 5, colour = "grey80"))
-)
-```
-
-***Box Plot*** `Function`.
-
-```{r}
-#                           -=( Box Plot Function )=-
-boxp <- function(dt, cp=colord, labs=lab1){ #data, color palette, label
-  install_load('ggplot2')
-  b <- ggplot(data=dt, aes(y="", x=y)) + 
-        #Violin Plot
-        geom_violin(scale="count", fill=cp$v[1], color=NA, alpha=0.5, 
-                    trim = FALSE) +
-        #Box Plot
-        geom_boxplot(fill=cp$f[1], color=cp$c[1],
-                     outlier.size=15, outlier.color=cp$oc[1], 
-                     alpha=0.7,notch=T, width = 0.25) +
-        #Median Value
-        stat_summary(geom="text", fun=median,
-                     aes(label=sprintf("%1.1f", after_stat(x))),
-                     position=position_nudge(y=0.425), size=16, color=cp$med[1]) +
-        #IQR1 Value
-        stat_summary(geom="text", fun="quantile", fun.args=list(probs=0.25),
-                     aes(label=sprintf("%1.1f", after_stat(x))),
-                     position=position_nudge(y=-0.425), size=16, color=cp$iqr[1]) +
-        #IQR3 Value
-        stat_summary(geom="text", fun="quantile", fun.args=list(probs=0.75),
-                     aes(label=sprintf("%1.1f", after_stat(x))),
-                     position=position_nudge(y=-0.425), size=16, color=cp$iqr[1]) +
-        #Mean Marker
-        stat_summary(fun='mean', geom="point",colour=cp$mean[1], 
-                     shape=18, size=16, alpha=0.75) +
-        #Title
-        ggtitle(labs$title) + 
-        theme(plot.title = element_text(hjust = 0.5)) + #Title Position
-        #Labels
-        ylab(labs$ylab) + xlab(labs$xlab) +
-        #Mean Value
-        geom_text(data = data.frame(mean = round(mean(dt$y), 2))
-                    , aes(label = paste0("Mean : ",mean), x = mean),
-                  angle=45, size=16, vjust=-0.5, hjust=0.5, color=cp$mean[1]) + 
-        #Theme
-        theme1
-return(b)
-}
-```
-
-*Default* *label* untuk `function` *box plot.*
-
-```{r}
-#                            -=( Default Label/Title )=-
-lab1 <- data.frame(title='Distribution of Data X', ylab='', xlab='Data X')
-```
-
 # A. Tentang Data
 
 Dataset ini dibangun dari dataset awal yang terdiri dari $600.000$ data transaksi yang dikumpulkan dalam waktu 6 tahun (periode 2014-2019), yang mencatat tanggal dan waktu penjualan, nama merek obat farmasi, dan jumlah yang terjual. Data ini diekspor dari sistem *Point-of-Sale* di apotek individu. Kelompok obat yang dipilih dari dataset (57 obat) diklasifikasikan ke dalam kategori berikut dalam Sistem Klasifikasi Anatomi Terapeutik Kimia (ATC):
 
-1.  M01AB - Produk antiinflamasi dan antirheumatik, non-steroid, Turunan asam asetat dan substansi terkait
-2.  M01AE - Produk antiinflamasi dan antirheumatik, non-steroid, Turunan asam propionat
-3.  N02BA - Analgesik dan antipiretik lainnya, Asam salisilat dan turunannya N02BE/B -
-4.  Analgesik dan antipiretik lainnya, Pirazolona dan Anilida
-5.  N05B - Obat psikoleptik, Obat ansiolitik
-6.  N05C - Obat psikoleptik, Obat hipnotik dan sedatif
-7.  R03 - Obat untuk penyakit saluran napas obstruktif
-8.  R06 - Antihistamin untuk penggunaan sistemik
+1.  `M01AB` - Produk antiinflamasi dan antirheumatik, non-steroid, Turunan asam asetat dan substansi terkait
+2.  `M01AE` - Produk antiinflamasi dan antirheumatik, non-steroid, Turunan asam propionat
+3.  `N02BA` - Analgesik dan antipiretik lainnya, Asam salisilat dan turunannya
+4.  `N02BE/B` - Analgesik dan antipiretik lainnya, Pirazolona dan Anilida
+5.  `N05B` - Obat psikoleptik, Obat ansiolitik
+6.  `N05C` - Obat psikoleptik, Obat hipnotik dan sedatif
+7.  `R03` - Obat untuk penyakit saluran napas obstruktif
+8.  `R06` - Antihistamin untuk penggunaan sistemik
 
-Data penjualan diambil ulang dalam periode per jam, per hari, per minggu, dan per bulan. Data sudah diproses sebelumnya, termasuk deteksi dan penanganan outlier serta pengisian data yang hilang.
+Data penjualan diambil ulang dalam periode per jam, per hari, per minggu, dan per bulan. Data sudah diproses sebelumnya, termasuk deteksi dan penanganan outlier serta pengisian data yang hilang. Data yang akan saya gunakan adalah data dalam periode per bulan.
 
-Data yang akan saya gunakan adalah data dalam periode per bulan. Obat `M01AB` dan `M01AE` merupakan obat yang sama, namun dengan bahan dasar yang berbeda. Saya penasaran "*Apakah penjualan obat `M01AB` dipengaruhi oleh penjualan obat `M01AB` dan obat-obat lainnya?"* Sehingga saya memilih Peubah `M01AB` sebagai peubah respon `Y`. Dan peubah lainnya sebagai peubah penjelas `X`.
+Beberapa waktu yang lalu saya merasa sulit untuk tidur. Kebetulan ada obat `N05C` yang merupakan obat tidur dalam dataset saya. `N05C` merupakan obat penenang, sifat tenang ini yang mungkin membantu seseorang untuk tidur. Ternyata ada obat tipe penenang lainnya, yakni `N05B`.
+
+Kedua obat ini memiliki kesamaan yakni termasuk dalam klasifikasi **ATC N** (*Nervous System*), yang berarti keduanya berhubungan dengan **sistem saraf**. Kedua obat ini termasuk dalam kelompok ***"Psycholeptics drugs,"*** yang berarti keduanya dapat memengaruhi **sistem saraf** dan **suasana hati** pasien.
+
+Namun ada beberapa perbedaan, diantaranya: `N05B` lebih fokus pada **obat penenang** dan pengobatan **gangguan kecemasan**. Sementara `N05C` lebih fokus pada **obat tidur** dan pengobatan **gangguan tidur**. Contoh obat-obatan yang termasuk dalam kategori ini berbeda, dengan `N05B` memiliki contoh obat-obatan penenang seperti *benzodiazepin*, sementara `N05C` memiliki obat tidur seperti *zolpidem*.
+
+Obat `M01AB` dan `M01AE` merupakan obat yang sama, namun dengan bahan dasar yang berbeda. Saya penasaran "*Apakah penjualan obat `M01AB` dipengaruhi oleh penjualan obat `M01AB` dan obat-obat lainnya?"* Sehingga saya memilih Peubah `M01AB` sebagai peubah respon `Y`. Dan peubah lainnya sebagai peubah penjelas `X`.
 
 ### Import Data
 
 ```{r}
 install_load('rio')
-raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Pertemuan%202/salesmonthly.csv")
+raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Pertemuan%203/salesmonthly.csv")
 ```
 
 ## Pembagian Data
 
 ```{r}
 #SPLIT DATA
-train<-data[1:15,]
-test<-data[16:20,]
+data <- raw.data
+train <- data[1:round(nrow(data) *80/100),] #80% data
+test <- data[(nrow(train)+1) : nrow(data),] #20% data
 ```
 
 ```{r}
 #data time series
-train.ts<-ts(train)
-test.ts<-ts(test)
-data.ts<-ts(data)
+train.ts <- ts(train)
+test.ts <- ts(test)
+data.ts <- ts(data)
 ```
 
 ## Model Koyck
 
-Model Koyck didasarkan pada asumsi bahwa semakin jauh jarak lag peubah independen dari periode sekarang maka semakin kecil pengaruh peubah lag terhadap peubah dependen.
+**Model Koyck** didasarkan pada asumsi bahwa **semakin jauh** **jarak lag** peubah independen dari periode sekarang maka **semakin kecil pengaruh** peubah lag terhadap peubah dependen.
 
 Koyck mengusulkan suatu metode untuk menduga model dinamis distributed lag dengan mengasumsikan bahwa semua koefisien $\beta$ mempunyai tanda sama.
 
@@ -193,30 +115,34 @@ koyckDlm(x , y , intercept)
 Fungsi `koyckDlm()` akan menerapkan model lag terdistribusi dengan transformasi Koyck satu prediktor. Nilai `x` dan `y` tidak perlu sebagai objek *time series* (`ts`). `intercept` dapat dibuat `TRUE` untuk memasukkan intersep ke dalam model.
 
 ```{r}
+install_load('dLagM')
 #MODEL KOYCK
-model.koyck <- koyckDlm(x = train$Xt, y = train$Yt)
+model.koyck <- koyckDlm(x = train$N05C, y = train$N05B)
 summary(model.koyck)
 AIC(model.koyck)
 BIC(model.koyck)
 ```
 
-Dari hasil tersebut, didapat bahwa peubah $x_t$ dan $y_{t-1}$ memiliki nilai $P-Value<0.05$. Hal ini menunjukkan bahwa peubah $x_t$ dan $y_{t-1}$ berpengaruh signifikan terhadap $y$. Adapun model keseluruhannya adalah sebagai berikut
+Dari hasil tersebut, didapat bahwa peubah $x_t$ dan $y_{t-1}$ memiliki nilai $P.Value(0.0004841)<0.05$. Hal ini menunjukkan bahwa peubah $x_t$ dan $y_{t-1}$ **berpengaruh signifikan** terhadap $y$. Adapun model keseluruhannya adalah sebagai berikut
 
 $$
-\hat{Y_t}=-3.7335+1.1510X_t+0.4214Y_{t-1}
+\hat{Y_t}=146.5938+ 1.0619X_t-9.8906 Y_{t-1}
 $$
 
 ### Peramalan dan Akurasi
 
-Berikut adalah hasil peramalan y untuk 5 periode kedepan menggunakan model koyck
+Berikut adalah hasil peramalan `y` untuk $14$ periode kedepan menggunakan model koyck
 
 ```{r}
-fore.koyck <- forecast(model = model.koyck, x=test$Xt, h=5)
+install_load('MLmetrics')
+fore.koyck <- forecast(model = model.koyck, x=test$N05C, h=14)
 fore.koyck
-mape.koyck <- MAPE(fore.koyck$forecasts, test$Yt)
+mape.koyck <- MAPE(fore.koyck$forecasts, test$N05C)
 #akurasi data training
 GoF(model.koyck)
 ```
+
+Pada perhitungan *keakuratan model* menggunakan **metode Koyck** didapatkan **nilai `MAPE`** $7.89\%$. Nilai akurasi model ini *kurang dari* $10\%$ sehingga dapat dikategorikan **sangat baik.**
 
 ## Regression with Distributed Lag
 
@@ -231,66 +157,68 @@ Fungsi `dlm()` akan menerapkan model lag terdistribusi dengan satu atau lebih pr
 ### Pemodelan (Lag=2)
 
 ```{r}
-model.dlm <- dlm(x = train$Xt,y = train$Yt , q = 2)
+model.dlm <- dlm(x = train$N05C, y = train$N05B , q = 2)
 summary(model.dlm)
 AIC(model.dlm)
 BIC(model.dlm)
 ```
 
-Dari hasil diatas, didapat bahwa $P-value$ dari intercept dan $x_{t-1}<0.05$. Hal ini menunjukkan bahwa intercept dan $x_{t-1}$ berpengaruh signifikan terhadap $y$. Adapun model keseluruhan yang terbentuk adalah sebagai berikut
+Dari hasil diatas, didapat bahwa $P.value$ dari intercept dan $x_{t-1}(1.749\times 10^{-6})<0.05$. Hal ini menunjukkan bahwa intercept dan $x_{t-1}$ **berpengaruh signifikan** terhadap $y$. Adapun model keseluruhan yang terbentuk adalah sebagai berikut
 
 $$
-\hat{Y_t}=-9.6779+0.3179X_t+1.5276X_{t-1}+0.2651X_{t-2}
+\hat{Y_t}=106.58449 + 6.86841X_t + 2.65332X_{t-1} - 0.03826X_{t-2}
 $$
 
 ### Peramalan dan Akurasi
 
-Berikut merupakan hasil peramalan $y$ untuk 5 periode kedepan
+Berikut merupakan hasil peramalan $y$ untuk $14$ periode kedepan
 
 ```{r}
-fore.dlm <- forecast(model = model.dlm, x=test$Xt, h=5)
+fore.dlm <- forecast(model = model.dlm, x=test$N05C, h=14)
 fore.dlm
-mape.dlm <- MAPE(fore.dlm$forecasts, test$Yt)
+mape.dlm <- MAPE(fore.dlm$forecasts, test$N05C)
 #akurasi data training
 GoF(model.dlm)
 ```
+
+Pada perhitungan *keakuratan model* menggunakan **metode Regression with Distributed Lag** didapatkan nilai `MAPE` $3.0037\%$. Nilai akurasi model ini *kurang dari* $10\%$ sehingga dapat dikategorikan **sangat baik.**
 
 ### *Lag* Optimum
 
 ```{r}
 #penentuan lag optimum 
-finiteDLMauto(formula = Yt ~ Xt,
+finiteDLMauto(formula = N05B ~ N05C,
               data = data.frame(train), q.min = 1, q.max = 6,
               model.type = "dlm", error.type = "AIC", trace = FALSE)
 ```
 
-Berdasarkan output tersebut, lag optimum didapatkan ketika lag=6. Selanjutnya dilakukan pemodelan untuk lag=6
+Berdasarkan output tersebut, lag optimum didapatkan ketika `lag`=$6$. Selanjutnya dilakukan pemodelan untuk lag=$6$.
 
 ```{r}
 #model dlm dengan lag optimum
-model.dlm2 <- dlm(x = train$Xt,y = train$Yt , q = 6)
+model.dlm2 <- dlm(x = train$N05C,y = train$N05B , q = 6)
 summary(model.dlm2)
 AIC(model.dlm2)
 BIC(model.dlm2)
 ```
 
-Dari hasil tersebut terdapat beberapa peubah yang berpengaruh signifikan terhadap taraf nyata 5% yaitu $x_t$ , $x_{t-2}$ , $x_{t-4}$ , $x_{t-6}$. Adapun keseluruhan model yang terbentuk adalah
+Dari hasil tersebut terdapat beberapa peubah yang berpengaruh signifikan terhadap taraf nyata $5\%$ yaitu $x_t$ , $x_{t-1}$ , $x_{t-3}$. Adapun keseluruhan model yang terbentuk adalah
 
 $$
-\hat{Y_t}=21.42223+1.68749X_t+...-3.47612X_{t-6}
+\hat{Y_t}=-6.0039 + 6.769 X_t + 2.4839 X_{t-1} + 0.3845 X_{t-2} + 2.8511 X_{t-3} +  2.1521 X_{t-4} + 0.8164 X_{t-5} + 1.1695 X_{t-6}
 $$
 
-Adapun hasil peramalan 5 periode kedepan menggunakan model tersebut adalah sebagai berikut
+Adapun hasil peramalan $14$ periode kedepan menggunakan model tersebut adalah sebagai berikut
 
 ```{r}
 #peramalan dan akurasi
-fore.dlm2 <- forecast(model = model.dlm2, x=test$Xt, h=5)
-mape.dlm2<- MAPE(fore.dlm2$forecasts, test$Yt)
+fore.dlm2 <- forecast(model = model.dlm2, x=test$N05C, h=14)
+mape.dlm2<- MAPE(fore.dlm2$forecasts, test$N05B)
 #akurasi data training
 GoF(model.dlm2)
 ```
 
-Model tersebut merupakan model yang sangat baik dengan nilai MAPE yang kurang dari 10%.
+Didapatkan nilai `MAPE` sebesar $2.92\%$. Model tersebut merupakan **model yang sangat baik** dengan nilai `MAPE` yang *kurang dari* $10\%$.
 
 ## Model Autoregressive
 
@@ -308,42 +236,42 @@ ardlDlm(formula = NULL , data = NULL , x = NULL , y = NULL , p = 1 , q = 1 ,
 Dengan $p$ adalah integer yang mewakili panjang *lag* yang terbatas dan $q$ adalah integer yang merepresentasikan ordo dari proses *autoregressive*.
 
 ```{r}
-model.ardl <- ardlDlm(x = train$Xt, y = train$Yt, p = 1 , q = 1)
+model.ardl <- ardlDlm(x = train$N05C, y = train$N05B, p = 1 , q = 1)
 summary(model.ardl)
 AIC(model.ardl)
 BIC(model.ardl)
 ```
 
-Hasil di atas menunjukkan bahwa selain peubah $x_{t-1}$, hasil uji t menunjukkan nilai-p pada peubah $\ge0.05$ Hal ini menunjukkan bahwa peubah $x_{t-1}$ berpengaruh signifikan terhadap $y_t$, sementara $x_t$ dan $y_{t-1}$ berpengaruh signifikan terhadap $y_t$. Model keseluruhannya adalah sebagai berikut:
+Dari hasil tersebut, didapat bahwa peubah $x_t$ , dan $y_{t−1}$ memiliki nilai $P.Value < 0.05$ Hal ini menunjukkan bahwa kedua peubah tersebut **berpengaruh signifikan** terhadap $y_t$ pada taraf nyata $5\%$. Model keseluruhannya adalah sebagai berikut:
 
 $$
-\hat{Y}=-8,3594+0,3563X_t+1,4557X_{t-1}+0,1408Y_{t-1}
+\hat{Y}=31.42282 + 4.99458 X_t - 1.88602 X_{t-1} + 0.68407 Y_{t-1}
 $$
 
 ### Peramalan dan Akurasi
 
 ```{r}
-fore.ardl <- forecast(model = model.ardl, x=test$Xt, h=5)
+fore.ardl <- forecast(model = model.ardl, x=test$N05C, h=14)
 fore.ardl
 ```
 
-Data di atas merupakan hasil peramalan untuk 5 periode ke depan menggunakan Model Autoregressive dengan $p=1$ dan $q=1$.
+Data di atas merupakan hasil peramalan untuk 5 periode ke depan menggunakan **Model Autoregressive** dengan $p=1$ dan $q=1$.
 
 ```{r}
-mape.ardl <- MAPE(fore.ardl$forecasts, test$Yt)
+mape.ardl <- MAPE(fore.ardl$forecasts, test$N05B)
 mape.ardl
 #akurasi data training
 GoF(model.ardl)
 ```
 
-Berdasarkan akurasi di atas, terlihat bahwa nilai MAPE keduanya tidak jauh berbeda. Artinya, model regresi dengan distribusi lag ini tidak `overfitted` atau `underfitted`
+Berdasarkan akurasi di atas, terlihat bahwa nilai `MAPE` keduanya **tidak jauh berbeda**. Artinya, model regresi dengan distribusi lag ini **tidak** `overfitted` atau `underfitted`
 
 ### *Lag* Optimum
 
 ```{r}
 #penentuan lag optimum
 model.ardl.opt <- ardlBoundOrders(data = data.frame(data), ic = "AIC", 
-                                  formula = Yt ~ Xt )
+                                  formula = N05B ~ N05C )
 min_p=c()
 for(i in 1:6){
   min_p[i]=min(model.ardl.opt$Stat.table[[i]])
@@ -355,7 +283,7 @@ data.frame("q_optimum" = q_opt, "p_optimum" = p_opt,
            "AIC"=model.ardl.opt$min.Stat)
 ```
 
-Dari tabel di atas, dapat terlihat bahwa nilai AIC terendah didapat ketika $p=6$ dan $q=1$, yaitu sebesar `-20,56587`. Artinya, model autoregressive optimum didapat ketika $p=6$ dan $q=1$.
+Dari tabel di atas, dapat terlihat bahwa nilai AIC terendah didapat ketika $p=15$ dan $q=3$, yaitu sebesar $568.2968$. Artinya, model autoregressive optimum didapat ketika $p=15$ dan $q=3$.
 
 Selanjutnya dapat dilakukan pemodelan dengan nilai $p$ dan $q$ optimum seperti inisialisasi di langkah sebelumnya.
 
@@ -372,14 +300,15 @@ dynlm(formula, data, subset, weights, na.action, method = "qr",
 Untuk menentukan `formula` model yang akan digunakan, tersedia fungsi tambahan yang memungkinkan spesifikasi dinamika (melalui `d()` dan `L()`) atau pola linier/siklus dengan mudah (melalui `trend()`, `season()`, dan `harmon()`). Semua fungsi formula baru mengharuskan argumennya berupa objek deret waktu (yaitu, `"ts"` atau `"zoo"`).
 
 ```{r}
+install_load('dynlm')
 #sama dengan model dlm q=1
-cons_lm1 <- dynlm(Yt ~ Xt+L(Xt),data = train.ts)
+cons_lm1 <- dynlm(N05B ~ N05C+L(N05C),data = train.ts)
 #sama dengan model ardl p=1 q=0
-cons_lm2 <- dynlm(Yt ~ Xt+L(Yt),data = train.ts)
+cons_lm2 <- dynlm(N05B ~ N05C+L(N05B),data = train.ts)
 #sama dengan ardl p=1 q=1
-cons_lm3 <- dynlm(Yt ~ Xt+L(Xt)+L(Yt),data = train.ts)
+cons_lm3 <- dynlm(N05B ~ N05C+L(N05C)+L(N05B),data = train.ts)
 #sama dengan dlm p=2
-cons_lm4 <- dynlm(Yt ~ Xt+L(Xt)+L(Xt,2),data = train.ts)
+cons_lm4 <- dynlm(N05B ~ N05C+L(N05C)+L(N05C,2),data = train.ts)
 ```
 
 ### Ringkasan Model
@@ -403,17 +332,18 @@ summary(cons_lm4)
 ### SSE
 
 ```{r}
-deviance(cons_lm1)
-deviance(cons_lm2)
-deviance(cons_lm3)
-deviance(cons_lm4)
+cat(" Model DLM q=1      : ", deviance(cons_lm1), "\n",
+     "Model ARDL p=1 q=0 : ", deviance(cons_lm1), "\n",
+     "Model ARDL p=1 q=1 : ", deviance(cons_lm1), "\n",
+     "Model DLM p=2      : ", deviance(cons_lm1), "\n")
 ```
 
 ### Uji Diagnostik
 
 ```{r}
 #uji model
-if(require("lmtest")) encomptest(cons_lm1, cons_lm2)
+install_load('lmtest')
+encomptest(cons_lm1, cons_lm2)
 ```
 
 #### Autokorelasi
@@ -453,75 +383,24 @@ colnames(akurasi) <- c("MAPE")
 akurasi
 ```
 
-Berdasarkan nilai MAPE, model paling optimum didapat pada Model Koyck karena memiliki nilai MAPE yang terkecil.
+Berdasarkan nilai `MAPE`, model **paling optimum** didapat pada **Model Autoregressive** karena memiliki nilai `MAPE` yang *terkecil*.
 
 ### Plot
 
-```{r}
+```{r dpi=300, fig1, fig.height = 15, fig.width = 10, fig.align = "center"}
 par(mfrow=c(1,1))
-plot(test$Xt, test$Yt, type="b", col="black", ylim=c(120,250))
-points(test$Xt, fore.koyck$forecasts,col="red")
-lines(test$Xt, fore.koyck$forecasts,col="red")
-points(test$Xt, fore.dlm$forecasts,col="blue")
-lines(test$Xt, fore.dlm$forecasts,col="blue")
-points(test$Xt, fore.dlm2$forecasts,col="orange")
-lines(test$Xt, fore.dlm2$forecasts,col="orange")
-points(test$Xt, fore.ardl$forecasts,col="green")
-lines(test$Xt, fore.ardl$forecasts,col="green")
-legend("topleft",c("aktual", "koyck","DLM 1","DLM 2", "autoregressive"), lty=1, col=c("black","red","blue","orange","green"), cex=0.8)
+plot(test$N05C, test$N05B, type="b", col="black", 
+     ylim=c(-600,380),  xlim=c(5,30))
+points(test$N05C, fore.koyck$forecasts, col="red")
+lines(test$N05C, fore.koyck$forecasts, col="red")
+points(test$N05C, fore.dlm$forecasts, col="blue")
+lines(test$N05C, fore.dlm$forecasts, col="blue")
+points(test$N05C, fore.dlm2$forecasts, col="orange")
+lines(test$N05C, fore.dlm2$forecasts, col="orange")
+points(test$N05C, fore.ardl$forecasts, col="green")
+lines(test$N05C, fore.ardl$forecasts, col="green")
+legend("topleft",c("aktual", "koyck","DLM 1","DLM 2", "autoregressive"), 
+       lty=1, col=c("black","red","blue","orange","green"), cex=0.8)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot yang paling mendekati data aktualnya adalah Model koyck, sehingga dapat disimpulkan model terbaik dalam hal ini adalah model regresi koyck
-
-## Pengayaan (Regresi Berganda)
-
-### Data
-
-```{r}
-data(M1Germany)
-data1 = M1Germany[1:144,]
-```
-
-### DLM
-
-```{r}
-#Run the search over finite DLMs according to AIC values
-finiteDLMauto(formula = logprice ~ interest+logm1,
-              data = data.frame(data1), q.min = 1, q.max = 5,
-              model.type = "dlm", error.type = "AIC", trace = FALSE)
-```
-
-```{r}
-#model dlm berganda
-model.dlmberganda = dlm(formula = logprice ~ interest + logm1,
-                data = data.frame(data1) , q = 5)
-summary(model.dlmberganda)
-
-model.dlmberganda2 = dlm(formula = logprice ~ interest + logm1,
-                        data = data.frame(data1) , q = 1)
-summary(model.dlmberganda2)
-```
-
-### ARDL
-
-```{r}
-#Mencari orde lag optimum model ARDL
-ardlBoundOrders(data = data1 , formula = logprice ~ interest + logm1,
-                ic="AIC")
-
-model.ardlDlmberganda = ardlDlm(formula = logprice ~ interest + logm1,
-                        data = data.frame(data1) , p = 4 , q = 4)
-summary(model.ardlDlmberganda)
-```
-
-```{r}
-#model p interest 0 p logm1 4 
-rem.p = list(interest = c(1,2,3,4))
-remove = list(p = rem.p)
-model.ardlDlmberganda2 = ardlDlm(formula = logprice ~ interest + logm1,
-                        data = data.frame(data1) , p = 4 , q = 4 ,
-                        remove = remove)
-summary(model.ardlDlmberganda2)
-```
-
-Proses selanjutnya sama dengan pemodelan menggunakan peubah tunggal.
+Berdasarkan plot tersebut, terlihat bahwa plot yang paling mendekati data aktualnya adalah **Model Autoregressive**, sehingga dapat disimpulkan **model terbaik** dalam hal ini adalah **Model Reresi Autoregressive**.
