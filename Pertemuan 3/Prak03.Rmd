@@ -65,7 +65,9 @@ Kedua obat ini memiliki kesamaan yakni termasuk dalam klasifikasi **ATC N** (*Ne
 
 Namun ada beberapa perbedaan, diantaranya: `N05B` lebih fokus pada **obat penenang** dan pengobatan **gangguan kecemasan**. Sementara `N05C` lebih fokus pada **obat tidur** dan pengobatan **gangguan tidur**. Contoh obat-obatan yang termasuk dalam kategori ini berbeda, dengan `N05B` memiliki contoh obat-obatan penenang seperti *benzodiazepin*, sementara `N05C` memiliki obat tidur seperti *zolpidem*.
 
-Obat `M01AB` dan `M01AE` merupakan obat yang sama, namun dengan bahan dasar yang berbeda. Saya penasaran "*Apakah penjualan obat `M01AB` dipengaruhi oleh penjualan obat `M01AB` dan obat-obat lainnya?"* Sehingga saya memilih Peubah `M01AB` sebagai peubah respon `Y`. Dan peubah lainnya sebagai peubah penjelas `X`.
+**Tujuan Praktikum** kali ini adalah membuat Model Regresi dengan Peubah Lag terbaik. ***Lag*** secara bahasa sendiri memiliki arti **keterlambatan.** Bisa dikatakan ***Lag*** mengacu pada nilai suatu variabel pada **waktu sebelumnya** dalam rangkaian data waktu.
+
+Kali ini saya akan melihat *"Apakah **penjualan** obat penenang `N05B`* *pada **periode*** ***waktu saat inidipengaruhi*** *oleh penjualan obat tidur `N05C`* *pada **periode waktu sebelumnya?**"* Atau *"Apakah **penjualan** obat tidur `N05C`**periodesebelumnya** memiliki **pengaruh signifikan** terhadap **penjualan** obat penenang `N05B`* *pada **periode*** ***waktu saat ini* ?***.*
 
 ### Import Data
 
@@ -90,7 +92,7 @@ test.ts <- ts(test)
 data.ts <- ts(data)
 ```
 
-## Model Koyck
+## 1. Model Koyck
 
 **Model Koyck** didasarkan pada asumsi bahwa **semakin jauh** **jarak lag** peubah independen dari periode sekarang maka **semakin kecil pengaruh** peubah lag terhadap peubah dependen.
 
@@ -144,7 +146,7 @@ GoF(model.koyck)
 
 Pada perhitungan *keakuratan model* menggunakan **metode Koyck** didapatkan **nilai `MAPE`** $7.89\%$. Nilai akurasi model ini *kurang dari* $10\%$ sehingga dapat dikategorikan **sangat baik.**
 
-## Regression with Distributed Lag
+## 2. Regression with Distributed Lag
 
 Pemodelan model Regression with Distributed Lag dengan `R` dapat menggunakan `dLagM::dlm()` . Fungsi umum dari `dlm` adalah sebagai berikut.
 
@@ -220,7 +222,7 @@ GoF(model.dlm2)
 
 Didapatkan nilai `MAPE` sebesar $2.92\%$. Model tersebut merupakan **model yang sangat baik** dengan nilai `MAPE` yang *kurang dari* $10\%$.
 
-## Model Autoregressive
+## 3. Model Autoregressive
 
 Peubah dependen dipengaruhi oleh peubah independen pada waktu sekarang, serta dipengaruhi juga oleh peubah dependen itu sendiri pada satu waktu yang lalu maka model tersebut disebut *autoregressive* (Gujarati 2004).
 
@@ -287,7 +289,7 @@ Dari tabel di atas, dapat terlihat bahwa nilai AIC terendah didapat ketika $p=15
 
 Selanjutnya dapat dilakukan pemodelan dengan nilai $p$ dan $q$ optimum seperti inisialisasi di langkah sebelumnya.
 
-## Pemodelan DLM & ARDL dengan Library `dynlm`
+## 4. Pemodelan DLM & ARDL dengan Library `dynlm`
 
 Pemodelan regresi dengan peubah *lag* tidak hanya dapat dilakukan dengan fungsi pada *packages* `dLagM` , tetapi terdapat *packages* `dynlm` yang dapat digunakan. Fungsi `dynlm` secara umum adalah sebagai berikut.
 
@@ -374,7 +376,7 @@ shapiro.test(residuals(cons_lm3))
 shapiro.test(residuals(cons_lm4))
 ```
 
-## Perbandingan Model
+# B. Perbandingan Model
 
 ```{r}
 akurasi <- matrix(c(mape.koyck, mape.dlm, mape.dlm2, mape.ardl))
@@ -403,4 +405,10 @@ legend("topleft",c("aktual", "koyck","DLM 1","DLM 2", "autoregressive"),
        lty=1, col=c("black","red","blue","orange","green"), cex=0.8)
 ```
 
+Agak chaos yak hiks :")
+
 Berdasarkan plot tersebut, terlihat bahwa plot yang paling mendekati data aktualnya adalah **Model Autoregressive**, sehingga dapat disimpulkan **model terbaik** dalam hal ini adalah **Model Reresi Autoregressive**.
+
+# C. Kesimpulan
+
+Penjualan obat tidur `N05C` periode sebelumnya **memiliki pengaruh signifikan** terhadap penjualan obat penenang `N05B` pada periode waktu saat ini obat. Model Regresi terbaik degan Peubah Lag nya adalah **Model Regresi Autoregressive.** Dengan urutan kebaikan model dari yang terbaik adalah **`Autoregressive`** (`MAPE` = $0.3$ ; *"Sangat Baik"*), **`DLM 2`** (`MAPE` = $0.45$ ; "*Sangat Baik"*), **`DLM 1`** (`MAPE` = $15.06$ ; "*Baik*"), dan **`Koyck`** (`MAPE` = $17.5$ ; *"Baik"*).
