@@ -224,11 +224,11 @@ for(i in 3:300){
 ma
 ```
 
-Selain menggunakan cara di atas, pembangkitan proses MA(1) dapat dilakukan dengan fungsi `arima.sim()` sebagai berikut.
+Selain menggunakan cara di atas, pembangkitan proses MA(2) dapat dilakukan dengan fungsi `arima.sim()` sebagai berikut.
 
 ```{r}
-ma1 <- arima.sim(list(order=c(0,0,1), ma=0.5), n=200)
-ma1
+ma2 <- arima.sim(list(order=c(0,0,2), ma=c(0.4, 0.6)), n=300)
+ma2
 ```
 
 ## Karakteristik MA(1)
@@ -239,7 +239,7 @@ ma1
 ts.plot(ma)
 ```
 
-Berdasarkan plot time series, terlihat bahwa data MA(1) yang dibangkitkan stasioner dalam rataan
+Berdasarkan plot time series, terlihat bahwa data MA(2) yang dibangkitkan stasioner dalam rataan.
 
 ### Plot ACF
 
@@ -247,7 +247,7 @@ Berdasarkan plot time series, terlihat bahwa data MA(1) yang dibangkitkan stasio
 acf(ma,lag.max = 20)
 ```
 
-Berdasarkan plot AFC tersebut, terlihat bahwa plot ACF *cuts off* di lag pertama
+Berdasarkan plot AFC tersebut, terlihat bahwa plot ACF *cuts off* di lag kedua
 
 ### Plot PACF
 
@@ -263,7 +263,9 @@ Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF cenderung *tails off* d
 TSA::eacf(ma)
 ```
 
-Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa segitiga nol berada pada ordo AR(0) dan ordo MA(1)
+Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa segitiga nol berada pada ordo AR(0) dan ordo MA(2)
+
+Dari keempat plot tersebut, terlihat bahwa data stasioner.
 
 ### Scatterplot Antar Lag
 
@@ -274,7 +276,7 @@ Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa segitiga nol berada
 yt_ma <- ma[-1]
 yt_ma
 #Yt-1
-yt_1_ma <- ma[-200]
+yt_1_ma <- ma[-300]
 yt_1_ma
 ```
 
@@ -288,11 +290,7 @@ Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antar
 cor(yt_ma,yt_1_ma)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t-1}$ dari hasil simulasi mendekati perhitungan teoritis yaitu
-
-$$
-\rho_1=\frac{-\theta}{1+(-\theta)^2}=\frac{-(-0.5)}{1+(-0.5)^2}=0.4
-$$
+Korelasi antara $Y_t$ dengan $Y_{t-1}$ dari hasil simulasi mendekati perhitungan teoritis.
 
 #### Korelasi antara $Y_t$ dengan $Y_{t-2}$
 
@@ -301,12 +299,12 @@ $$
 yt_ma2 <- ma[-c(1,2)]
 yt_ma2
 #Yt-2
-yt_2_ma <- ma[-c(199,200)]
+yt_2_ma <- ma[-c(299,300)]
 yt_2_ma
 ```
 
 ```{r}
-plot(y=yt_ma2,x=yt_2_ma)
+plot(y=yt_ma2, x=yt_2_ma)
 ```
 
 Berdasarkan scatterplot tersebut, terlihat bahwa cenderung tidak terdapat hubungan antara $Y_t$ dengan $Y_{t-2}$.
@@ -316,6 +314,29 @@ cor(yt_ma2,yt_2_ma)
 ```
 
 Korelasi antara $Y_t$ dengan $Y_{t-2}$ hasil simulasi mendekati teori yang ada yaitu 0.
+
+#### Korelasi antara $Y_t$ dengan $Y_{t-3}$
+
+```{r}
+#Yt
+yt_ma3 <- ma[-c(1,2,3)]
+yt_ma3
+#Yt-2
+yt_3_ma <- ma[-c(298,299,300)]
+yt_3_ma
+```
+
+```{r}
+plot(y=yt_ma3, x=yt_3_ma)
+```
+
+Berdasarkan scatterplot tersebut, terlihat bahwa cenderung tidak terdapat hubungan antara $Y_t$ dengan $Y_{t-3}$.
+
+```{r}
+cor(yt_ma3,yt_3_ma)
+```
+
+Korelasi antara $Y_t$ dengan $Y_{t-3}$ hasil simulasi mendekati teori yang ada yaitu 0.
 
 ## Proses AR
 
