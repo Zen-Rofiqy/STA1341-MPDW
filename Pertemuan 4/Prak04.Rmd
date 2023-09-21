@@ -313,7 +313,7 @@ Berdasarkan scatterplot tersebut, terlihat bahwa cenderung tidak terdapat hubung
 cor(yt_ma2,yt_2_ma)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t-2}$ hasil simulasi mendekati teori yang ada yaitu 0.
+Korelasi antara $Y_t$ dengan $Y_{t-2}$ hasil simulasi yaitu $0.4017548$.
 
 #### Korelasi antara $Y_t$ dengan $Y_{t-3}$
 
@@ -333,10 +333,10 @@ plot(y=yt_ma3, x=yt_3_ma)
 Berdasarkan scatterplot tersebut, terlihat bahwa cenderung tidak terdapat hubungan antara $Y_t$ dengan $Y_{t-3}$.
 
 ```{r}
-cor(yt_ma3,yt_3_ma)
+cor(yt_ma3, yt_3_ma)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t-3}$ hasil simulasi mendekati teori yang ada yaitu 0.
+Korelasi antara $Y_t$ dengan $Y_{t-3}$ hasil simulasi mendekati teori yang ada yaitu $0$.
 
 ## Proses AR
 
@@ -349,29 +349,29 @@ $$ y_{t} = c + e_t + \phi_{1}Y_{t-1} + \phi_{2}Y_{t-2} + \dots + \phi_{q}Y_{t-q}
 Akan dicoba membangkitkan proses AR paling sederhana, yaitu AR(1) dengan $\phi = 0.7$ sebanyak 200 observasi dan $c=0$.
 
 ```{r}
-set.seed(1234)
+set.seed(006)
 ```
 
 Nilai-nilai selanjutnya dapat dicari melalui *loop*. Bentuk loop dapat dilihat dari rumus AR(1) yang hendak dibangkitkan:
 
-$$ Y_t = e_t+0.7Y_{t-1} $$
+$$ Y_t = e_t+ 0.5Y_{t-1} + 0.2Y_{t-2} $$
 
 ```{r}
 n<-length(wn)
 n
 ar <- c(1:n) 
-for (i in 2:n) {ar[i]<-wn[i]+0.7*ar[i-1]}
+for (i in 3:n) {ar[i]<-wn[i]+0.5*ar[i-1]   +0.2*ar[i-2]}
 ar
 ```
 
 Selain menggunakan cara di atas, pembangkitan proses AR dapat dilakukan dengan fungsi `arima.sim()` sebagai berikut.
 
 ```{r}
-ar1 <- arima.sim(list(order=c(1,0,0), ar=0.7), n=200)
-ar1
+ar2 <- arima.sim(list(order=c(2,0,0), ar=c(0.5,0.2)), n=300)
+ar2
 ```
 
-## Karakteristik AR(1)
+## Karakteristik AR(2)
 
 ### Plot Time Series
 
@@ -395,7 +395,7 @@ Berdasarkan plot ACF tersebut terlihat bahwa plot ACF cenderung *tails off* dan 
 pacf(ar)
 ```
 
-Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF *cuts off* pada lag pertama, sejalan dengan teori yang ada
+Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF *cuts off* pada lag kedua, sejalan dengan teori yang ada
 
 ### Plot EACF
 
@@ -403,7 +403,7 @@ Berdasarkan plot PACF tersebut, terlihat bahwa plot PACF *cuts off* pada lag per
 TSA::eacf(ar)
 ```
 
-Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa segitiga nol berada pada ordo AR(1) dan ordo MA(0)
+Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa segitiga nol berada pada ordo AR(2) dan ordo MA(0)
 
 ### Scatterplot Antar Lag
 
@@ -414,7 +414,7 @@ Berdasarkan pola segitiga nol pada plot EACF, terlihat bahwa segitiga nol berada
 yt_ar <- ar[-1]
 yt_ar
 #Yt-1
-yt_1_ar <- ar[-200]
+yt_1_ar <- ar[-300]
 yt_1_ar
 ```
 
@@ -428,7 +428,7 @@ Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antar
 cor(yt_ar,yt_1_ar)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t-1}$ dari hasil simulasi mendekati perhitungan teoritis yaitu $\rho_1=\phi^1=0.7$
+Korelasi antara $Y_t$ dengan $Y_{t-1}$ dari hasil simulasi mendekati perhitungan teoritis yaitu $\rho_1=\phi^1=0.64$
 
 #### Korelasi antara $Y_t$ dengan $Y_{t-2}$
 
@@ -437,7 +437,7 @@ Korelasi antara $Y_t$ dengan $Y_{t-1}$ dari hasil simulasi mendekati perhitungan
 yt_ar2 <- ar[-c(1,2)]
 yt_ar2
 #Yt-2
-yt_2_ar <- ar[-c(199,200)]
+yt_2_ar <- ar[-c(299,300)]
 yt_2_ar
 ```
 
@@ -451,7 +451,30 @@ Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antar
 cor(yt_ar2,yt_2_ar)
 ```
 
-Korelasi antara $Y_t$ dengan $Y_{t-2}$ dari hasil simulasi mendekati perhitungan teoritis yaitu $\rho_2=\phi^2=0.49$.
+Korelasi antara $Y_t$ dengan $Y_{t-2}$ dari hasil simulasi mendekati perhitungan teoritis yaitu $\rho_2=\phi^2=0.48$.
+
+#### Korelasi antara $Y_t$ dengan $Y_{t-3}$
+
+```{r}
+#Yt
+yt_ar3 <- ar[-c(1,2,3)]
+yt_ar3
+#Yt-3
+yt_3_ar <- ar[-c(298,299,300)]
+yt_3_ar
+```
+
+```{r}
+plot(y=yt_ar3,x=yt_3_ar)
+```
+
+Berdasarkan scatterplot tersebut, terlihat bahwa terdapat hubungan positif antara $Y_t$ dengan $Y_{t-3}$. Hal ini sesuai dengan teori yang ada
+
+```{r}
+cor(yt_ar3,yt_3_ar)
+```
+
+Korelasi antara $Y_t$ dengan $Y_{t-3}$ dari hasil simulasi mendekati perhitungan teoritis yaitu $\rho_2=\phi^2=0.35$.
 
 ## Fungsi pembangkitan ARMA
 
