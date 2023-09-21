@@ -491,17 +491,17 @@ Komponen $c$ dan $e_{t}$ cukup mudah untuk dibuat dan dicari. Bagaimana untuk ko
 $$
 \begin{aligned}
 \begin{bmatrix}
-\phi_1 \  \phi_2 \ \phi_3
+\phi_1 \  \phi_2 
 \end{bmatrix}&=
 \begin{bmatrix}
-0.3 \ 0.5 \ 0.2
+0.5 \ 0.2 
 \end{bmatrix}
 \\
 \begin{bmatrix}
-y_{t-1} \  y_{t-2} \ y_{t-3}
+y_{t-1} \  y_{t-2} 
 \end{bmatrix}&=
 \begin{bmatrix}
-1 \ 2 \ 3
+1 \ 2 
 \end{bmatrix}
 \end{aligned}
 $$
@@ -511,28 +511,28 @@ Maka dari itu,
 $$
 \begin{aligned}
 \begin{bmatrix}
-\phi_1 \  \phi_2 \ \phi_3
+\phi_1 \  \phi_2 
 \end{bmatrix}
 \begin{bmatrix}
-y_{t-1} \\  y_{t-2} \\ y_{t-3}
-\end{bmatrix} &= \phi_1 \ y_{t-1}+\phi_2 \ y_{t-2}+\phi_3 \ y_{t-3}
+y_{t-1} \\  y_{t-2} 
+\end{bmatrix} &= \phi_1 \ y_{t-1}+\phi_2 \ y_{t-2}
 \\
 \begin{bmatrix}
- 0.3 \ 0.5 \ 0.2
+ 0.5 \ 0.2 
 \end{bmatrix}
 \begin{bmatrix}
-1 \\ 2 \\ 3
-\end{bmatrix} & = 0.3 \cdot1+0.5 \cdot 2+0.2 \cdot 3\\
-&=0.3+1+0.6 = 1.9
+1 \\ 2 
+\end{bmatrix} & = 0.5 \cdot 1 + 0.2 \cdot 2\\
+&=0.5+0.4 = 0.9
 \end{aligned}
 $$
 
 Jika koefisien dan *white noise*/nilai deret waktu sebelumnya dapat diekstrak dalam bentuk vektor, dapat dilakukan perkalian matriks untuk mencari nilai bagian AR dan MA:
 
 ```{r}
-set.seed(30)
-coefs <- c(0.3, 0.5, 0.2)
-e <- c(1, 2, 3)
+set.seed(006)
+coefs <- c(0.5, 0.2)
+e <- c(1, 2)
 
 coefs %*% e
 ```
