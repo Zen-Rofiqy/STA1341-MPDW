@@ -8,5 +8,4 @@ Yuk mampir ke :
 https://rpubs.com/ZenR_Prog/MPDW-Prak04  
   
 ## Tentang Data
-Link Data :  
-https://www.kaggle.com/datasets/milanzdravkovic/pharma-sales-data?select=salesmonthly.csv   
+https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data
