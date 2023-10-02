@@ -17,8 +17,7 @@ Abaikan bagian ini. Lansung saja loncat ke `1. Tentang Data` .
 path <- function(){
   gsub  ( "\\\\",  "/",  readClipboard ()  )
 }
-#Copy path
-#Panggil function di console
+#Copy path, Panggil function di console
 #Copy r path, paste ke var yang diinginkan
 ```
 
@@ -204,7 +203,7 @@ data <- data %>%
 
 ### Time Series MAANG
 
-```{r dpi=300, fig1, fig.height = 9, fig.width = 16, fig.align = "center"}
+```{r dpi=300, fig1, fig.height = 9, fig.width = 16, fig.align = "center", warning=FALSE, message = FALSE}
 install_load('viridis','ggrepel')
 #Plot
 cts.maang <-
