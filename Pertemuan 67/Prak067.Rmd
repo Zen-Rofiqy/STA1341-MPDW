@@ -129,7 +129,7 @@ Melihat baris, kolom mana data yang kosong.
 na.idx <- which(is.na(data), arr.ind = TRUE)
 
 # Menampilkan data raw dengan baris dan kolom yang mengandung NA
-install_load('kableExtra','DT')
+install_load('DT')
 datatable(raw.data[                        # Subsetting
                 unique(na.idx[, 1]),   # Vektor indeks baris yang mengandung NA
                 unique(na.idx[, 2])  ] # Vektor indeks kolom yang mengandung NA
@@ -445,7 +445,7 @@ eacf(train.diff)
 
 Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah).
 
-![](images/Screenshot 2023-10-15 234003-01.png)
+![](images/Screenshot%202023-10-15%20234003-01.png)
 
 Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
 
@@ -690,8 +690,6 @@ Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut i
 #---FORECAST---#
 ramalan.da <- forecast::forecast(best.model.da, h = 54) 
 ramalan.da
-datatable(models, filter = 'top', 
-          options = list(pageLength = 5))
 ```
 
 ## Plot
