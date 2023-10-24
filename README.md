@@ -7,7 +7,11 @@ Rataan Bergerak (Moving Average), Eksponensial, Metode Winter. Selain itu mata k
 Data Deret Waktu, serta pemodelan data deret waktu ARIMA(p,d,q) melalui Metode Box-Jenkins.  
 
 `Semester: 5`  
+
+## Install Mendeley
+https://www.mendeley.com/autoupdates/installers/1.19.8  
   
+### Extras 
 Kalo mau download Semua file di repo pake ini:  
 https://download-directory.github.io/
 
