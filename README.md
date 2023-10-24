@@ -7,7 +7,10 @@ Rataan Bergerak (Moving Average), Eksponensial, Metode Winter. Selain itu mata k
 Data Deret Waktu, serta pemodelan data deret waktu ARIMA(p,d,q) melalui Metode Box-Jenkins.  
 
 `Semester: 5`  
-
+  
+#### Mata Kuliah Prasyarat:  
+STA1231 - Analisis Regresi  
+  
 ## Install Mendeley
 https://simak.ipb.ac.id/Foto/Panduan/Dokumen_44.pdf
   
