@@ -9,7 +9,7 @@ Data Deret Waktu, serta pemodelan data deret waktu ARIMA(p,d,q) melalui Metode B
 `Semester: 5`  
   
 #### Mata Kuliah Prasyarat:  
-STA1231 - Analisis Regresi  
+`STA1231 - Analisis Regresi`  
   
 ## Install Mendeley
 https://simak.ipb.ac.id/Foto/Panduan/Dokumen_44.pdf
