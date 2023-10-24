@@ -1,4 +1,4 @@
-[# STA1341 - Metode Peramalan Deret Waktu (S1)](https://krs.ipb.ac.id/mk/172259)  
+# [STA1341 - Metode Peramalan Deret Waktu (S1)](https://krs.ipb.ac.id/mk/172259)  
 `SKS: 3 (2-1)`  
 
 ### Deskripsi Mata Kuliah  
