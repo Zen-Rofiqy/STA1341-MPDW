@@ -1,0 +1,887 @@
+---
+title: "Pendugaan Parameter, Diagnostik Model, dan Peramalan"
+author: "Angga Fathan Rofiqy"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: hide
+    toc_depth: 3
+    number_sections: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    fig_caption: true
+pkgdown:
+  as_is: true
+---
+
+Kode di `Hide` dalam *default*, untuk menampilkan kode, klik `Code` .
+
+```{r, warning=FALSE, message = FALSE}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+```
+
+```{r}
+path <- function(){
+  gsub  ( "\\\\",  "/",  readClipboard ()  )
+}
+#Copy path, Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+```{r}
+#Export chart
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 8/Chart"
+```
+
+# Pendahuluan
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*2Yt3-zcGKc6MYuXCxgCL0A.jpeg)
+
+Dataset yang saya gunakan merupakan koleksi data harga saham historis periode Juli 2018 hingga Juli 2023 dari tujuh raksasa teknologi paling berpengaruh di dunia: Microsoft, Apple, Amazon, Nvidia, Google, Netflix, dan Meta (sebelumnya dikenal sebagai Facebook). Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.
+
+Dataset ini memilki data :
+
+1.  **Open:** yakni Harga saham pada awal periode perdagangan tertentu. Ini adalah harga saham pertama pada hari perdagangan tersebut.
+2.  **High:** Harga tertinggi yang saham capai selama periode perdagangan tersebut. Ini mencerminkan harga tertinggi yang pembeli bersedia bayar selama hari tersebut.
+3.  **Low:** Harga terendah yang saham capai selama periode perdagangan tersebut. Ini mencerminkan harga terendah yang penjual bersedia terima selama hari tersebut.
+4.  **Close:** Harga saham pada akhir periode perdagangan tertentu. Ini adalah harga saham terakhir pada hari perdagangan tersebut.
+5.  **Adj Close (Adjusted Close):** Harga penutup yang telah disesuaikan untuk memperhitungkan perubahan seperti pembagian saham atau dividen. Ini adalah harga penutup yang paling relevan untuk analisis jangka panjang, karena mencerminkan harga saham yang sebenarnya setelah penyesuaian.
+6.  **Volume:** Volume perdagangan saham selama periode tertentu. Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan tersebut.
+
+Kami akan menggunakan peubah `Adj Close (Adjusted Close)`, Karena sesuai dengan penjelasan diatas, peubah `Adj Close` adalah yang paling sesuai untuk dianalisis dibandingkan peubah lainnya.
+
+## Tujuan
+
+Tujuan dari praktikum ini adalah untuk menganalisis pola perkiraan pergerakan harga tujuh saham teknologi terkemuka dengan harapan dapat memberikan rekomendasi kepada pembaca mengenai saham mana yang sebaiknya dipertimbangkan untuk dibeli atau diinvestasikan secara signifikan di antara tujuh perusahaan teknologi besar tersebut.
+
+## Data Preparation {.tabset}
+
+### Import Data
+
+```{r, warning=FALSE, message = FALSE}
+install_load('rio')
+raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Data/MAANG%20Stock%20Prices.csv")
+```
+
+### Data Checking
+
+Cek Tipe data.
+
+```{r}
+str(raw.data)
+```
+
+Semua data Karakter, harus diubah.
+
+Cek Data kosong.
+
+```{r}
+sum(is.na(raw.data))
+```
+
+Tidak ada data kosong.
+
+### Penyesuaian Tipe Data
+
+Semua tipe data masih berupa character. Harus diubah menjadi tipe data yang sesuai.
+
+```{r, warning=FALSE, message = FALSE}
+install_load('dplyr')
+data <- raw.data %>%  
+  mutate(
+    Date = as.Date(raw.data[, 2], format = "%m/%d/%y"), #Mengubah menjadi Date 
+    across(3:ncol(raw.data), as.numeric)                #Mengubah menjadi Numerik
+  )
+str(data)
+```
+
+### Rechecking Data 
+
+Cek kembali data kosong.
+
+```{r}
+cat('Banyaknya Data Kosong', sum(is.na(data)))
+```
+
+Melihat baris, kolom mana data yang kosong.
+
+```{r message=FALSE, warning=FALSE}
+# Mencari indeks baris dan kolom yang mengandung NA
+na.idx <- which(is.na(data), arr.ind = TRUE)
+
+# Menampilkan data raw dengan baris dan kolom yang mengandung NA
+install_load('DT')
+datatable(raw.data[                        # Subsetting
+                unique(na.idx[, 1]),   # Vektor indeks baris yang mengandung NA
+                unique(na.idx[, 2])  ] # Vektor indeks kolom yang mengandung NA
+          )  
+```
+
+Ternyata pada baris tersebut ada data karakter text yang merupakan label dari tiap kolomnya. Sehingga ketika diubah ke numerik akan menjadi `NA`. Maka saya akan menghapus baris tersebut.
+
+### Data Cleaned
+
+```{r}
+data <- data %>%
+  filter(!row_number() %in% unique(na.idx[, 1]))
+datatable(data, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+## Eksplorasi Data {.tabset}
+
+```{r, warning=FALSE, message = FALSE}
+install_load('ggplot2','extrafont')
+# font_import(); loadfonts() #Run ini sekali aja
+theme.ts <- list(
+  theme(legend.position = "none",
+        axis.text.x = element_text(hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 20, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        )
+theme.ts1 <- list(
+  theme(legend.position = "none",
+        axis.text.x = element_text(hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 50, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        )
+```
+
+### Time Series MAANG
+
+Melihat keseluruhan *Time Series* data saham.
+
+```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+install_load('viridis','ggrepel')
+#Plot
+chart <-
+ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
+  #Color
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", nvda="orange2") ) +
+  scale_alpha_manual(values = c("NVDA" = .25, "NFLX" = .25, "MSFT" = .25, 
+                                "META" = .25, "AAPL" = .25, "GOOG" = .25, 
+                                "nvda" = 1)) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Time Series MAANG",
+       subtitle = "Seperti apa sih pola deret waktu saham MAANG?\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data[data$Date == max(data$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 80, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date("2018-07-30"), as.Date("2023-12-28"))
+    #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date("2023-07-28")), 
+             linetype = "dotted", color = "red")
+chart
+
+#Export Chart
+ggsave("01_Time Series MAANG.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+```
+
+Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, saya hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun. Agar pengerjaannya tidak terlalu sulit, karena masih tahap awal pembelajaran.
+
+### Time Series Apple
+
+```{r}
+aapl <- data %>%
+  select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
+  filter(Name == "AAPL", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(aapl) <- NULL
+str(aapl)
+```
+
+```{r}
+datatable(aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+aapl.ts <- ts(aapl[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(aapl.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(aapl$`Adj Close`)
+min_date <- aapl$Date[which.min(aapl$`Adj Close`)]
+percentage <- (which.min(aapl$`Adj Close`) / nrow(aapl)) * 100
+
+chart <-
+ggplot(aapl, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("lightskyblue4")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Apple",
+       subtitle = "Seperti apa sih pola deret waktu saham Apple?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("03_Time Series Apple.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_aapl <- aapl[1: round(nrow(aapl) *80/100),]
+test_aapl <- aapl[round(nrow(aapl) *80/100): nrow(aapl),]
+train_aapl.ts <- ts(train_aapl[,3])
+test_aapl.ts <- ts(train_aapl[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_aapl, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_aapl, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Apple",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("lightskyblue4", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("03_TS_AAPL_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+
+### Time Series Amazon
+
+```{r}
+nvda <- data %>%
+  select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
+  filter(Name == "nvda", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(nvda) <- NULL
+str(nvda)
+```
+
+```{r}
+datatable(nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+nvda.ts <- ts(nvda[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(nvda.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(nvda$`Adj Close`)
+min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
+percentage <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
+
+chart <-
+ggplot(nvda, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("orange2")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Amazon",
+       subtitle = "Seperti apa sih pola deret waktu saham Amazon?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Potong\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("02_Time Series Amazon.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_nvda <- nvda[1: round(nrow(nvda) *80/100),]
+test_nvda <- nvda[round(nrow(nvda) *80/100): nrow(nvda),]
+train_nvda.ts <- ts(train_nvda[,3])
+test_nvda.ts <- ts(test_nvda[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Amazon",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("orange", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("02_TS_Amazon_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+
+### Time Series Google
+
+```{r}
+goog <- data %>%
+  select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
+  filter(Name == "GOOG", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(goog) <- NULL
+str(goog)
+```
+
+```{r}
+datatable(goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+goog.ts <- ts(goog[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(goog.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(goog$`Adj Close`)
+min_date <- goog$Date[which.min(goog$`Adj Close`)]
+percentage <- (which.min(goog$`Adj Close`) / nrow(goog)) * 100
+
+chart <-
+ggplot(goog, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("gold3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Google",
+       subtitle = "Seperti apa sih pola deret waktu saham Google?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("04_Time Series Google.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_goog <- goog[1: round(nrow(goog) *80/100),]
+test_goog <- goog[round(nrow(goog) *80/100): nrow(goog),]
+train_goog.ts <- ts(train_goog[,3])
+test_goog.ts <- ts(test_goog[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_goog, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_goog, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Google",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("gold3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("04_TS_GOOG_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+
+### Time Series META
+
+```{r}
+meta <- data %>%
+  select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
+  filter(Name == "META", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(meta) <- NULL
+str(meta)
+```
+
+```{r}
+datatable(meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+meta.ts <- ts(meta[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(meta.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(meta$`Adj Close`)
+min_date <- meta$Date[which.min(meta$`Adj Close`)]
+percentage <- (which.min(meta$`Adj Close`) / nrow(meta)) * 100
+
+chart <-
+ggplot(meta, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("dodgerblue3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham META",
+       subtitle = "Seperti apa sih pola deret waktu saham META?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("05_Time Series META.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_meta <- meta[1: round(nrow(meta) *80/100),]
+test_meta <- meta[round(nrow(meta) *80/100): nrow(meta),]
+train_meta.ts <- ts(train_meta[,3])
+test_meta.ts <- ts(test_meta[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_meta, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_meta, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham META",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("dodgerblue3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("05_TS_META_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+
+### Time Series Microsoft
+
+```{r}
+msft <- data %>%
+  select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
+  filter(Name == "MSFT", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(msft) <- NULL
+str(msft)
+```
+
+```{r}
+datatable(msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+msft.ts <- ts(msft[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(msft.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(msft$`Adj Close`)
+min_date <- msft$Date[which.min(msft$`Adj Close`)]
+percentage <- (which.min(msft$`Adj Close`) / nrow(msft)) * 100
+
+chart <-
+ggplot(msft, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("deepskyblue2")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Microsoft",
+       subtitle = "Seperti apa sih pola deret waktu saham Microsoft?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("06_Time Series Microsoft.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_msft <- msft[1: round(nrow(msft) *80/100),]
+test_msft <- msft[round(nrow(msft) *80/100): nrow(msft),]
+train_msft.ts <- ts(train_msft[,3])
+test_msft.ts <- ts(test_msft[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_msft, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_msft, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Microsoft",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("deepskyblue2", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("06_TS_MSFT_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+
+### Time Series Netflix
+
+```{r}
+nflx <- data %>%
+  select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
+  filter(Name == "NFLX", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(nflx) <- NULL
+str(nflx)
+```
+
+```{r}
+datatable(nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+nflx.ts <- ts(nflx[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(nflx.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(nflx$`Adj Close`)
+min_date <- nflx$Date[which.min(nflx$`Adj Close`)]
+percentage <- (which.min(nflx$`Adj Close`) / nrow(nflx)) * 100
+
+chart <-
+ggplot(nflx, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("firebrick3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Seperti apa sih pola deret waktu saham Netflix?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("07_Time Series Netflix.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_nflx <- nflx[1: round(nrow(nflx) *80/100),]
+test_nflx <- nflx[round(nrow(nflx) *80/100): nrow(nflx),]
+train_nflx.ts <- ts(train_nflx[,3])
+test_nflx.ts <- ts(test_nflx[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("firebrick3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("07_TS_NFLX_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+
+### Time Series NVIDIA
+
+```{r}
+nvda <- data %>%
+  select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
+  filter(Name == "NVDA", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(nvda) <- NULL
+str(nvda)
+```
+
+```{r}
+datatable(nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+nvda.ts <- ts(nvda[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(nvda.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(nvda$`Adj Close`)
+min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
+percentage <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
+
+chart <-
+ggplot(nvda, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("green4")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham NVIDIA",
+       subtitle = "Seperti apa sih pola deret waktu saham NVIDIA?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_nvda <- nvda[1: round(nrow(nvda) *80/100),]
+test_nvda <- nvda[round(nrow(nvda) *80/100): nrow(nvda),]
+train_nvda.ts <- ts(train_nvda[,3])
+test_nvda.ts <- ts(test_nvda[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham NVIDIA",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("green4", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+
+# Apple
+
+# Amazon
+
+# Google
+
+# Meta
+
+# Microsoft
+
+# Netflix
+
+# NVIDIA
+
