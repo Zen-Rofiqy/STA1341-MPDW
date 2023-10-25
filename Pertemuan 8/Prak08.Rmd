@@ -201,7 +201,7 @@ chart <-
 ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
-  scale_color_manual(values = c(NVDA="green4", NFLX="red4", 
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
                                 MSFT="deepskyblue2", META="dodgerblue3", 
                                 AAPL="lightskyblue4",
                                 GOOG="gold3", AMZN="orange2") ) +
@@ -745,7 +745,7 @@ ggplot(nflx, aes(x=Date, y=`Adj Close`)) +
             vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
 chart
 #Export Chart
-ggsave("02_Time Series Netflix.png", chart, path = export.chart,
+ggsave("07_Time Series Netflix.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -764,12 +764,12 @@ test_nflx.ts <- ts(test_nflx[,3])
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
 chart <-
 ggplot() + 
-  geom_line(data = training, linewidth=2,
+  geom_line(data = train_nflx, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = testing, linewidth=2,
+  geom_line(data = test_nflx, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
+       title = "Time Series Saham Netflix",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
@@ -777,7 +777,7 @@ ggplot() +
                       values = c("firebrick3", "grey30")) + theme.ts1
 chart
 #Export Chart
-ggsave("02_TSA_train-test.png", chart, path = export.chart,
+ggsave("07_TS_NFLX_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -786,54 +786,54 @@ Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cender
 ### Time Series NVIDIA
 
 ```{r}
-amzn <- data %>%
+nvda <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
-  filter(Name == "AMZN", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+  filter(Name == "NVDA", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
-rownames(amzn) <- NULL
-str(amzn)
+rownames(nvda) <- NULL
+str(nvda)
 ```
 
 ```{r}
-datatable(amzn, filter = 'top', 
+datatable(nvda, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Mengubah `Ajd Close` Menjadi *Time series.*
 
 ```{r}
-amzn.ts <- ts(amzn[,3])
+nvda.ts <- ts(nvda[,3])
 ```
 
 Ringkasan Data `Ajd CLose.`
 
 ```{r}
-summary(amzn.ts)
+summary(nvda.ts)
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
-min_value <- min(amzn$`Adj Close`)
-min_date <- amzn$Date[which.min(amzn$`Adj Close`)]
-percentage <- (which.min(amzn$`Adj Close`) / nrow(amzn)) * 100
+min_value <- min(nvda$`Adj Close`)
+min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
+percentage <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
 
 chart <-
-ggplot(amzn, aes(x=Date, y=`Adj Close`)) + 
+ggplot(nvda, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("orange2")) +
+  scale_color_manual(values = c("green4")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
-       subtitle = "Seperti apa sih pola deret waktu saham Amazon?\n") +
+       title = "Time Series Saham NVIDIA",
+       subtitle = "Seperti apa sih pola deret waktu saham NVIDIA?\n") +
   theme(legend.position = "none") +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
-             linetype = "dotted", color = "cyan4", linewidth = 1.5) +
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
   geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
-                  paste0("Titik Potong\n","(",round(percentage, 2), "%)",
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
                          "   ",min_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "cyan4") 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
 chart
 #Export Chart
-ggsave("02_Time Series Amazon.png", chart, path = export.chart,
+ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -843,29 +843,29 @@ Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memilik
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
-training <- amzn[1: round(nrow(amzn) *80/100),]
-testing <- amzn[round(nrow(amzn) *80/100): nrow(amzn),]
-train.ts <- ts(training[,3])
-test.ts <- ts(testing[,3])
+train_nvda <- nvda[1: round(nrow(nvda) *80/100),]
+test_nvda <- nvda[round(nrow(nvda) *80/100): nrow(nvda),]
+train_nvda.ts <- ts(train_nvda[,3])
+test_nvda.ts <- ts(test_nvda[,3])
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
 chart <-
 ggplot() + 
-  geom_line(data = training, linewidth=2,
+  geom_line(data = train_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = testing, linewidth=2,
+  geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
+       title = "Time Series Saham NVIDIA",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("orange", "cyan4")) + theme.ts1
+                      values = c("green4", "grey30")) + theme.ts1
 chart
 #Export Chart
-ggsave("02_TSA_train-test.png", chart, path = export.chart,
+ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
