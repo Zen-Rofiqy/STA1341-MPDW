@@ -1197,7 +1197,10 @@ datatable(perbandingan_aapl.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.aapl <- accuracy(ts(hasil[-1]), head(test_aapl.ts, n=54))
+akurasi.aapl <- accuracy(ts(hasil[-1]), head(test_aapl.ts, n=54)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_aapl.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
 row.names(akurasi.aapl) <- "AAPL"
 akurasi.aapl
 ```
@@ -1443,7 +1446,10 @@ datatable(perbandingan_amzn.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.amzn <- accuracy(ts(hasil[-1]), head(test_amzn.ts, n=54))
+akurasi.amzn <- accuracy(ts(hasil[-1]), head(test_amzn.ts, n=54)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_amzn.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
 row.names(akurasi.amzn) <- "AMZN"
 akurasi.amzn
 ```
@@ -1691,7 +1697,10 @@ datatable(perbandingan_goog.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.goog <- accuracy(ts(hasil[-1]), head(test_goog.ts, n=54))
+akurasi.goog <- accuracy(ts(hasil[-1]), head(test_goog.ts, n=54)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_goog.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
 row.names(akurasi.goog) <- "GOOG"
 akurasi.goog
 ```
@@ -1938,7 +1947,10 @@ datatable(perbandingan_meta.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.meta <- accuracy(ts(hasil[-1]), head(test_meta.ts, n=54))
+akurasi.meta <- accuracy(ts(hasil[-1]), head(test_meta.ts, n=54)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_meta.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
 row.names(akurasi.meta) <- "META"
 akurasi.meta
 ```
@@ -2082,7 +2094,7 @@ acf(sisaan_msft.da)
 pacf(sisaan_msft.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(``2,1,3``)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan ``` ARIMA(``2,1,3``) ``` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2186,12 +2198,15 @@ datatable(perbandingan_msft.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.msft <- accuracy(ts(hasil[-1]), head(test_msft.ts, n=54))
+akurasi.msft <- accuracy(ts(hasil[-1]), head(test_msft.ts, n=54)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_msft.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
 row.names(akurasi.msft) <- "MSFT"
 akurasi.msft
 ```
 
-Didapatkan nilai MAPE sebesar $7.869212\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(``2,1,3``)` sudah sangat baik.
+Didapatkan nilai MAPE sebesar $7.869212\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model ``` ARIMA(``2,1,3``) ``` sudah sangat baik.
 
 # Netflix
 
@@ -2434,7 +2449,10 @@ datatable(perbandingan_nflx.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.nflx <- accuracy(ts(hasil[-1]), head(test_nflx.ts, n=54))
+akurasi.nflx <- accuracy(ts(hasil[-1]), head(test_nflx.ts, n=54)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_nflx.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
 row.names(akurasi.nflx) <- "NFLX"
 akurasi.nflx
 ```
@@ -2683,7 +2701,9 @@ datatable(perbandingan_nvda.da, filter = 'top',
 
 ```{r}
 akurasi.nvda <- accuracy(ts(hasil[-1]), head(test_nvda.ts, n=54)) %>%
-  cbind(Model = ramalan_nvda.da[["method"]]) 
+  as.data.frame() %>%
+  cbind(Model = ramalan_nvda.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
 row.names(akurasi.nvda) <- "NVDA"
 akurasi.nvda
 ```
@@ -2697,7 +2717,6 @@ Didapatkan nilai MAPE sebesar $9.308578\%$ (kurang dari $10\%$) yang menandakan 
 ```{r}
 akurasi <- rbind(akurasi.aapl, akurasi.amzn, akurasi.goog, akurasi.meta,
                  akurasi.msft, akurasi.nflx, akurasi.nvda) %>%
-  as.data.frame() %>% 
   mutate(Keterangan = case_when(
     MAPE < 10 ~ "Sangat Baik",
     MAPE >= 10 & MAPE <= 20 ~ "Baik",
