@@ -2682,7 +2682,8 @@ datatable(perbandingan_nvda.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.nvda <- accuracy(ts(hasil[-1]), head(test_nvda.ts, n=54))
+akurasi.nvda <- accuracy(ts(hasil[-1]), head(test_nvda.ts, n=54)) %>%
+  cbind(Model = ramalan_nvda.da[["method"]]) 
 row.names(akurasi.nvda) <- "NVDA"
 akurasi.nvda
 ```
@@ -2695,13 +2696,15 @@ Didapatkan nilai MAPE sebesar $9.308578\%$ (kurang dari $10\%$) yang menandakan 
 
 ```{r}
 akurasi <- rbind(akurasi.aapl, akurasi.amzn, akurasi.goog, akurasi.meta,
-                 akurasi.msft, akurasi.nflx, akurasi.nvda)
-akurasi <- akurasi %>%
+                 akurasi.msft, akurasi.nflx, akurasi.nvda) %>%
+  as.data.frame() %>% 
   mutate(Keterangan = case_when(
     MAPE < 10 ~ "Sangat Baik",
     MAPE >= 10 & MAPE <= 20 ~ "Baik",
     MAPE > 20 & MAPE <= 50 ~ "Layak",
     MAPE > 50 ~ "Tidak Akurat"
-  ))
-akurasi
+  )) %>% relocate(Keterangan, .before = 1)
+
+datatable(akurasi, filter = 'top', 
+          options = list(pageLength = 5))
 ```
