@@ -924,8 +924,7 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
 plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "orange", lwd = 3.5,
-        ylab="Saham Harga penutup", 
+        col = "lightskyblue4", lwd = 3.5,
         main="Plot Difference Saham Amazon")
 ```
 
@@ -985,8 +984,6 @@ Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut ki
 Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
 
 ## **Pendugaan Parameter Model Tentatif**
-
-### Menggunakan Function
 
 Keterangan parameter function :
 
@@ -1069,14 +1066,14 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
           options = list(pageLength = 5))
 }
 
-# Contoh penggunaan fungsi dengan p_max = 3, q_max = 3
+# Panggil Fungsi
 model_tentatif(train_aapl.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1617.75$ dimiliki oleh model `ARIMA(3,1,4)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,1,4)` .
 
 ```{r}
-model_aapl.da <- Arima(train_aapl.diff, order=c(4,1,5), method="ML")
+model_aapl.da <- Arima(train_aapl.diff, order=c(3,1,4), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -1096,7 +1093,7 @@ acf(sisaan_aapl.da)
 pacf(sisaan_aapl.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(3,1,4)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1171,7 +1168,7 @@ ramalan_aapl.da
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 data.ramalan_aapl.da <- ramalan_aapl.da$mean
-plot(ramalan_aapl.da)
+plot(ramalan_aapl.da, col = "lightskyblue4", xlab="Periode (Hari)", lwd = 2)
 ```
 
 Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
@@ -1181,10 +1178,13 @@ pt_1 <- train_aapl.ts[length(train_aapl.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_aapl.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_aapl.ts,hasil)
+ts.plot(train_aapl.ts,hasil, xlab="Periode (Hari)", 
+        col = "lightskyblue4", lwd = 3,
+        ylab="Saham Harga (USD)",
+        main="Plot Ramalan Saham Apple")
 ```
 
-Dapat dilihat bahwa rata-rata harga lelang plat nomor mobil di shanghai diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan terus menurun setiap periodenya.
 
 ### Perbandingan
 
@@ -1202,15 +1202,11 @@ row.names(akurasi.aapl) <- "AAPL"
 akurasi.aapl
 ```
 
-Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah cukup baik.
+Didapatkan nilai MAPE sebesar $3.320077\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(3,1,4)` sudah sangat baik.
 
 # Amazon
 
 ## Uji Stasioner Data {.tabset}
-
-```{r message=FALSE, warning=FALSE}
-install_load('tsibble','tseries')
-```
 
 ### Plot ACF
 
@@ -1235,7 +1231,6 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3071$ yang lebih besa
 ### Plot Box-Cox
 
 ```{r message=FALSE, warning=FALSE}
-install_load('MASS')
 index <- seq(1:nrow(amzn))
 bc = boxcox(amzn.ts~index, lambda = seq(-2, 4, by=0.01))
 ```
@@ -1256,9 +1251,8 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_amzn.diff <- diff(train_amzn.ts, differences = 1) 
-plot.ts(train_amzn.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "orange", lwd = 3.5,
-        ylab="Saham Harga penutup", 
+plot.ts(train_amzn.diff, lty=1, xlab="Periode (Hari)", 
+        col = "orange2", lwd = 3.5,
         main="Plot Difference Saham Amazon")
 ```
 
@@ -1307,7 +1301,6 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada la
 ### Plot EACF
 
 ```{r message=FALSE, warning=FALSE}
-install_load('TSA')
 eacf(train_amzn.diff)
 ```
 
@@ -1319,90 +1312,7 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 
 ## **Pendugaan Parameter Model Tentatif**
 
-### Menggunakan Function
-
-Keterangan parameter function :
-
--   `data` = data Time Series baik yang sudah di `.diff` maupun belum
-
--   `p_max` = ordo maksimal dari **AR**
-
--   `d` = ordo **I**
-
--   `q_max` = ordo maksimal dari **MA**
-
--   `alpha` = alpha
-
 ```{r message=FALSE, warning=FALSE}
-install_load('forecast')
-
-# Fungsi untuk menghitung model ARIMA dan menganalisis parameter
-model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
-  best_model <- NULL
-  best_aic <- Inf
-  eacf_result <- eacf(data)
-  models <- data.frame(Model = character(0), 
-                       AIC = numeric(0), 
-                       Signif = character(0), 
-                       Keterangan = character(0))
-  
-  for (p in 0:p_max) {
-    for (q in 1:q_max) {
-      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
-          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
-          !is.na(eacf_result$symbol[p + 2, q + 2])) {
-        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
-            eacf_result$symbol[p + 1, q + 2] == "o" && 
-            eacf_result$symbol[p + 2, q + 2] == "o") {
-      
-          model <- Arima(data, order = c(p, d, q), method = "ML")
-          aic <- AIC(model)
-          
-          # Mendapatkan nilai coef dari model
-          coeftest_result <- lmtest::coeftest(model)
-          
-          # jika lebih kecil dari alpha, maka signifikan
-          significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] < alpha]  
-          
-          # jika lebih besar dari alpha, maka tidak signifikan
-          non_significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] > alpha]  
-          
-          # Keterangan signifikansi
-          if (length(significant_params) == 0) {
-            keterangan <- "Semua parameter tidak signifikan"
-          } else if (length(significant_params) == nrow(coeftest_result)) {
-            keterangan <- "Semua parameter signifikan"
-          } else {
-            keterangan <- paste("Parameter yang tidak signifikan adalah", 
-                                paste(non_significant_params, collapse = ", "))
-          }
-          
-          models <- rbind(models, 
-                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q, ")", 
-                                             sep = ""), 
-                               AIC = aic, 
-                               Signif = paste(significant_params, collapse = ", "), 
-                               Keterangan = keterangan))
-          
-            if (aic < best_aic) {
-              best_model <- model
-              best_aic <- aic
-          }
-        }
-      }
-    }
-  }
-  
-  cat("\nModel ARIMA dengan AIC terkecil:\n")
-  print(best_model)
-
-  datatable(models, filter = 'top', 
-          options = list(pageLength = 5))
-}
-
-# Contoh penggunaan fungsi dengan p_max = 3, q_max = 3
 model_tentatif(train_amzn.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
@@ -1504,7 +1414,7 @@ ramalan_amzn.da
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 data.ramalan_amzn.da <- ramalan_amzn.da$mean
-plot(ramalan_amzn.da)
+plot(ramalan_amzn.da, col = "orange2", xlab="Periode (Hari)", lwd = 2.5)
 ```
 
 Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
@@ -1514,10 +1424,13 @@ pt_1 <- train_amzn.ts[length(train_amzn.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_amzn.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_amzn.ts,hasil)
+ts.plot(train_amzn.ts, hasil, xlab="Periode (Hari)", 
+        col = "orange2", lwd = 3,
+        ylab="Saham Harga (USD)",
+        main="Plot Ramalan Saham Amazon")
 ```
 
-Dapat dilihat bahwa rata-rata harga lelang plat nomor mobil di shanghai diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menurun setiap periodenya.
 
 ### Perbandingan
 
@@ -1540,10 +1453,6 @@ Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan b
 # Google
 
 ## Uji Stasioner Data {.tabset}
-
-```{r message=FALSE, warning=FALSE}
-install_load('tsibble','tseries')
-```
 
 ### Plot ACF
 
@@ -1589,10 +1498,9 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_goog.diff <- diff(train_goog.ts, differences = 1) 
-plot.ts(train_goog.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "orange", lwd = 3.5,
-        ylab="Saham Harga penutup", 
-        main="Plot Difference Saham Amazon")
+plot.ts(train_goog.diff, lty=1, xlab="Periode (Hari)", 
+        col = "gold3", lwd = 3.5,
+        main="Plot Difference Saham Google")
 ```
 
 Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
@@ -1652,97 +1560,14 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 
 ## **Pendugaan Parameter Model Tentatif**
 
-### Menggunakan Function
-
-Keterangan parameter function :
-
--   `data` = data Time Series baik yang sudah di `.diff` maupun belum
-
--   `p_max` = ordo maksimal dari **AR**
-
--   `d` = ordo **I**
-
--   `q_max` = ordo maksimal dari **MA**
-
--   `alpha` = alpha
-
 ```{r message=FALSE, warning=FALSE}
-install_load('forecast')
-
-# Fungsi untuk menghitung model ARIMA dan menganalisis parameter
-model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
-  best_model <- NULL
-  best_aic <- Inf
-  eacf_result <- eacf(data)
-  models <- data.frame(Model = character(0), 
-                       AIC = numeric(0), 
-                       Signif = character(0), 
-                       Keterangan = character(0))
-  
-  for (p in 0:p_max) {
-    for (q in 1:q_max) {
-      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
-          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
-          !is.na(eacf_result$symbol[p + 2, q + 2])) {
-        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
-            eacf_result$symbol[p + 1, q + 2] == "o" && 
-            eacf_result$symbol[p + 2, q + 2] == "o") {
-      
-          model <- Arima(data, order = c(p, d, q), method = "ML")
-          aic <- AIC(model)
-          
-          # Mendapatkan nilai coef dari model
-          coeftest_result <- lmtest::coeftest(model)
-          
-          # jika lebih kecil dari alpha, maka signifikan
-          significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] < alpha]  
-          
-          # jika lebih besar dari alpha, maka tidak signifikan
-          non_significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] > alpha]  
-          
-          # Keterangan signifikansi
-          if (length(significant_params) == 0) {
-            keterangan <- "Semua parameter tidak signifikan"
-          } else if (length(significant_params) == nrow(coeftest_result)) {
-            keterangan <- "Semua parameter signifikan"
-          } else {
-            keterangan <- paste("Parameter yang tidak signifikan adalah", 
-                                paste(non_significant_params, collapse = ", "))
-          }
-          
-          models <- rbind(models, 
-                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q, ")", 
-                                             sep = ""), 
-                               AIC = aic, 
-                               Signif = paste(significant_params, collapse = ", "), 
-                               Keterangan = keterangan))
-          
-            if (aic < best_aic) {
-              best_model <- model
-              best_aic <- aic
-          }
-        }
-      }
-    }
-  }
-  
-  cat("\nModel ARIMA dengan AIC terkecil:\n")
-  print(best_model)
-
-  datatable(models, filter = 'top', 
-          options = list(pageLength = 5))
-}
-
-# Contoh penggunaan fungsi dengan p_max = 3, q_max = 3
 model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
-model_goog.da <- Arima(train_goog.diff, order=c(4,1,5), method="ML")
+model_goog.da <- Arima(train_goog.diff, order=c(0,1,1), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -1762,7 +1587,7 @@ acf(sisaan_goog.da)
 pacf(sisaan_goog.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1837,20 +1662,23 @@ ramalan_goog.da
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 data.ramalan_goog.da <- ramalan_goog.da$mean
-plot(ramalan_goog.da)
+plot(ramalan_goog.da, xlab="Periode (Hari)", col = "gold3", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_goog.ts[length(train_goog.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_goog.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_goog.ts,hasil)
+ts.plot(train_goog.ts,hasil, xlab="Periode (Hari)", 
+        col = "gold3", lwd = 3.5,
+        ylab="Saham Harga (USD)",
+        main="Plot Ramalan Saham Google")
 ```
 
-Dapat dilihat bahwa rata-rata harga lelang plat nomor mobil di shanghai diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham Google diramalkan akan terus menurun setiap periodenya.
 
 ### Perbandingan
 
@@ -1868,15 +1696,11 @@ row.names(akurasi.goog) <- "GOOG"
 akurasi.goog
 ```
 
-Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah cukup baik.
+Didapatkan nilai MAPE sebesar $11.24534\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah cukup baik.
 
 # META
 
 ## Uji Stasioner Data {.tabset}
-
-```{r message=FALSE, warning=FALSE}
-install_load('tsibble','tseries')
-```
 
 ### Plot ACF
 
@@ -1923,9 +1747,8 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_meta.diff <- diff(train_meta.ts, differences = 1) 
 plot.ts(train_meta.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "orange", lwd = 3.5,
-        ylab="Saham Harga penutup", 
-        main="Plot Difference Saham Amazon")
+        col = "dodgerblue3", lwd = 3.5,
+        main="Plot Difference Saham META")
 ```
 
 Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
@@ -1973,7 +1796,6 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada la
 ### Plot EACF
 
 ```{r message=FALSE, warning=FALSE}
-install_load('TSA')
 eacf(train_meta.diff)
 ```
 
@@ -1985,97 +1807,14 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 
 ## **Pendugaan Parameter Model Tentatif**
 
-### Menggunakan Function
-
-Keterangan parameter function :
-
--   `data` = data Time Series baik yang sudah di `.diff` maupun belum
-
--   `p_max` = ordo maksimal dari **AR**
-
--   `d` = ordo **I**
-
--   `q_max` = ordo maksimal dari **MA**
-
--   `alpha` = alpha
-
 ```{r message=FALSE, warning=FALSE}
-install_load('forecast')
-
-# Fungsi untuk menghitung model ARIMA dan menganalisis parameter
-model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
-  best_model <- NULL
-  best_aic <- Inf
-  eacf_result <- eacf(data)
-  models <- data.frame(Model = character(0), 
-                       AIC = numeric(0), 
-                       Signif = character(0), 
-                       Keterangan = character(0))
-  
-  for (p in 0:p_max) {
-    for (q in 1:q_max) {
-      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
-          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
-          !is.na(eacf_result$symbol[p + 2, q + 2])) {
-        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
-            eacf_result$symbol[p + 1, q + 2] == "o" && 
-            eacf_result$symbol[p + 2, q + 2] == "o") {
-      
-          model <- Arima(data, order = c(p, d, q), method = "ML")
-          aic <- AIC(model)
-          
-          # Mendapatkan nilai coef dari model
-          coeftest_result <- lmtest::coeftest(model)
-          
-          # jika lebih kecil dari alpha, maka signifikan
-          significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] < alpha]  
-          
-          # jika lebih besar dari alpha, maka tidak signifikan
-          non_significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] > alpha]  
-          
-          # Keterangan signifikansi
-          if (length(significant_params) == 0) {
-            keterangan <- "Semua parameter tidak signifikan"
-          } else if (length(significant_params) == nrow(coeftest_result)) {
-            keterangan <- "Semua parameter signifikan"
-          } else {
-            keterangan <- paste("Parameter yang tidak signifikan adalah", 
-                                paste(non_significant_params, collapse = ", "))
-          }
-          
-          models <- rbind(models, 
-                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q, ")", 
-                                             sep = ""), 
-                               AIC = aic, 
-                               Signif = paste(significant_params, collapse = ", "), 
-                               Keterangan = keterangan))
-          
-            if (aic < best_aic) {
-              best_model <- model
-              best_aic <- aic
-          }
-        }
-      }
-    }
-  }
-  
-  cat("\nModel ARIMA dengan AIC terkecil:\n")
-  print(best_model)
-
-  datatable(models, filter = 'top', 
-          options = list(pageLength = 5))
-}
-
-# Contoh penggunaan fungsi dengan p_max = 3, q_max = 3
 model_tentatif(train_meta.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2190.39$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
 
 ```{r}
-model_meta.da <- Arima(train_meta.diff, order=c(4,1,5), method="ML")
+model_meta.da <- Arima(train_meta.diff, order=c(0,1,1), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -2095,7 +1834,7 @@ acf(sisaan_meta.da)
 pacf(sisaan_meta.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2170,20 +1909,23 @@ ramalan_meta.da
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 data.ramalan_meta.da <- ramalan_meta.da$mean
-plot(ramalan_meta.da)
+plot(ramalan_meta.da, xlab="Periode (Tahun)", col = "dodgerblue3", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_meta.ts[length(train_meta.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_meta.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_meta.ts,hasil)
+ts.plot(train_meta.ts,hasil, xlab="Periode (Tahun)", 
+        col = "dodgerblue3", lwd = 3.5,
+        ylab="Saham Harga (USD)",
+        main="Plot Ramalan Saham META")
 ```
 
-Dapat dilihat bahwa rata-rata harga lelang plat nomor mobil di shanghai diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham META diramalkan akan terus menaik setiap periodenya.
 
 ### Perbandingan
 
@@ -2201,15 +1943,11 @@ row.names(akurasi.meta) <- "META"
 akurasi.meta
 ```
 
-Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah cukup baik.
+Didapatkan nilai MAPE sebesar $4.507078\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
 
 # Microsoft
 
 ## Uji Stasioner Data {.tabset}
-
-```{r message=FALSE, warning=FALSE}
-install_load('tsibble','tseries')
-```
 
 ### Plot ACF
 
@@ -2256,9 +1994,8 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_msft.diff <- diff(train_msft.ts, differences = 1) 
 plot.ts(train_msft.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "orange", lwd = 3.5,
-        ylab="Saham Harga penutup", 
-        main="Plot Difference Saham Amazon")
+        col = "deepskyblue2", lwd = 3.5,
+        main="Plot Difference Saham Microsoft")
 ```
 
 Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
@@ -2318,97 +2055,14 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 
 ## **Pendugaan Parameter Model Tentatif**
 
-### Menggunakan Function
-
-Keterangan parameter function :
-
--   `data` = data Time Series baik yang sudah di `.diff` maupun belum
-
--   `p_max` = ordo maksimal dari **AR**
-
--   `d` = ordo **I**
-
--   `q_max` = ordo maksimal dari **MA**
-
--   `alpha` = alpha
-
 ```{r message=FALSE, warning=FALSE}
-install_load('forecast')
-
-# Fungsi untuk menghitung model ARIMA dan menganalisis parameter
-model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
-  best_model <- NULL
-  best_aic <- Inf
-  eacf_result <- eacf(data)
-  models <- data.frame(Model = character(0), 
-                       AIC = numeric(0), 
-                       Signif = character(0), 
-                       Keterangan = character(0))
-  
-  for (p in 0:p_max) {
-    for (q in 1:q_max) {
-      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
-          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
-          !is.na(eacf_result$symbol[p + 2, q + 2])) {
-        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
-            eacf_result$symbol[p + 1, q + 2] == "o" && 
-            eacf_result$symbol[p + 2, q + 2] == "o") {
-      
-          model <- Arima(data, order = c(p, d, q), method = "ML")
-          aic <- AIC(model)
-          
-          # Mendapatkan nilai coef dari model
-          coeftest_result <- lmtest::coeftest(model)
-          
-          # jika lebih kecil dari alpha, maka signifikan
-          significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] < alpha]  
-          
-          # jika lebih besar dari alpha, maka tidak signifikan
-          non_significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] > alpha]  
-          
-          # Keterangan signifikansi
-          if (length(significant_params) == 0) {
-            keterangan <- "Semua parameter tidak signifikan"
-          } else if (length(significant_params) == nrow(coeftest_result)) {
-            keterangan <- "Semua parameter signifikan"
-          } else {
-            keterangan <- paste("Parameter yang tidak signifikan adalah", 
-                                paste(non_significant_params, collapse = ", "))
-          }
-          
-          models <- rbind(models, 
-                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q, ")", 
-                                             sep = ""), 
-                               AIC = aic, 
-                               Signif = paste(significant_params, collapse = ", "), 
-                               Keterangan = keterangan))
-          
-            if (aic < best_aic) {
-              best_model <- model
-              best_aic <- aic
-          }
-        }
-      }
-    }
-  }
-  
-  cat("\nModel ARIMA dengan AIC terkecil:\n")
-  print(best_model)
-
-  datatable(models, filter = 'top', 
-          options = list(pageLength = 5))
-}
-
-# Contoh penggunaan fungsi dengan p_max = 3, q_max = 3
 model_tentatif(train_msft.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1982.37$ dimiliki oleh model `ARIMA(2,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,3)`.
 
 ```{r}
-model_msft.da <- Arima(train_msft.diff, order=c(4,1,5), method="ML")
+model_msft.da <- Arima(train_msft.diff, order=c(2,1,3), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -2428,7 +2082,7 @@ acf(sisaan_msft.da)
 pacf(sisaan_msft.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(``2,1,3``)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2503,7 +2157,7 @@ ramalan_msft.da
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 data.ramalan_msft.da <- ramalan_msft.da$mean
-plot(ramalan_msft.da)
+plot(ramalan_msft.da, xlab="Periode (Tahun)", col = "deepskyblue2", lwd = 2.5)
 ```
 
 Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
@@ -2513,10 +2167,13 @@ pt_1 <- train_msft.ts[length(train_msft.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_msft.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_msft.ts,hasil)
+ts.plot(train_msft.ts,hasil, xlab="Periode (Tahun)", 
+        ylab="Saham Harga (USD)",
+        col = "deepskyblue2", lwd = 3.5,
+        main="Plot Ramalan Saham Microsoft")
 ```
 
-Dapat dilihat bahwa rata-rata harga lelang plat nomor mobil di shanghai diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham Microsoft diramalkan akan terus konstan setiap periodenya.
 
 ### Perbandingan
 
@@ -2539,10 +2196,6 @@ Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan b
 # Netflix
 
 ## Uji Stasioner Data {.tabset}
-
-```{r message=FALSE, warning=FALSE}
-install_load('tsibble','tseries')
-```
 
 ### Plot ACF
 
@@ -2651,90 +2304,7 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 
 ## **Pendugaan Parameter Model Tentatif**
 
-### Menggunakan Function
-
-Keterangan parameter function :
-
--   `data` = data Time Series baik yang sudah di `.diff` maupun belum
-
--   `p_max` = ordo maksimal dari **AR**
-
--   `d` = ordo **I**
-
--   `q_max` = ordo maksimal dari **MA**
-
--   `alpha` = alpha
-
 ```{r message=FALSE, warning=FALSE}
-install_load('forecast')
-
-# Fungsi untuk menghitung model ARIMA dan menganalisis parameter
-model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
-  best_model <- NULL
-  best_aic <- Inf
-  eacf_result <- eacf(data)
-  models <- data.frame(Model = character(0), 
-                       AIC = numeric(0), 
-                       Signif = character(0), 
-                       Keterangan = character(0))
-  
-  for (p in 0:p_max) {
-    for (q in 1:q_max) {
-      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
-          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
-          !is.na(eacf_result$symbol[p + 2, q + 2])) {
-        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
-            eacf_result$symbol[p + 1, q + 2] == "o" && 
-            eacf_result$symbol[p + 2, q + 2] == "o") {
-      
-          model <- Arima(data, order = c(p, d, q), method = "ML")
-          aic <- AIC(model)
-          
-          # Mendapatkan nilai coef dari model
-          coeftest_result <- lmtest::coeftest(model)
-          
-          # jika lebih kecil dari alpha, maka signifikan
-          significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] < alpha]  
-          
-          # jika lebih besar dari alpha, maka tidak signifikan
-          non_significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] > alpha]  
-          
-          # Keterangan signifikansi
-          if (length(significant_params) == 0) {
-            keterangan <- "Semua parameter tidak signifikan"
-          } else if (length(significant_params) == nrow(coeftest_result)) {
-            keterangan <- "Semua parameter signifikan"
-          } else {
-            keterangan <- paste("Parameter yang tidak signifikan adalah", 
-                                paste(non_significant_params, collapse = ", "))
-          }
-          
-          models <- rbind(models, 
-                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q, ")", 
-                                             sep = ""), 
-                               AIC = aic, 
-                               Signif = paste(significant_params, collapse = ", "), 
-                               Keterangan = keterangan))
-          
-            if (aic < best_aic) {
-              best_model <- model
-              best_aic <- aic
-          }
-        }
-      }
-    }
-  }
-  
-  cat("\nModel ARIMA dengan AIC terkecil:\n")
-  print(best_model)
-
-  datatable(models, filter = 'top', 
-          options = list(pageLength = 5))
-}
-
-# Contoh penggunaan fungsi dengan p_max = 3, q_max = 3
 model_tentatif(train_nflx.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
@@ -2873,10 +2443,6 @@ Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan b
 
 ## Uji Stasioner Data {.tabset}
 
-```{r message=FALSE, warning=FALSE}
-install_load('tsibble','tseries')
-```
-
 ### Plot ACF
 
 ```{r}
@@ -2984,90 +2550,7 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 
 ## **Pendugaan Parameter Model Tentatif**
 
-### Menggunakan Function
-
-Keterangan parameter function :
-
--   `data` = data Time Series baik yang sudah di `.diff` maupun belum
-
--   `p_max` = ordo maksimal dari **AR**
-
--   `d` = ordo **I**
-
--   `q_max` = ordo maksimal dari **MA**
-
--   `alpha` = alpha
-
 ```{r message=FALSE, warning=FALSE}
-install_load('forecast')
-
-# Fungsi untuk menghitung model ARIMA dan menganalisis parameter
-model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
-  best_model <- NULL
-  best_aic <- Inf
-  eacf_result <- eacf(data)
-  models <- data.frame(Model = character(0), 
-                       AIC = numeric(0), 
-                       Signif = character(0), 
-                       Keterangan = character(0))
-  
-  for (p in 0:p_max) {
-    for (q in 1:q_max) {
-      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
-          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
-          !is.na(eacf_result$symbol[p + 2, q + 2])) {
-        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
-            eacf_result$symbol[p + 1, q + 2] == "o" && 
-            eacf_result$symbol[p + 2, q + 2] == "o") {
-      
-          model <- Arima(data, order = c(p, d, q), method = "ML")
-          aic <- AIC(model)
-          
-          # Mendapatkan nilai coef dari model
-          coeftest_result <- lmtest::coeftest(model)
-          
-          # jika lebih kecil dari alpha, maka signifikan
-          significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] < alpha]  
-          
-          # jika lebih besar dari alpha, maka tidak signifikan
-          non_significant_params <- 
-            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] > alpha]  
-          
-          # Keterangan signifikansi
-          if (length(significant_params) == 0) {
-            keterangan <- "Semua parameter tidak signifikan"
-          } else if (length(significant_params) == nrow(coeftest_result)) {
-            keterangan <- "Semua parameter signifikan"
-          } else {
-            keterangan <- paste("Parameter yang tidak signifikan adalah", 
-                                paste(non_significant_params, collapse = ", "))
-          }
-          
-          models <- rbind(models, 
-                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q, ")", 
-                                             sep = ""), 
-                               AIC = aic, 
-                               Signif = paste(significant_params, collapse = ", "), 
-                               Keterangan = keterangan))
-          
-            if (aic < best_aic) {
-              best_model <- model
-              best_aic <- aic
-          }
-        }
-      }
-    }
-  }
-  
-  cat("\nModel ARIMA dengan AIC terkecil:\n")
-  print(best_model)
-
-  datatable(models, filter = 'top', 
-          options = list(pageLength = 5))
-}
-
-# Contoh penggunaan fungsi dengan p_max = 3, q_max = 3
 model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
