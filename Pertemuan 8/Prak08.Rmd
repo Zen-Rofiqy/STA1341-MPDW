@@ -2684,7 +2684,7 @@ hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_nvda.ts,hasil, ylab="Saham Harga (USD)",
         xlab="Periode (Tahun)", 
         col = "green4", lwd = 3.5,
-        main="Plot Difference Saham Amazon")
+        main="Plot Difference Saham NVIDIA")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham NVIDA diramalkan akan terus Melonjak naik setiap periodenya.
