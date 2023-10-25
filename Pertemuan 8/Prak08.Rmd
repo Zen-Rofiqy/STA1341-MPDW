@@ -55,7 +55,7 @@ path <- function(){
 
 ```{r}
 #Export chart
-export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 67/Chart"
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 8/Chart"
 ```
 
 # Pendahuluan
@@ -202,8 +202,8 @@ ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
   scale_color_manual(values = c(NVDA="green4", NFLX="red4", MSFT="steelblue3",
-                                META="royalblue4", AAPL="lightskyblue4",
-                                GOOG="yellow3", AMZN="orange2") ) +
+                                META="dodgerblue3", AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
   scale_alpha_manual(values = c("NVDA" = .25, "NFLX" = .25, "MSFT" = .25, 
                                 "META" = .25, "AAPL" = .25, "GOOG" = .25, 
                                 "AMZN" = 1)) +
@@ -297,11 +297,11 @@ ggplot(amzn, aes(x=Date, y=`Adj Close`)) +
   theme(legend.position = "none") +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
-             linetype = "dotted", color = "cyan4", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)/1.59, label = 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
                   paste0("Titik Potong\n","(",round(percentage, 2), "%)",
                          "   ",min_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "cyan4") 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
 chart
 #Export Chart
 ggsave("02_Time Series Amazon.png", chart, path = export.chart,
@@ -314,18 +314,18 @@ Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memilik
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
-training <- amzn[1: round(nrow(amzn) *80/100),]
-testing <- amzn[round(nrow(amzn) *80/100): nrow(amzn),]
-train.ts <- ts(training[,3])
-test.ts <- ts(testing[,3])
+train_amzn <- amzn[1: round(nrow(amzn) *80/100),]
+test_amzn <- amzn[round(nrow(amzn) *80/100): nrow(amzn),]
+train_amzn.ts <- ts(train_amzn[,3])
+test_amzn.ts <- ts(test_amzn[,3])
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
 chart <-
 ggplot() + 
-  geom_line(data = training, linewidth=2,
+  geom_line(data = train_amzn, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = testing, linewidth=2,
+  geom_line(data = test_amzn, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Amazon",
@@ -333,10 +333,10 @@ ggplot() +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("orange", "cyan4")) + theme.ts1
+                      values = c("orange", "grey30")) + theme.ts1
 chart
 #Export Chart
-ggsave("02_TSA_train-test.png", chart, path = export.chart,
+ggsave("02_TS_Amazon_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -345,54 +345,54 @@ Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cender
 ### Time Series Apple
 
 ```{r}
-amzn <- data %>%
+aapl <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
-  filter(Name == "AMZN", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+  filter(Name == "AAPL", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
-rownames(amzn) <- NULL
-str(amzn)
+rownames(aapl) <- NULL
+str(aapl)
 ```
 
 ```{r}
-datatable(amzn, filter = 'top', 
+datatable(aapl, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Mengubah `Ajd Close` Menjadi *Time series.*
 
 ```{r}
-amzn.ts <- ts(amzn[,3])
+aapl.ts <- ts(aapl[,3])
 ```
 
 Ringkasan Data `Ajd CLose.`
 
 ```{r}
-summary(amzn.ts)
+summary(aapl.ts)
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
-min_value <- min(amzn$`Adj Close`)
-min_date <- amzn$Date[which.min(amzn$`Adj Close`)]
-percentage <- (which.min(amzn$`Adj Close`) / nrow(amzn)) * 100
+min_value <- min(aapl$`Adj Close`)
+min_date <- aapl$Date[which.min(aapl$`Adj Close`)]
+percentage <- (which.min(aapl$`Adj Close`) / nrow(aapl)) * 100
 
 chart <-
-ggplot(amzn, aes(x=Date, y=`Adj Close`)) + 
+ggplot(aapl, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("orange2")) +
+  scale_color_manual(values = c("lightskyblue4")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
-       subtitle = "Seperti apa sih pola deret waktu saham Amazon?\n") +
+       title = "Time Series Saham Apple",
+       subtitle = "Seperti apa sih pola deret waktu saham Apple?\n") +
   theme(legend.position = "none") +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
-             linetype = "dotted", color = "cyan4", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)/1.59, label = 
-                  paste0("Titik Potong\n","(",round(percentage, 2), "%)",
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
                          "   ",min_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "cyan4") 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
 chart
 #Export Chart
-ggsave("02_Time Series Amazon.png", chart, path = export.chart,
+ggsave("03_Time Series Apple.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -402,29 +402,29 @@ Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memilik
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
-training <- amzn[1: round(nrow(amzn) *80/100),]
-testing <- amzn[round(nrow(amzn) *80/100): nrow(amzn),]
-train.ts <- ts(training[,3])
-test.ts <- ts(testing[,3])
+train_aapl <- aapl[1: round(nrow(aapl) *80/100),]
+test_aapl <- aapl[round(nrow(aapl) *80/100): nrow(aapl),]
+train_aapl.ts <- ts(train_aapl[,3])
+test_aapl.ts <- ts(train_aapl[,3])
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
 chart <-
 ggplot() + 
-  geom_line(data = training, linewidth=2,
+  geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = testing, linewidth=2,
+  geom_line(data = test_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
+       title = "Time Series Saham Apple",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("orange", "cyan4")) + theme.ts1
+                      values = c("lightskyblue4", "grey30")) + theme.ts1
 chart
 #Export Chart
-ggsave("02_TSA_train-test.png", chart, path = export.chart,
+ggsave("03_TS_AAPL_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -433,54 +433,54 @@ Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cender
 ### Time Series Google
 
 ```{r}
-amzn <- data %>%
+goog <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
-  filter(Name == "AMZN", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+  filter(Name == "GOOG", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
-rownames(amzn) <- NULL
-str(amzn)
+rownames(goog) <- NULL
+str(goog)
 ```
 
 ```{r}
-datatable(amzn, filter = 'top', 
+datatable(goog, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Mengubah `Ajd Close` Menjadi *Time series.*
 
 ```{r}
-amzn.ts <- ts(amzn[,3])
+goog.ts <- ts(goog[,3])
 ```
 
 Ringkasan Data `Ajd CLose.`
 
 ```{r}
-summary(amzn.ts)
+summary(goog.ts)
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
-min_value <- min(amzn$`Adj Close`)
-min_date <- amzn$Date[which.min(amzn$`Adj Close`)]
-percentage <- (which.min(amzn$`Adj Close`) / nrow(amzn)) * 100
+min_value <- min(goog$`Adj Close`)
+min_date <- goog$Date[which.min(goog$`Adj Close`)]
+percentage <- (which.min(goog$`Adj Close`) / nrow(goog)) * 100
 
 chart <-
-ggplot(amzn, aes(x=Date, y=`Adj Close`)) + 
+ggplot(goog, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("orange2")) +
+  scale_color_manual(values = c("gold3")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
-       subtitle = "Seperti apa sih pola deret waktu saham Amazon?\n") +
+       title = "Time Series Saham Google",
+       subtitle = "Seperti apa sih pola deret waktu saham Google?\n") +
   theme(legend.position = "none") +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
-             linetype = "dotted", color = "cyan4", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)/1.59, label = 
-                  paste0("Titik Potong\n","(",round(percentage, 2), "%)",
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
                          "   ",min_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "cyan4") 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
 chart
 #Export Chart
-ggsave("02_Time Series Amazon.png", chart, path = export.chart,
+ggsave("04_Time Series Google.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -490,29 +490,29 @@ Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memilik
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
-training <- amzn[1: round(nrow(amzn) *80/100),]
-testing <- amzn[round(nrow(amzn) *80/100): nrow(amzn),]
-train.ts <- ts(training[,3])
-test.ts <- ts(testing[,3])
+train_goog <- goog[1: round(nrow(goog) *80/100),]
+test_goog <- goog[round(nrow(goog) *80/100): nrow(goog),]
+train_goog.ts <- ts(train_goog[,3])
+test_goog.ts <- ts(test_goog[,3])
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
 chart <-
 ggplot() + 
-  geom_line(data = training, linewidth=2,
+  geom_line(data = train_goog, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = testing, linewidth=2,
+  geom_line(data = test_goog, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
+       title = "Time Series Saham Google",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("orange", "cyan4")) + theme.ts1
+                      values = c("gold3", "grey30")) + theme.ts1
 chart
 #Export Chart
-ggsave("02_TSA_train-test.png", chart, path = export.chart,
+ggsave("04_TS_GOOG_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -521,54 +521,54 @@ Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cender
 ### Time Series META
 
 ```{r}
-amzn <- data %>%
+meta <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
-  filter(Name == "AMZN", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+  filter(Name == "META", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
-rownames(amzn) <- NULL
-str(amzn)
+rownames(meta) <- NULL
+str(meta)
 ```
 
 ```{r}
-datatable(amzn, filter = 'top', 
+datatable(meta, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Mengubah `Ajd Close` Menjadi *Time series.*
 
 ```{r}
-amzn.ts <- ts(amzn[,3])
+meta.ts <- ts(meta[,3])
 ```
 
 Ringkasan Data `Ajd CLose.`
 
 ```{r}
-summary(amzn.ts)
+summary(meta.ts)
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
-min_value <- min(amzn$`Adj Close`)
-min_date <- amzn$Date[which.min(amzn$`Adj Close`)]
-percentage <- (which.min(amzn$`Adj Close`) / nrow(amzn)) * 100
+min_value <- min(meta$`Adj Close`)
+min_date <- meta$Date[which.min(meta$`Adj Close`)]
+percentage <- (which.min(meta$`Adj Close`) / nrow(meta)) * 100
 
 chart <-
-ggplot(amzn, aes(x=Date, y=`Adj Close`)) + 
+ggplot(meta, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("orange2")) +
+  scale_color_manual(values = c("dodgerblue3")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
-       subtitle = "Seperti apa sih pola deret waktu saham Amazon?\n") +
+       title = "Time Series Saham META",
+       subtitle = "Seperti apa sih pola deret waktu saham META?\n") +
   theme(legend.position = "none") +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
-             linetype = "dotted", color = "cyan4", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)/1.59, label = 
-                  paste0("Titik Potong\n","(",round(percentage, 2), "%)",
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
                          "   ",min_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "cyan4") 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
 chart
 #Export Chart
-ggsave("02_Time Series Amazon.png", chart, path = export.chart,
+ggsave("05_Time Series META.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -578,29 +578,29 @@ Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memilik
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
-training <- amzn[1: round(nrow(amzn) *80/100),]
-testing <- amzn[round(nrow(amzn) *80/100): nrow(amzn),]
-train.ts <- ts(training[,3])
-test.ts <- ts(testing[,3])
+train_meta <- meta[1: round(nrow(meta) *80/100),]
+test_meta <- meta[round(nrow(meta) *80/100): nrow(meta),]
+train_meta.ts <- ts(train_meta[,3])
+test_meta.ts <- ts(test_meta[,3])
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
 chart <-
 ggplot() + 
-  geom_line(data = training, linewidth=2,
+  geom_line(data = train_meta, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = testing, linewidth=2,
+  geom_line(data = test_meta, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Amazon",
+       title = "Time Series Saham META",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("orange", "cyan4")) + theme.ts1
+                      values = c("dodgerblue3", "grey30")) + theme.ts1
 chart
 #Export Chart
-ggsave("02_TSA_train-test.png", chart, path = export.chart,
+ggsave("05_TS_META_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
@@ -609,29 +609,29 @@ Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cender
 ### Time Series Microsoft
 
 ```{r}
-amzn <- data %>%
+msft <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
-  filter(Name == "AMZN", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+  filter(Name == "MSFT", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
-rownames(amzn) <- NULL
-str(amzn)
+rownames(msft) <- NULL
+str(msft)
 ```
 
 ```{r}
-datatable(amzn, filter = 'top', 
+datatable(msft, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Mengubah `Ajd Close` Menjadi *Time series.*
 
 ```{r}
-amzn.ts <- ts(amzn[,3])
+msft.ts <- ts(msft[,3])
 ```
 
 Ringkasan Data `Ajd CLose.`
 
 ```{r}
-summary(amzn.ts)
+summary(msft.ts)
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
@@ -650,7 +650,7 @@ ggplot(amzn, aes(x=Date, y=`Adj Close`)) +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
              linetype = "dotted", color = "cyan4", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)/1.59, label = 
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
                   paste0("Titik Potong\n","(",round(percentage, 2), "%)",
                          "   ",min_date)), 
             vjust = -1.5, hjust = 0, size = 7, color = "cyan4") 
@@ -738,7 +738,7 @@ ggplot(amzn, aes(x=Date, y=`Adj Close`)) +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
              linetype = "dotted", color = "cyan4", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)/1.59, label = 
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
                   paste0("Titik Potong\n","(",round(percentage, 2), "%)",
                          "   ",min_date)), 
             vjust = -1.5, hjust = 0, size = 7, color = "cyan4") 
@@ -826,7 +826,7 @@ ggplot(amzn, aes(x=Date, y=`Adj Close`)) +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
              linetype = "dotted", color = "cyan4", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)/1.59, label = 
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
                   paste0("Titik Potong\n","(",round(percentage, 2), "%)",
                          "   ",min_date)), 
             vjust = -1.5, hjust = 0, size = 7, color = "cyan4") 
