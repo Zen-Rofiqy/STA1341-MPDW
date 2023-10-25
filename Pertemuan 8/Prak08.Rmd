@@ -1448,7 +1448,7 @@ row.names(akurasi.amzn) <- "AMZN"
 akurasi.amzn
 ```
 
-Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah cukup baik.
+Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah baik.
 
 # Google
 
@@ -1696,7 +1696,7 @@ row.names(akurasi.goog) <- "GOOG"
 akurasi.goog
 ```
 
-Didapatkan nilai MAPE sebesar $11.24534\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah cukup baik.
+Didapatkan nilai MAPE sebesar $11.24534\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah baik.
 
 # META
 
@@ -1919,7 +1919,7 @@ pt_1 <- train_meta.ts[length(train_meta.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_meta.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_meta.ts,hasil, xlab="Periode (Tahun)", 
+ts.plot(train_meta.ts,hasil, xlab="Periode (Hari)", 
         col = "dodgerblue3", lwd = 3.5,
         ylab="Saham Harga (USD)",
         main="Plot Ramalan Saham META")
@@ -2167,7 +2167,7 @@ pt_1 <- train_msft.ts[length(train_msft.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_msft.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_msft.ts,hasil, xlab="Periode (Tahun)", 
+ts.plot(train_msft.ts,hasil, xlab="Periode (Hari)", 
         ylab="Saham Harga (USD)",
         col = "deepskyblue2", lwd = 3.5,
         main="Plot Ramalan Saham Microsoft")
@@ -2191,7 +2191,7 @@ row.names(akurasi.msft) <- "MSFT"
 akurasi.msft
 ```
 
-Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah cukup baik.
+Didapatkan nilai MAPE sebesar $7.869212\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(``2,1,3``)` sudah sangat baik.
 
 # Netflix
 
@@ -2241,10 +2241,9 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_nflx.diff <- diff(train_nflx.ts, differences = 1) 
-plot.ts(train_nflx.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "orange", lwd = 3.5,
-        ylab="Saham Harga penutup", 
-        main="Plot Difference Saham Amazon")
+plot.ts(train_nflx.diff, lty=1, xlab="Periode (Hari)", 
+        col = "firebrick3", lwd = 3.5,
+        main="Plot Difference Saham Netflix")
 ```
 
 Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
@@ -2308,10 +2307,10 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 model_tentatif(train_nflx.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(5,1,6)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(5,1,6)`.
 
 ```{r}
-model_nflx.da <- Arima(train_nflx.diff, order=c(4,1,5), method="ML")
+model_nflx.da <- Arima(train_nflx.diff, order=c(5,1,6), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -2331,7 +2330,7 @@ acf(sisaan_nflx.da)
 pacf(sisaan_nflx.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(5,1,6)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2406,20 +2405,23 @@ ramalan_nflx.da
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 data.ramalan_nflx.da <- ramalan_nflx.da$mean
-plot(ramalan_nflx.da)
+plot(ramalan_nflx.da, xlab="Periode (Hari)", col = "firebrick3", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(5,1,6)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_nflx.ts[length(train_nflx.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_nflx.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_nflx.ts,hasil)
+ts.plot(train_nflx.ts,hasil, ylab="Saham Harga (USD)", 
+        xlab="Periode (Hari)", 
+        col = "firebrick3", lwd = 3.5,
+        main="Plot Ramalan Saham Netflix")
 ```
 
-Dapat dilihat bahwa rata-rata harga lelang plat nomor mobil di shanghai diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham Netfilx diramalkan akan terus menaik setiap periodenya.
 
 ### Perbandingan
 
@@ -2437,7 +2439,7 @@ row.names(akurasi.nflx) <- "NFLX"
 akurasi.nflx
 ```
 
-Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah cukup baik.
+Didapatkan nilai MAPE sebesar $7.852942\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(5,1,6)` sudah sangat baik.
 
 # NVIDIA
 
@@ -2488,8 +2490,7 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_nvda.diff <- diff(train_nvda.ts, differences = 1) 
 plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "orange", lwd = 3.5,
-        ylab="Saham Harga penutup", 
+        col = "green4", lwd = 4,
         main="Plot Difference Saham Amazon")
 ```
 
@@ -2554,10 +2555,10 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(5,1,6)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(5,1,6)`.
 
 ```{r}
-model_nvda.da <- Arima(train_nvda.diff, order=c(4,1,5), method="ML")
+model_nvda.da <- Arima(train_nvda.diff, order=c(5,1,6), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -2577,7 +2578,7 @@ acf(sisaan_nvda.da)
 pacf(sisaan_nvda.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(5,1,6)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2652,20 +2653,23 @@ ramalan_nvda.da
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 data.ramalan_nvda.da <- ramalan_nvda.da$mean
-plot(ramalan_nvda.da)
+plot(ramalan_nvda.da, xlab="Periode (Tahun)", col = "green4", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(5,1,6)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_nvda.ts[length(train_nvda.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_nvda.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_nvda.ts,hasil)
+ts.plot(train_nvda.ts,hasil, ylab="Saham Harga (USD)",
+        xlab="Periode (Tahun)", 
+        col = "green4", lwd = 3.5,
+        main="Plot Difference Saham Amazon")
 ```
 
-Dapat dilihat bahwa rata-rata harga lelang plat nomor mobil di shanghai diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham NVIDA diramalkan akan terus Melonjak naik setiap periodenya.
 
 ### Perbandingan
 
@@ -2683,6 +2687,21 @@ row.names(akurasi.nvda) <- "NVDA"
 akurasi.nvda
 ```
 
-Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah cukup baik.
+Didapatkan nilai MAPE sebesar $9.308578\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(5,1,6)` sudah sangat baik.
 
 # Perbandingan Antar Saham
+
+## Perbandingan Akurasi
+
+```{r}
+akurasi <- rbind(akurasi.aapl, akurasi.amzn, akurasi.goog, akurasi.meta,
+                 akurasi.msft, akurasi.nflx, akurasi.nvda)
+akurasi <- akurasi %>%
+  mutate(Keterangan = case_when(
+    MAPE < 10 ~ "Sangat Baik",
+    MAPE >= 10 & MAPE <= 20 ~ "Baik",
+    MAPE > 20 & MAPE <= 50 ~ "Layak",
+    MAPE > 50 ~ "Tidak Akurat"
+  ))
+akurasi
+```
