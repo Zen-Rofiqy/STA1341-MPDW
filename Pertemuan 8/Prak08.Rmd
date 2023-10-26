@@ -205,7 +205,7 @@ ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
                                 MSFT="deepskyblue2", META="dodgerblue3", 
                                 AAPL="lightskyblue4",
                                 GOOG="gold3", AMZN="orange2") ) +
-  scale_alpha_manual(values = c("NVDA" = .25, "NFLX" = .25, "MSFT" = .25, 
+  scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
                                 "META" = .25, "AAPL" = .25, "GOOG" = .25, 
                                 "AMZN" = 1)) +
   theme.ts + #THeme
@@ -253,7 +253,17 @@ ggsave("01_Time Series MAANG.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 23)
 ```
 
-Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, saya hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun. Agar pengerjaannya tidak terlalu sulit, karena masih tahap awal pembelajaran.
+Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Amazon**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
+
+Berikut adalah list sesi `Rpubs` dari rentang tahun yang ada :
+
+-   [2019-2023](https://rpubs.com/ZenR_Prog/MPDW-Prak08-19-23){.uri} (Semua)
+
+-   [2020-2023](https://rpubs.com/ZenR_Prog/MPDW-Prak08-20-23){.uri}
+
+-   [2021-2023](https://rpubs.com/ZenR_Prog/MPDW-Prak08-21-23){.uri}
+
+-   [2022-2023](https://rpubs.com/ZenR_Prog/MPDW-Prak08-22-23){.uri}
 
 ### Time Series Apple
 
