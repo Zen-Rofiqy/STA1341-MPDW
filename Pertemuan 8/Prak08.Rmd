@@ -495,7 +495,7 @@ ggsave("04_Time Series Google.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $53.81\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2023-01-05`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $53.81\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2021-11-03`, terjadi perubahan pola menjadi [tren naik]{.underline}.
 
 **Pembagian Data Training Dan Test.**
 
@@ -583,9 +583,9 @@ ggsave("05_Time Series META.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $53.81\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-11-03`, terjadi perubahan pola menjadi [tren naik]{.underline}. Tanggal dan persentase perubahan pola beserta polanya mirip dengan saham Google.
 
-**Pembagian Data Training Dan Test.**
+**Pembagian Data Training Dan Test2**
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
@@ -671,7 +671,7 @@ ggsave("06_Time Series Microsoft.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $53.81\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-11-03`, terjadi perubahan pola menjadi [tren naik]{.underline}. Tanggal dan persentase perubahan pola beserta polanya mirip dengan saham Google dan META.
 
 **Pembagian Data Training Dan Test.**
 
@@ -759,7 +759,7 @@ ggsave("07_Time Series Netflix.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+Berbeda dari yang lain, berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $22.84\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-05-11`, terjadi perubahan pola menjadi [tren naik]{.underline}.
 
 **Pembagian Data Training Dan Test.**
 
@@ -847,7 +847,7 @@ ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $50.25\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-10-14`, terjadi perubahan pola menjadi [tren naik]{.underline} dan menaik tajam pada Juli 2023.
 
 **Pembagian Data Training Dan Test.**
 
