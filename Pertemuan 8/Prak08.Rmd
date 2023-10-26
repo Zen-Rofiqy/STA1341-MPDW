@@ -939,7 +939,7 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
 plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
         col = "lightskyblue4", lwd = 3.5,
-        main="Plot Difference Saham Amazon")
+        main="Plot Difference Saham Apple")
 ```
 
 Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
@@ -997,6 +997,8 @@ Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut ki
 
 Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
 
+Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
 ## **Pendugaan Parameter Model Tentatif**
 
 Untuk menduga parameter model tentatif, kami akan menggunakan function berdasarkan plot EACF yang sudah dirancang sebagai berikut.
@@ -1028,6 +1030,7 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
   
   for (p in 0:p_max) {
     for (q in 1:q_max) {
+      #Pola Matriks segitiga bawah
       if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
           !is.na(eacf_result$symbol[p + 1, q + 2]) && 
           !is.na(eacf_result$symbol[p + 2, q + 2])) {
@@ -1067,12 +1070,14 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
                                               collapse = ", "), 
                                Keterangan = keterangan))
           
-                if ("Semua parameter signifikan" %in% Keterangan) {
-                  if (aic < best_aic) {
-                    best_model <- model
-                    best_aic <- aic
-                }
-              }
+          #Identifikasi Best Model
+            if (keterangan == "Semua parameter signifikan" && 
+                !any(is.na(significant_params))) {
+              if (aic < best_aic) {
+                best_model <- model
+                best_aic <- aic
+            }
+          }
         }
       }
     }
@@ -1091,10 +1096,10 @@ datatable(model.tentaif_aapl, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1617.75$ dimiliki oleh model `ARIMA(3,1,4)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,1,4)` .
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1624.99$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA``(0,1,1)` .
 
 ```{r}
-model_aapl.da <- Arima(train_aapl.diff, order=c(3,1,4), method="ML")
+model_aapl.da <- Arima(train_aapl.diff, order=c(0,1,1), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -1121,7 +1126,7 @@ acf(sisaan_aapl.da)
 pacf(sisaan_aapl.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar [tidak normal]{.underline} ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki [ragam yang homogen]{.underline}. Plot ACF dan PACF sisaan `ARIMA(3,1,4)` juga tidak signifikan pada 20 lag awal yang menandakan [saling bebas]{.underline}. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar [tidak normal]{.underline} ditandai dengan tidak semua titiknya mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki [ragam yang homogen]{.underline}. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan [saling bebas]{.underline}. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1151,7 +1156,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.6657$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7856$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 #### Sisaan homogen
 
@@ -1165,7 +1170,7 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.5083$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.2439$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
 ```{r}
 #4) Nilai tengah sisaan sama dengan nol 
@@ -1178,7 +1183,7 @@ Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. H
 >
 > $H_1$ : nilai tengah sisaan tidak sama dengan 0
 
-Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.1509$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.1592$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
 ## **Peramalan** {.tabset}
 
@@ -1199,7 +1204,7 @@ data.ramalan_aapl.da <- ramalan_aapl.da$mean
 plot(ramalan_aapl.da, col = "lightskyblue4", xlab="Periode (Hari)", lwd = 2)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_aapl.ts[length(train_aapl.ts)] #nilai akhir data latih
@@ -1230,10 +1235,11 @@ akurasi.aapl <- accuracy(ts(hasil[-1]), head(test_aapl.ts, n=54)) %>%
   cbind(Model = ramalan_aapl.da[["method"]]) %>% 
   relocate(Model, .before = 1)
 row.names(akurasi.aapl) <- "AAPL"
-akurasi.aapl
+
+datatable(akurasi.aapl)
 ```
 
-Didapatkan nilai MAPE sebesar $3.320077\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(3,1,4)` sudah sangat baik.
+Didapatkan nilai MAPE sebesar $3.299559\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
 
 # Amazon
 
@@ -1276,7 +1282,7 @@ cat(" Lambda :", lambda_amzn,
     "Batas Bawah :", min(sk_amzn), "\n Batas Bawah :", max(sk_amzn) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.33$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
@@ -1319,7 +1325,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_amzn.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
 ### PACF
 
@@ -1327,7 +1333,7 @@ Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada l
 pacf(train_amzn.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15.
+Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15. Sehingga model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
@@ -1335,16 +1341,17 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada la
 eacf(train_amzn.diff)
 ```
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah).
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
 
-![](images/Screenshot%202023-10-15%20234003-01.png)
-
-Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
+Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 ## **Pendugaan Parameter Model Tentatif**
 
 ```{r message=FALSE, warning=FALSE}
-model_tentatif(train_amzn.diff, p_max = 6, d = 1, q_max = 12)
+model.tentaif_amzn <- 
+  model_tentatif(train_amzn.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_amzn, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
 Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
