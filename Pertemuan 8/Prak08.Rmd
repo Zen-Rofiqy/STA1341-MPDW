@@ -1625,14 +1625,23 @@ Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model A
 #Eksplorasi 
 sisaan_goog.da <- model_goog.da$residuals 
 par(mfrow=c(2,2)) 
+# QQ-Plot
 qqnorm(sisaan_goog.da) 
-qqline(sisaan_goog.da, col = "blue", lwd = 2) 
-plot(c(1:length(sisaan_goog.da)),sisaan_goog.da) 
+qqline(sisaan_goog.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_goog.da)), sisaan_goog.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
 acf(sisaan_goog.da) 
 pacf(sisaan_goog.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar normal ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1871,14 +1880,23 @@ Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model A
 #Eksplorasi 
 sisaan_meta.da <- model_meta.da$residuals 
 par(mfrow=c(2,2)) 
+# QQ-Plot
 qqnorm(sisaan_meta.da) 
-qqline(sisaan_meta.da, col = "blue", lwd = 2) 
-plot(c(1:length(sisaan_meta.da)),sisaan_meta.da) 
+qqline(sisaan_meta.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_meta.da)), sisaan_meta.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
 acf(sisaan_meta.da) 
 pacf(sisaan_meta.da) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2118,14 +2136,23 @@ Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model A
 #Eksplorasi 
 sisaan_msft.da <- model_msft.da$residuals 
 par(mfrow=c(2,2)) 
+# QQ-Plot
 qqnorm(sisaan_msft.da) 
-qqline(sisaan_msft.da, col = "blue", lwd = 2) 
-plot(c(1:length(sisaan_msft.da)),sisaan_msft.da) 
+qqline(sisaan_msft.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_msft.da)), sisaan_msft.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
 acf(sisaan_msft.da) 
 pacf(sisaan_msft.da) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan ``` ARIMA(``2,1,3``) ``` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2365,14 +2392,23 @@ Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model A
 #Eksplorasi 
 sisaan_nflx.da <- model_nflx.da$residuals 
 par(mfrow=c(2,2)) 
+# QQ-Plot
 qqnorm(sisaan_nflx.da) 
-qqline(sisaan_nflx.da, col = "blue", lwd = 2) 
-plot(c(1:length(sisaan_nflx.da)),sisaan_nflx.da) 
+qqline(sisaan_nflx.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_nflx.da)), sisaan_nflx.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
 acf(sisaan_nflx.da) 
 pacf(sisaan_nflx.da) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(5,1,6)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2612,14 +2648,23 @@ Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model A
 #Eksplorasi 
 sisaan_nvda.da <- model_nvda.da$residuals 
 par(mfrow=c(2,2)) 
+# QQ-Plot
 qqnorm(sisaan_nvda.da) 
-qqline(sisaan_nvda.da, col = "blue", lwd = 2) 
-plot(c(1:length(sisaan_nvda.da)),sisaan_nvda.da) 
+qqline(sisaan_nvda.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_nvda.da)), sisaan_nvda.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
 acf(sisaan_nvda.da) 
 pacf(sisaan_nvda.da) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(5,1,6)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
