@@ -1428,6 +1428,8 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 
 Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
 
+#### Nilai tengah sama dengan nol
+
 ```{r}
 #4) Nilai tengah sisaan sama dengan nol 
 t.test(sisaan_amzn.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
@@ -1639,9 +1641,7 @@ acf(sisaan_goog.da)
 pacf(sisaan_goog.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar normal ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
-
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar normal ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1657,7 +1657,7 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 >
 > $H_1$ : Sisaan tidak menyebar normal
 
-Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2e-16$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $4.441\times10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
 
 #### Sisaan saling bebas/tidak ada autokorelasi
 
@@ -1671,7 +1671,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7336$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.6544$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 #### Sisaan homogen
 
@@ -1685,7 +1685,9 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.6532$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+#### Nilai tengah sama dengan nol
 
 ```{r}
 #4) Nilai tengah sisaan sama dengan nol 
@@ -1941,6 +1943,8 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 > $H_1$ : Ragam sisaan tidak homogen
 
 Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
+
+#### Nilai tengah sama dengan nol
 
 ```{r}
 #4) Nilai tengah sisaan sama dengan nol 
@@ -2198,6 +2202,8 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 
 Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
 
+#### Nilai tengah sama dengan nol
+
 ```{r}
 #4) Nilai tengah sisaan sama dengan nol 
 t.test(sisaan_msft.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
@@ -2454,6 +2460,8 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 
 Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
 
+#### Nilai tengah sama dengan nol
+
 ```{r}
 #4) Nilai tengah sisaan sama dengan nol 
 t.test(sisaan_nflx.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
@@ -2709,6 +2717,8 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 > $H_1$ : Ragam sisaan tidak homogen
 
 Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
+
+#### Nilai tengah sama dengan nol
 
 ```{r}
 #4) Nilai tengah sisaan sama dengan nol 
