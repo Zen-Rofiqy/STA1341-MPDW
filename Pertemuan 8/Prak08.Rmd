@@ -1067,10 +1067,12 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
                                               collapse = ", "), 
                                Keterangan = keterangan))
           
-            if (aic < best_aic) {
-              best_model <- model
-              best_aic <- aic
-          }
+                if ("Semua parameter signifikan" %in% Keterangan) {
+                  if (aic < best_aic) {
+                    best_model <- model
+                    best_aic <- aic
+                }
+              }
         }
       }
     }
@@ -1079,12 +1081,14 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
   cat("\nModel ARIMA dengan AIC terkecil:\n")
   print(best_model)
 
-  datatable(models, filter = 'top', 
-          options = list(pageLength = 5))
+  return(models)
 }
 
 # Panggil Fungsi
-model_tentatif(train_aapl.diff, p_max = 6, d = 1, q_max = 12)
+model.tentaif_aapl <- 
+  model_tentatif(train_aapl.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_aapl, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
 Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1617.75$ dimiliki oleh model `ARIMA(3,1,4)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,1,4)` .
