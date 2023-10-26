@@ -1126,7 +1126,7 @@ acf(sisaan_aapl.da)
 pacf(sisaan_aapl.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar [tidak normal]{.underline} ditandai dengan tidak semua titiknya mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki [ragam yang homogen]{.underline}. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan [saling bebas]{.underline}. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1142,9 +1142,9 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 >
 > $H_1$ : Sisaan tidak menyebar normal
 
-Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.**
 
-#### Sisaan saling bebas/tidak ada autokorelasi
+#### Sisaan saling bebas
 
 ```{r}
 Box.test(sisaan_aapl.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
@@ -1156,7 +1156,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7856$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7856$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Yang berarti tidak ada autokorelasi. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 #### Sisaan homogen
 
@@ -1171,6 +1171,8 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 > $H_1$ : Ragam sisaan tidak homogen
 
 Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.2439$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+#### Nilai tengah sama dengan nol
 
 ```{r}
 #4) Nilai tengah sisaan sama dengan nol 
@@ -1370,14 +1372,21 @@ Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model A
 #Eksplorasi 
 sisaan_amzn.da <- model_amzn.da$residuals 
 par(mfrow=c(2,2)) 
+# QQ-Plot
 qqnorm(sisaan_amzn.da) 
-qqline(sisaan_amzn.da, col = "blue", lwd = 2) 
-plot(c(1:length(sisaan_amzn.da)),sisaan_amzn.da) 
+qqline(sisaan_amzn.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_amzn.da)), sisaan_amzn.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
 acf(sisaan_amzn.da) 
 pacf(sisaan_amzn.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar normal ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1393,7 +1402,7 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 >
 > $H_1$ : Sisaan tidak menyebar normal
 
-Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2e-16$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2e-16$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.**
 
 #### Sisaan saling bebas/tidak ada autokorelasi
 
