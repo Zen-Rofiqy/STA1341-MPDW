@@ -319,7 +319,7 @@ ggsave("03_Time Series Apple.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $64.47\%$ dari data menunjukkan kecenderungan [musiman yang menurun secara multipel]{.underline}. Kemudian, pada tanggal `2023-01-05`, terjadi perubahan pola menjadi [tren naik]{.underline}.
 
 **Pembagian Data Training Dan Test.**
 
@@ -351,7 +351,7 @@ ggsave("03_TS_AAPL_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun musiman multiplikatif. Ini mengisyaratkan bahwa data latih tidak memenuhi kriteria stasioneritas dalam rataan maupun ragam. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji tidak stasioner dalam rataan.
 
 ### Time Series Amazon
 
@@ -407,7 +407,7 @@ ggsave("02_Time Series Amazon.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $63.2\%$ dari data menunjukkan kecenderungan [musiman yang menurun secara aditif]{.underline}. Kemudian, pada tanggal `2022-12-28`, terjadi perubahan pola menjadi [tren naik]{.underline}.
 
 **Pembagian Data Training Dan Test.**
 
@@ -439,7 +439,7 @@ ggsave("02_TS_Amazon_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun musiman aditif. Ini mengisyaratkan bahwa data latih tidak memenuhi kriteria stasioneritas dalam rataan maupun ragam. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji tidak stasioner dalam rataan.
 
 ### Time Series Google
 
@@ -495,7 +495,7 @@ ggsave("04_Time Series Google.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan chart data deret waktu diatas, terlihat bahwa data cenderung memiliki trend naik dan turun dengan titik potong di tanggal `20222-12-28`. Namun titik potongnya masih jauh dari angka $80\%$. Sehingga tidak akan dijadikan acuan untuk pemisahan data training dan testing.
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $53.81\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2023-01-05`, terjadi perubahan pola menjadi [tren naik]{.underline}.
 
 **Pembagian Data Training Dan Test.**
 
@@ -527,7 +527,7 @@ ggsave("04_TS_GOOG_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun. Ini mengisyaratkan bahwa data latih tidak memenuhi kriteria stasioneritas dalam rataan. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji tidak stasioner dalam rataan.
 
 ### Time Series META
 
@@ -615,7 +615,7 @@ ggsave("05_TS_META_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik. Ini mengisyaratkan bahwa data latih tidak memenuhi kriteria stasioneritas dalam rataan maupun ragam. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji tidak stasioner dalam rataan.
 
 ### Time Series Microsoft
 
@@ -703,7 +703,7 @@ ggsave("06_TS_MSFT_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik. Ini mengisyaratkan bahwa data latih tidak memenuhi kriteria stasioneritas dalam rataan maupun ragam. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji tidak stasioner dalam rataan.
 
 ### Time Series Netflix
 
@@ -791,7 +791,7 @@ ggsave("07_TS_NFLX_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun yang drastis dan tren naik yang cukup mulus. Ini mengisyaratkan bahwa data latih tidak memenuhi kriteria stasioneritas dalam rataan maupun ragam. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji tidak stasioner dalam rataan.
 
 ### Time Series NVIDIA
 
@@ -879,7 +879,7 @@ ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Berdasarkan plot data deret waktu pada data training, terlihat bahwa data cenderung memiliki trend yang turun dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data tidak stasioner dalam rataan. Pada plot data uji, terlihat bahwa data cenderung memiliki trend yang naik dan cenderung tidak bergerak pada nilai tengah tertentu. Hal ini mengindikasikan bahwa data uji tidak stasioner dalam rataan.
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih tidak memenuhi kriteria stasioneritas dalam rataan maupun ragam. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji tidak stasioner dalam rataan.
 
 # Apple
 
