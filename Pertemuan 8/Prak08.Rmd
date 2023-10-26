@@ -907,7 +907,7 @@ tseries::adf.test(train_aapl.ts)
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3071$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.4788$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
@@ -927,7 +927,7 @@ cat(" Lambda :", lambda_aapl,
     "Batas Bawah :", min(sk_aapl), "\n Batas Bawah :", max(sk_aapl) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.88$ dan batas atas $0.99$. Selang tersebut tidak memuat nilai satu (walaupun hampir) sehingga dapat dikatakan bahwa data saham Apple tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
