@@ -928,7 +928,7 @@ lambda_aapl <- bc$x[which.max(bc$y)]
 sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
 cat(" Lambda :", lambda_aapl,
     "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_aapl), "\n Batas Bawah :", max(sk_aapl) )
+    "Batas Bawah :", min(sk_aapl), "\n Batas Atas  :", max(sk_aapl) )
 ```
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.88$ dan batas atas $0.99$. Selang tersebut tidak memuat nilai satu (walaupun hampir) sehingga dapat dikatakan bahwa data saham Apple tidak stasioner dalam ragam.
@@ -995,9 +995,7 @@ Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut ki
 
 ![](images/Screenshot%202023-10-15%20234003-01.png)
 
-Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
-
-Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 ## **Pendugaan Parameter Model Tentatif**
 
@@ -1284,7 +1282,7 @@ cat(" Lambda :", lambda_amzn,
     "Batas Bawah :", min(sk_amzn), "\n Batas Bawah :", max(sk_amzn) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.33$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.33$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
@@ -1343,9 +1341,7 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada la
 eacf(train_amzn.diff)
 ```
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
-
-Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 ## **Pendugaan Parameter Model Tentatif**
 
@@ -1522,7 +1518,7 @@ tseries::adf.test(train_goog.ts)
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3071$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.4787$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
@@ -1539,10 +1535,10 @@ lambda_goog <- bc$x[which.max(bc$y)]
 sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
 cat(" Lambda :", lambda_goog,
     "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_goog), "\n Batas Bawah :", max(sk_goog) )
+    "Batas Bawah :", min(sk_goog), "\n Batas Atas  :", max(sk_goog) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.51$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.23$ dan batas atas $1.25$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Google stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
@@ -1563,7 +1559,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_goog.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
 ### Uji ADF
 
@@ -1585,7 +1581,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_goog.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13.
+Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot ACF.
 
 ### PACF
 
@@ -1593,28 +1589,27 @@ Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada l
 pacf(train_goog.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15.
+Sama dengan plot ACF nya, pada plot PACF terlihat tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
 ```{r message=FALSE, warning=FALSE}
-install_load('TSA')
+
 eacf(train_goog.diff)
 ```
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah).
-
-![](images/Screenshot%202023-10-15%20234003-01.png)
-
-Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 ## **Pendugaan Parameter Model Tentatif**
 
 ```{r message=FALSE, warning=FALSE}
-model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
+model.tentaif_goog <- 
+  model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_goog, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1525.72$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_goog.da <- Arima(train_goog.diff, order=c(0,1,1), method="ML")
@@ -1790,7 +1785,7 @@ lambda_meta <- bc$x[which.max(bc$y)]
 sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
 cat(" Lambda :", lambda_meta,
     "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_meta), "\n Batas Bawah :", max(sk_meta) )
+    "Batas Bawah :", min(sk_meta), "\n Batas Atas  :", max(sk_meta) )
 ```
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
@@ -1852,11 +1847,7 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada la
 eacf(train_meta.diff)
 ```
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah).
-
-![](images/Screenshot%202023-10-15%20234003-01.png)
-
-Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 ## **Pendugaan Parameter Model Tentatif**
 
@@ -2040,7 +2031,7 @@ lambda_msft <- bc$x[which.max(bc$y)]
 sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
 cat(" Lambda :", lambda_msft,
     "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_msft), "\n Batas Bawah :", max(sk_msft) )
+    "Batas Bawah :", min(sk_msft), "\n Batas Atas  :", max(sk_msft) )
 ```
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
@@ -2099,15 +2090,11 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada la
 ### Plot EACF
 
 ```{r message=FALSE, warning=FALSE}
-install_load('TSA')
+
 eacf(train_msft.diff)
 ```
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah).
-
-![](images/Screenshot%202023-10-15%20234003-01.png)
-
-Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 ## **Pendugaan Parameter Model Tentatif**
 
@@ -2291,7 +2278,7 @@ lambda_nflx <- bc$x[which.max(bc$y)]
 sk_nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
 cat(" Lambda :", lambda_nflx,
     "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_nflx), "\n Batas Bawah :", max(sk_nflx) )
+    "Batas Bawah :", min(sk_nflx), "\n Batas Atas  :", max(sk_nflx) )
 ```
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
@@ -2350,15 +2337,11 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada la
 ### Plot EACF
 
 ```{r message=FALSE, warning=FALSE}
-install_load('TSA')
+
 eacf(train_nflx.diff)
 ```
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah).
-
-![](images/Screenshot%202023-10-15%20234003-01.png)
-
-Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 ## **Pendugaan Parameter Model Tentatif**
 
@@ -2542,7 +2525,7 @@ lambda_nvda <- bc$x[which.max(bc$y)]
 sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
 cat(" Lambda :", lambda_nvda,
     "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_nvda), "\n Batas Bawah :", max(sk_nvda) )
+    "Batas Bawah :", min(sk_nvda), "\n Batas Atas  :", max(sk_nvda) )
 ```
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
@@ -2601,15 +2584,11 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada la
 ### Plot EACF
 
 ```{r message=FALSE, warning=FALSE}
-install_load('TSA')
+
 eacf(train_nvda.diff)
 ```
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah).
-
-![](images/Screenshot%202023-10-15%20234003-01.png)
-
-Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst..
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 ## **Pendugaan Parameter Model Tentatif**
 
