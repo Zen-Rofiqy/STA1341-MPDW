@@ -2763,7 +2763,7 @@ pt_1 <- train_nvda.ts[length(train_nvda.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_nvda.da
 hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_nvda.ts,hasil, ylab="Saham Harga (USD)",
+ts.plot(train_nvda.ts, hasil, ylab="Saham Harga (USD)",
         xlab="Periode (Tahun)", 
         col = "green4", lwd = 3.5,
         main="Plot Ramal Saham NVIDIA")
@@ -2900,3 +2900,25 @@ chart
 Dari Semua data ujinya memiliki pola yang cenderung tren naik.
 
 ### Perbandingan Data Hasil Forcast
+
+```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
+# Buat vektor untuk Periode
+periode <- time(train_nvda.ts)
+periode_forecast <- seq(periode[length(periode)], length.out = length(hasil), by = 1)
+
+# Buat data frame untuk digunakan dalam ggplot2
+data_plot <- data.frame(
+  Periode = c(periode, periode_forecast),
+  Harga = c(as.vector(train_nvda.ts), hasil)
+)
+
+# Buat plot menggunakan ggplot2
+ggplot(data_plot, aes(x = Periode, y = Harga, color = "Saham NVIDIA")) +
+  geom_line(size = 1.5) +
+  labs(
+    y = "Saham Harga (USD)",
+    x = "Periode (Tahun)",
+    title = "Plot Difference Saham NVIDIA"
+  ) +
+  scale_color_manual(values = "green4")
+```
