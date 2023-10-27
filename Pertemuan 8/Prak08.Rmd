@@ -2845,7 +2845,7 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
     aes(color = Name, label = Name), #Warna garis & label saham
     size = 8, #Ukuran text
-    nudge_x = 80, #Posisi Text (kanan 50)
+    nudge_x = 20, #Posisi Text (kanan 50)
     hjust = 0, #Ujung
     segment.size = 1,               #Ukuran garis
     segment.alpha = .75,             #transparasi garis
@@ -2861,8 +2861,7 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     scale_x_date( #Sumbu x
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date(min(data2$Date)), 
-               data2$Date[ceiling(1.00025 * length(data2$Date))])
+    limits = c(as.Date(min(data2$Date)), as.Date("2023-09-28"))
   ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
@@ -2872,8 +2871,29 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     label = "28 Juli", size=6
   ) +
   geom_vline( #Buat garis batas data
-    xintercept = data2$Date[ceiling(0.8 * length(data2$Date))] , 
-             linetype = "dotted", color = "red", linewidth = 2)
+    xintercept = data2$Date[ceiling(0.8 * length(data2$Date)/7)] , 
+             linetype = "dotted", color = "black", linewidth = 2) +
+  
+  #Label Data Latih dan uji
+  geom_rect(data = NULL, aes(xmin = as.Date(min(data2$Date), 
+                             xmax = data2$Date[ceiling(0.8 * 
+                                               length(data2$Date)/7)]),
+            ymin = -Inf, ymax = Inf), fill = "gray", alpha = 0.3) +
+  geom_text(aes(x = as.Date(min(data2$Date) + 
+               (data2$Date[ceiling(0.8 * length(data2$Date)/7)] - 
+                  min(data2$Date))/2, y = max(`Adj Close`)/2),
+            label = "Data Latih", hjust = 0.5, vjust = 0.5, size = 4)) +
+  
+  geom_rect(data = NULL, aes(xmin = data2$Date[ceiling(0.8 * 
+                                               length(data2$Date)/7)], 
+                             xmax = as.Date("2023-09-28"),
+            ymin = -Inf, ymax = Inf), fill = "lightblue", alpha = 0.3) +
+  geom_text(aes(x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7)] +
+                    (as.Date("2023-09-28") - 
+                    data2$Date[ceiling(0.8 * length(data2$Date)/7)])/2, 
+                y = max(`Adj Close`)/2),
+            label = "Data Uji", hjust = 0.5, vjust = 0.5, size = 4))
+            
 chart
 
 #Export Chart
