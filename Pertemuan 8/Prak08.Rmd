@@ -2920,7 +2920,7 @@ data3 <- data.frame(
 colnames(data3) <- c("Date", "Adj Close", "Name")
 ```
 
-```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
+```{r dpi=300, fig1, fig.height = 12, fig.width = 27, fig.align = "center", warning=TRUE, message = FALSE}
 ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
   #Label Data Asli 
   annotate( "rect", alpha=0.1, fill="seagreen",
@@ -2976,7 +2976,7 @@ ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
     limits = c(as.Date(min(data3$Date)), 
-               as.Date(data3$Date[ceiling(max(length(data3$Date)/7) * 0.1)]) )
+               as.Date(max(data3$Date)) + 60)
   ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
