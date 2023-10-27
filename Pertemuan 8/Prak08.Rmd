@@ -2827,11 +2827,10 @@ str(data2)
 chart <-
 ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   #Label Data Latih 
-  geom_rect(data=data2, inherit.aes = FALSE, 
-            mapping = aes(xmin=as.Date(min(Date)), 
-                          xmax=Date[ceiling(0.8 * length(Date)/7)], 
-                          ymin=0, ymax=max(`Adj Close`)),
-            color="transparent", fill="grey20", alpha=0.3) +
+  annotate( "rect", alpha=0.2, fill="grey20",
+            xmin=as.Date(min(data2$Date)), 
+            xmax=data2$Date[ceiling(0.8 * length(data2$Date)/7)],
+            ymin=0, ymax=Inf ) + 
   
   annotate( "text", 
             x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
