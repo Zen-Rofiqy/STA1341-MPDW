@@ -2907,21 +2907,22 @@ data3 <- data.frame(
   Date = data2 %>% select(Date) %>%
     filter(Date <= 
            as.Date(data2$Date[(ceiling(0.8 * length(data2$Date)/7)) + 54])) ,
-  Harga = c(as.vector(train_aapl.ts), ramal_aapl,
-            as.vector(train_amzn.ts), ramal_amzn,
-            as.vector(train_goog.ts), ramal_goog,
-            as.vector(train_meta.ts), ramal_meta,
-            as.vector(train_msft.ts), ramal_msft,
-            as.vector(train_nflx.ts), ramal_nflx,
-            as.vector(train_nvda.ts), ramal_nvda ),
-  Saham = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
+  `Adj Close` = c(as.vector(train_aapl.ts), ramal_aapl,
+                  as.vector(train_amzn.ts), ramal_amzn,
+                  as.vector(train_goog.ts), ramal_goog,
+                  as.vector(train_meta.ts), ramal_meta,
+                  as.vector(train_msft.ts), ramal_msft,
+                  as.vector(train_nflx.ts), ramal_nflx,
+                  as.vector(train_nvda.ts), ramal_nvda ),
+  Name = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
               each = length(train_aapl.ts) + 54 + 1)
 )
+colnames(data3) <- c("Date", "Adj Close", "Name")
 ```
 
 ```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
 # Buat plot menggunakan ggplot2 dengan facet_wrap
-ggplot(data3, aes(x = Date, y = Harga, color = Saham)) +
+ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
   #Label Data Asli 
   annotate( "rect", alpha=0.1, fill="seagreen",
             xmin=as.Date(min(data2$Date)), 
@@ -2929,7 +2930,7 @@ ggplot(data3, aes(x = Date, y = Harga, color = Saham)) +
             ymin=0, ymax=Inf ) + 
   
   annotate( "text", color="seagreen",
-            x = as.Date(data2$Date[ceiling(max(data2$Date)/2)]), 
+            x = as.Date(data2$Date[ceiling(length(data2$Date)/7/2)]), 
             y = max(data2$`Adj Close`) * 0.95, 
     label = "Data Asli", size=10) + 
   
@@ -2944,7 +2945,7 @@ ggplot(data3, aes(x = Date, y = Harga, color = Saham)) +
             y = max(data2$`Adj Close`) * 0.95, 
     label = "Data Ramal\n54 Hari", size=10) +
   #Time Series
-  geom_line(aes(color=Saham), linewidth=1.5) +
+  geom_line(aes(color=Name), linewidth=1.5) +
   #Warna Saham
   scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
                                 MSFT="deepskyblue2", META="dodgerblue3", 
@@ -2976,7 +2977,7 @@ ggplot(data3, aes(x = Date, y = Harga, color = Saham)) +
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
     limits = c(as.Date(min(data3$Date)), 
-               as.Date(data3$Date[ceiling(max(data3$Date) * 0.1)]) )
+               as.Date(data3$Date[ceiling(max(length(data3$Date)/7) * 0.1)]) )
   ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
