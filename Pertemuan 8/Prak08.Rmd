@@ -2990,7 +2990,3 @@ ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
     xintercept = as.Date(max(data2$Date)) , 
              linetype = "dotted", color = "black", linewidth = 2)
 ```
-
-```{r}
-str(data_plot)
-```
