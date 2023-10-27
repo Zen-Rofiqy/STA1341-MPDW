@@ -1842,9 +1842,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_meta.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 20.
-
-Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 20. Maka model tidak dapat di identifikasi dengan plot ACF.
 
 ### Plot PACF
 
@@ -1852,9 +1850,7 @@ Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut of
 pacf(train_meta.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15.
-
-Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 20. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
