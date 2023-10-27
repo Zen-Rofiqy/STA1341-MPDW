@@ -1525,7 +1525,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.4787$ yang lebih besa
 ### Plot Box-Cox
 
 ```{r message=FALSE, warning=FALSE}
-install_load('MASS')
+
 index <- seq(1:nrow(goog))
 bc = boxcox(goog.ts~index, lambda = seq(-2, 4, by=0.01))
 ```
@@ -1779,12 +1779,12 @@ tseries::adf.test(train_meta.ts)
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3071$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.6539$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
 ```{r message=FALSE, warning=FALSE}
-install_load('MASS')
+
 index <- seq(1:nrow(meta))
 bc = boxcox(meta.ts~index, lambda = seq(-2, 4, by=0.01))
 ```
@@ -2041,7 +2041,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3071$ yang lebih besa
 ### Plot Box-Cox
 
 ```{r message=FALSE, warning=FALSE}
-install_load('MASS')
+
 index <- seq(1:nrow(msft))
 bc = boxcox(msft.ts~index, lambda = seq(-2, 4, by=0.01))
 ```
@@ -2299,7 +2299,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3071$ yang lebih besa
 ### Plot Box-Cox
 
 ```{r message=FALSE, warning=FALSE}
-install_load('MASS')
+
 index <- seq(1:nrow(nflx))
 bc = boxcox(nflx.ts~index, lambda = seq(-2, 4, by=0.01))
 ```
@@ -2557,7 +2557,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3071$ yang lebih besa
 ### Plot Box-Cox
 
 ```{r message=FALSE, warning=FALSE}
-install_load('MASS')
+
 index <- seq(1:nrow(nvda))
 bc = boxcox(nvda.ts~index, lambda = seq(-2, 4, by=0.01))
 ```
