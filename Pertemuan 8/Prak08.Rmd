@@ -1899,9 +1899,7 @@ acf(sisaan_meta.da)
 pacf(sisaan_meta.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
-
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang tidak homogen. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1917,7 +1915,7 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 >
 > $H_1$ : Sisaan tidak menyebar normal
 
-Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2e-16$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times 10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
 
 #### Sisaan saling bebas/tidak ada autokorelasi
 
@@ -1931,7 +1929,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7336$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.4216$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 #### Sisaan homogen
 
@@ -1945,7 +1943,7 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.8527$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
 #### Nilai tengah sama dengan nol
 
@@ -1960,7 +1958,7 @@ Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. H
 >
 > $H_1$ : nilai tengah sisaan tidak sama dengan 0
 
-Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.3043$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.1287$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
 ## **Peramalan** {.tabset}
 
