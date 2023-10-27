@@ -338,7 +338,7 @@ data2 <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Date >= as.Date("2022-01-01")) 
 #Banyaknya hari untuk di ramal 
-h <- nrow(data2)/7 - round(nrow(data2)/7 *80/100)
+h <- nrow(data2)/7 - round(nrow(data2)/7 *80/100); h
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
@@ -1220,7 +1220,7 @@ ramal_aapl <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_aapl.ts, ramal_aapl, xlab="Periode (Hari)", 
         col = "lightskyblue4", lwd = 3,
         ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham Apple")
+        main="Plot Ramalan Saham Apple Selama 79 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan terus menurun setiap periodenya.
@@ -1478,7 +1478,7 @@ ramal_amzn <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_amzn.ts, ramal_amzn, xlab="Periode (Hari)", 
         col = "orange2", lwd = 3,
         ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham Amazon")
+        main="Plot Ramalan Saham Amazon Selama 79 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menurun setiap periodenya.
@@ -1737,7 +1737,7 @@ ramal_goog <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_goog.ts, ramal_goog, xlab="Periode (Hari)", 
         col = "gold3", lwd = 3.5,
         ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham Google")
+        main="Plot Ramalan Saham Google Selama 79 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Google diramalkan akan terus menurun setiap periodenya.
@@ -1995,7 +1995,7 @@ ramal_meta <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_meta.ts, ramal_meta, xlab="Periode (Hari)", 
         col = "dodgerblue3", lwd = 3.5,
         ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham META")
+        main="Plot Ramalan Saham META Selama 79 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham META diramalkan akan terus menaik setiap periodenya.
@@ -2254,7 +2254,7 @@ ramal_msft <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_msft.ts, ramal_msft, xlab="Periode (Hari)", 
         ylab="Saham Harga (USD)",
         col = "deepskyblue2", lwd = 3.5,
-        main="Plot Ramalan Saham Microsoft")
+        main="Plot Ramalan Saham Microsoft Selama 79 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Microsoft diramalkan akan terus konstan setiap periodenya.
@@ -2513,7 +2513,7 @@ ramal_nflx <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_nflx.ts, ramal_nflx, ylab="Saham Harga (USD)", 
         xlab="Periode (Hari)", 
         col = "firebrick3", lwd = 3.5,
-        main="Plot Ramalan Saham Netflix")
+        main="Plot Ramalan Saham Netflix Selama 79 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Netfilx diramalkan akan terus menaik setiap periodenya.
@@ -2772,7 +2772,7 @@ ramal_nvda <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_nvda.ts, ramal_nvda, ylab="Saham Harga (USD)",
         xlab="Periode (Tahun)", 
         col = "green4", lwd = 3.5,
-        main="Plot Ramal Saham NVIDIA")
+        main="Plot Ramal Saham NVIDIA Selama 79 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham NVIDA diramalkan akan terus Melonjak naik setiap periodenya.
