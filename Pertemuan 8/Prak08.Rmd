@@ -1863,11 +1863,9 @@ Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut ki
 ## **Pendugaan Parameter Model Tentatif**
 
 ```{r message=FALSE, warning=FALSE}
-model_tentatif(train_meta.diff, p_max = 6, d = 1, q_max = 12)
-
-model.tentaif_goog <- 
-  model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
-datatable(model.tentaif_goog, filter = 'top', 
+model.tentaif_meta <- 
+  model_tentatif(train_meta.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_meta, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
@@ -2130,11 +2128,9 @@ Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut ki
 ## **Pendugaan Parameter Model Tentatif**
 
 ```{r message=FALSE, warning=FALSE}
-model_tentatif(train_msft.diff, p_max = 6, d = 1, q_max = 12)
-
-model.tentaif_goog <- 
-  model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
-datatable(model.tentaif_goog, filter = 'top', 
+model.tentaif_msft <- 
+  model_tentatif(train_msft.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_msft, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
@@ -2397,11 +2393,9 @@ Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut ki
 ## **Pendugaan Parameter Model Tentatif**
 
 ```{r message=FALSE, warning=FALSE}
-model_tentatif(train_nflx.diff, p_max = 6, d = 1, q_max = 12)
-
-model.tentaif_goog <- 
-  model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
-datatable(model.tentaif_goog, filter = 'top', 
+model.tentaif_nflx <- 
+  model_tentatif(train_nflx.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_nflx, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
@@ -2664,11 +2658,9 @@ Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut ki
 ## **Pendugaan Parameter Model Tentatif**
 
 ```{r message=FALSE, warning=FALSE}
-model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
-
-model.tentaif_goog <- 
-  model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
-datatable(model.tentaif_goog, filter = 'top', 
+model.tentaif_nvda <- 
+  model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_nvda, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
