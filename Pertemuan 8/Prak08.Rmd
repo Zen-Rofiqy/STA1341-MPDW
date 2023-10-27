@@ -2927,7 +2927,7 @@ ggplot(data_plot, aes(x = Periode, y = Harga, color = "Saham NVIDIA")) +
 #Pnggabungan data
 data_plot <- data.frame(
   Date = data2 %>% select(Date) %>%
-    filter(Date < 
+    filter(Date <= 
            as.Date(data2$Date[(ceiling(0.8 * length(data2$Date)/7)) + 54])) ,
   Harga = c(as.vector(train_aapl.ts), ramal_aapl,
             as.vector(train_amzn.ts), ramal_amzn,
@@ -2937,7 +2937,7 @@ data_plot <- data.frame(
             as.vector(train_nflx.ts), ramal_nflx,
             as.vector(train_nvda.ts), ramal_nvda ),
   Saham = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
-              each = length(train_aapl.ts))
+              each = length(train_aapl.ts) + 54 + 7)
 )
 
 # Buat plot menggunakan ggplot2 dengan facet_wrap
