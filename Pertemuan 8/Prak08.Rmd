@@ -2835,7 +2835,9 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   annotate( "text", 
             x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
             y = max(data2$`Adj Close`) * 0.9, 
-    label = "Data Latih", size=6) + 
+    label = "Data Latih", size=30) + 
+  
+  
   
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
@@ -2883,15 +2885,7 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   ) +
   geom_vline( #Buat garis batas data
     xintercept = data2$Date[ceiling(0.8 * length(data2$Date)/7)] , 
-             linetype = "dotted", color = "black", linewidth = 2) +
-  
-  #Label Data Uji
-
-  
-  annotate( "text", 
-            x = as.Date(data2$Date[ceiling(0.9 * length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * 0.9, 
-    label = "Data Uji", size=6)
+             linetype = "dotted", color = "black", linewidth = 2) 
             
 chart
 
