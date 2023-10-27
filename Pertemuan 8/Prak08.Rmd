@@ -976,7 +976,7 @@ acf(train_aapl.diff)
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 0. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
-### PACF
+### Plot PACF
 
 ```{r}
 pacf(train_aapl.diff)
@@ -1327,7 +1327,7 @@ acf(train_amzn.diff)
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
-### PACF
+### Plot PACF
 
 ```{r}
 pacf(train_amzn.diff)
@@ -1585,7 +1585,7 @@ acf(train_goog.diff)
 
 Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot ACF.
 
-### PACF
+### Plot PACF
 
 ```{r}
 pacf(train_goog.diff)
@@ -1799,7 +1799,7 @@ cat(" Lambda :", lambda_meta,
     "Batas Bawah :", min(sk_meta), "\n Batas Atas  :", max(sk_meta) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.13$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.17$ dan batas atas $0.42$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
@@ -1820,7 +1820,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_meta.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 20. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
 ### Uji ADF
 
@@ -1842,15 +1842,19 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_meta.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 20.
 
-### PACF
+Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot PACF
 
 ```{r}
 pacf(train_meta.diff)
 ```
 
 Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15.
+
+Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
@@ -2101,13 +2105,17 @@ acf(train_msft.diff)
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13.
 
-### PACF
+Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot PACF
 
 ```{r}
 pacf(train_msft.diff)
 ```
 
 Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15.
+
+Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
@@ -2359,13 +2367,17 @@ acf(train_nflx.diff)
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13.
 
-### PACF
+Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot PACF
 
 ```{r}
 pacf(train_nflx.diff)
 ```
 
 Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15.
+
+Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
@@ -2617,13 +2629,17 @@ acf(train_nvda.diff)
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13.
 
-### PACF
+Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot PACF
 
 ```{r}
 pacf(train_nvda.diff)
 ```
 
 Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15.
+
+Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
