@@ -2877,8 +2877,14 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   #Label Data Latih 
   geom_rect(data=data2, aes(xmin=as.Date(min(Date)), 
                             xmax=Date[ceiling(0.8 * length(Date)/7)], 
-                            ymin=-Inf, ymax=Inf),
+                            ymin=0, ymax=max(`Adj Close`)),
               color="grey20", alpha=0.3, inherit.aes = FALSE) +
+  
+  annotate( 
+    "text", x = as.Date(Date[ceiling(0.8 * length(Date)/7)]), 
+            y = 50, 
+    label = "28 Juli", size=6
+  )
   
   geom_text(data=data2, aes(x = as.Date(min(Date) + 
                (Date[ceiling(0.8 * length(Date)/7)] - 
@@ -2887,9 +2893,9 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   
   #Label Data Uji
   geom_rect(data=data2, aes(xmin=Date[ceiling(0.8 * length(Date)/7)], 
-                            xmax = as.Date("2023-09-28"),
-                            ymin = -Inf, 
-                            ymax = Inf), 
+                            xmax= as.Date("2023-09-28"),
+                            ymin=0, 
+                            ymax=max(`Adj Close`)), 
             color = "lightblue", alpha = 0.3, inherit.aes = FALSE) +
   
   geom_text(data=data2, aes(x=as.Date(Date[ceiling(0.8 * length(Date)/7)] +
