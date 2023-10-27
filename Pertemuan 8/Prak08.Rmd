@@ -330,7 +330,7 @@ Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $64.47\%$ 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
 train_aapl <- aapl[1: round(nrow(aapl) *80/100),]
-test_aapl <- aapl[round(nrow(aapl) *80/100): nrow(aapl),]
+test_aapl <- aapl[round(nrow(aapl) *80/100 +1): nrow(aapl),]
 train_aapl.ts <- ts(train_aapl[,3])
 test_aapl.ts <- ts(train_aapl[,3])
 
@@ -338,7 +338,7 @@ data2 <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Date >= as.Date("2022-01-01")) 
 #Banyaknya hari untuk di ramal 
-h <- nrow(data2)/7 - round(nrow(data2)/7 *80/100); h
+h <- nrow(data2)/7 - round(nrow(data2)/7 *80/100) - 5; h
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
@@ -1499,7 +1499,7 @@ akurasi.amzn <- accuracy(ts(hasil[-1]), head(test_amzn.ts, n=h)) %>%
   cbind(Model = ramalan_amzn.da[["method"]]) %>% 
   relocate(Model, .before = 1)
 row.names(akurasi.amzn) <- "AMZN"
-akurasi.amzn
+datatable(akurasi.amzn)
 ```
 
 Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah baik.
@@ -1758,7 +1758,7 @@ akurasi.goog <- accuracy(ts(hasil[-1]), head(test_goog.ts, n=h)) %>%
   cbind(Model = ramalan_goog.da[["method"]]) %>% 
   relocate(Model, .before = 1)
 row.names(akurasi.goog) <- "GOOG"
-akurasi.goog
+datatable(akurasi.goog)
 ```
 
 Didapatkan nilai MAPE sebesar $11.24534\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah baik.
@@ -2016,7 +2016,7 @@ akurasi.meta <- accuracy(ts(hasil[-1]), head(test_meta.ts, n=h)) %>%
   cbind(Model = ramalan_meta.da[["method"]]) %>% 
   relocate(Model, .before = 1)
 row.names(akurasi.meta) <- "META"
-akurasi.meta
+datatable(akurasi.meta)
 ```
 
 Didapatkan nilai MAPE sebesar $4.507078\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
