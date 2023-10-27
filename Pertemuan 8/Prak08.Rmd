@@ -2901,31 +2901,9 @@ Dari Semua data ujinya memiliki pola yang cenderung tren naik.
 
 ### Perbandingan Data Hasil Forcast
 
-```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
-# Buat vektor untuk Periode
-periode <- time(train_nvda.ts)
-periode_forecast <- seq(periode[length(periode)], length.out = length(hasil), by = 1)
-
-# Buat data frame untuk digunakan dalam ggplot2
-data_plot <- data.frame(
-  Periode = c(periode, periode_forecast),
-  Harga = c(as.vector(train_nvda.ts), hasil)
-)
-
-# Buat plot menggunakan ggplot2
-ggplot(data_plot, aes(x = Periode, y = Harga, color = "Saham NVIDIA")) +
-  geom_line(size = 1.5) +
-  labs(
-    y = "Saham Harga (USD)",
-    x = "Periode (Tahun)",
-    title = "Plot Difference Saham NVIDIA"
-  ) +
-  scale_color_manual(values = "green4")
-```
-
-```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
+```{r}
 #Pnggabungan data
-data_plot <- data.frame(
+data3 <- data.frame(
   Date = data2 %>% select(Date) %>%
     filter(Date <= 
            as.Date(data2$Date[(ceiling(0.8 * length(data2$Date)/7)) + 54])) ,
@@ -2937,21 +2915,79 @@ data_plot <- data.frame(
             as.vector(train_nflx.ts), ramal_nflx,
             as.vector(train_nvda.ts), ramal_nvda ),
   Saham = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
-              each = length(train_aapl.ts) + 54 + 7)
+              each = length(train_aapl.ts) + 54 + 1)
 )
+```
 
+```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
 # Buat plot menggunakan ggplot2 dengan facet_wrap
-ggplot(data_plot, aes(x = Date, y = Harga, color = Saham)) +
+ggplot(data3, aes(x = Date, y = Harga, color = Saham)) +
+  #Label Data Asli 
+  annotate( "rect", alpha=0.1, fill="seagreen",
+            xmin=as.Date(min(data2$Date)), 
+            xmax=as.Date(max(data2$Date)),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="seagreen",
+            x = as.Date(data2$Date[ceiling(max(data2$Date)/2)]), 
+            y = max(data2$`Adj Close`) * 0.95, 
+    label = "Data Asli", size=10) + 
+  
+  #Label Data Ramal
+  annotate( "rect", alpha=0.1, fill="violetred",
+            xmin=as.Date(max(data2$Date)), 
+            xmax=as.Date(max(data3$Date)),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="violetred",
+            x = as.Date(data2$Date[ceiling(0.9 * length(data2$Date)/7)]) , 
+            y = max(data2$`Adj Close`) * 0.95, 
+    label = "Data Ramal\n54 Hari", size=10) +
+  #Time Series
   geom_line(aes(color=Saham), linewidth=1.5) +
-  labs(
-    y = "Saham Harga (USD)",
-    x = "Periode",
-    title = "Plot Ramalan Saham"
-  ) +
+  #Warna Saham
   scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
                                 MSFT="deepskyblue2", META="dodgerblue3", 
                                 AAPL="lightskyblue4",
-                                GOOG="gold3", AMZN="orange2") )
+                                GOOG="gold3", AMZN="orange2") ) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Ramalan Saham MAANG",
+       subtitle = "Peramalan Saham MAANG Selama 54 Hari Kedepan\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data3[data3$Date == max(data3$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data3$Date)), 
+               as.Date(data3$Date[ceiling(max(data3$Date) * 0.1)]) )
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.Date(max(data2$Date)) , 
+             linetype = "dotted", color = "black", linewidth = 2)
 ```
 
 ```{r}
