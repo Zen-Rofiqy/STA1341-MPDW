@@ -2826,6 +2826,18 @@ str(data2)
 ```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
 chart <-
 ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  #Label Data Latih 
+  geom_rect(data=data2, inherit.aes = FALSE, 
+            mapping = aes(xmin=as.Date(min(Date)), 
+                          xmax=Date[ceiling(0.8 * length(Date)/7)], 
+                          ymin=0, ymax=max(`Adj Close`)),
+            color="transparent", fill="grey20", alpha=0.3) +
+  
+  annotate( "text", 
+            x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
+            y = max(data2$`Adj Close`) * 0.9, 
+    label = "Data Latih", size=6) + 
+  
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
   scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
@@ -2874,18 +2886,6 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     xintercept = data2$Date[ceiling(0.8 * length(data2$Date)/7)] , 
              linetype = "dotted", color = "black", linewidth = 2) +
   
-  #Label Data Latih 
-  geom_rect(data=data2, aes(xmin=as.Date(min(Date)), 
-                            xmax=Date[ceiling(0.8 * length(Date)/7)], 
-                            ymin=0, ymax=max(`Adj Close`)),
-            color="transparent", fill="grey20", alpha=0.3, 
-            inherit.aes = FALSE) +
-  
-  annotate( "text", 
-            x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
-            y = max(data2$`Adj Close`) * 0.9, 
-    label = "Data Latih", size=6) + 
-  
   #Label Data Uji
 
   
@@ -2896,7 +2896,4 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
             
 chart
 
-#Export Chart
-ggsave("0_Data Uji vs Data Latih.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 23)
 ```
