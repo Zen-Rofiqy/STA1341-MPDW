@@ -424,7 +424,7 @@ Dari grafik deret waktu yang ditampilkan, terlihat bahwa sekitar $63.2\%$ dari d
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
 train_amzn <- amzn[1: round(nrow(amzn) *80/100),]
-test_amzn <- amzn[round(nrow(amzn) *80/100): nrow(amzn),]
+test_amzn <- amzn[round(nrow(amzn) *80/100 +1): nrow(amzn),]
 train_amzn.ts <- ts(train_amzn[,3])
 test_amzn.ts <- ts(test_amzn[,3])
 ```
@@ -512,7 +512,7 @@ Melalui visualisasi grafik deret waktu yang disuguhkan, tampaknya sekitar $53.81
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
 train_goog <- goog[1: round(nrow(goog) *80/100),]
-test_goog <- goog[round(nrow(goog) *80/100): nrow(goog),]
+test_goog <- goog[round(nrow(goog) *80/100 +1): nrow(goog),]
 train_goog.ts <- ts(train_goog[,3])
 test_goog.ts <- ts(test_goog[,3])
 ```
@@ -600,7 +600,7 @@ Melalui grafik deret waktu yang disajikan, terlihat bahwa sekitar $53.81\%$ dari
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
 train_meta <- meta[1: round(nrow(meta) *80/100),]
-test_meta <- meta[round(nrow(meta) *80/100): nrow(meta),]
+test_meta <- meta[round(nrow(meta) *80/100 +1): nrow(meta),]
 train_meta.ts <- ts(train_meta[,3])
 test_meta.ts <- ts(test_meta[,3])
 ```
@@ -688,7 +688,7 @@ Dalam gambaran grafik deret waktu yang diberikan, sekitar $53.81%\$ data menunju
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
 train_msft <- msft[1: round(nrow(msft) *80/100),]
-test_msft <- msft[round(nrow(msft) *80/100): nrow(msft),]
+test_msft <- msft[round(nrow(msft) *80/100 +1): nrow(msft),]
 train_msft.ts <- ts(train_msft[,3])
 test_msft.ts <- ts(test_msft[,3])
 ```
@@ -776,7 +776,7 @@ Berbeda dari yang lain, berdasarkan grafik deret waktu yang disajikan, terlihat 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
 train_nflx <- nflx[1: round(nrow(nflx) *80/100),]
-test_nflx <- nflx[round(nrow(nflx) *80/100): nrow(nflx),]
+test_nflx <- nflx[round(nrow(nflx) *80/100  +1): nrow(nflx),]
 train_nflx.ts <- ts(train_nflx[,3])
 test_nflx.ts <- ts(test_nflx[,3])
 ```
@@ -864,7 +864,7 @@ Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $50.25\%$ 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
 train_nvda <- nvda[1: round(nrow(nvda) *80/100),]
-test_nvda <- nvda[round(nrow(nvda) *80/100): nrow(nvda),]
+test_nvda <- nvda[round(nrow(nvda) *80/100 +1): nrow(nvda),]
 train_nvda.ts <- ts(train_nvda[,3])
 test_nvda.ts <- ts(test_nvda[,3])
 ```
