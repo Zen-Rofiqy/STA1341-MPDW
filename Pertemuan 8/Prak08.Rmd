@@ -2880,16 +2880,10 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
                             ymin=0, ymax=max(`Adj Close`)),
               color="grey20", alpha=0.3, inherit.aes = FALSE) +
   
-  annotate( 
-    "text", x = as.Date(Date[ceiling(0.8 * length(Date)/7)]), 
-            y = 50, 
-    label = "28 Juli", size=6
-  )
-  
-  geom_text(data=data2, aes(x = as.Date(min(Date) + 
-               (Date[ceiling(0.8 * length(Date)/7)] - 
-                  min(Date))/2, y = max(`Adj Close`)/2)),
-            label = "Data Latih", hjust = 0.5, vjust = 0.5, size = 4) +
+  annotate( "text", 
+            x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
+            y = data2$`Adj Close` * 0.9, 
+    label = "Data Latih", size=6) + 
   
   #Label Data Uji
   geom_rect(data=data2, aes(xmin=Date[ceiling(0.8 * length(Date)/7)], 
@@ -2898,15 +2892,16 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
                             ymax=max(`Adj Close`)), 
             color = "lightblue", alpha = 0.3, inherit.aes = FALSE) +
   
-  geom_text(data=data2, aes(x=as.Date(Date[ceiling(0.8 * length(Date)/7)] +
-                              (as.Date("2023-09-28") - 
-                              Date[ceiling(0.8 * length(Date)/7)])/2, 
-                            y=max(`Adj Close`)/2)),
-            label = "Data Uji", hjust = 0.5, vjust = 0.5, size = 4)
+  annotate( "text", 
+            x = (as.Date(max(data2$Date)) - 
+                 as.Date(data2$Date[ceiling(0.8 * 
+                                    length(data2$Date)/7)]) )/2 , 
+            y = data2$`Adj Close` * 0.9, 
+    label = "Data Uji", size=6)
             
 chart
 
 #Export Chart
-ggsave("01_Time Series MAANG.png", chart, path = export.chart,
+ggsave("0_Data Uji vs Data Latih.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 23)
 ```
