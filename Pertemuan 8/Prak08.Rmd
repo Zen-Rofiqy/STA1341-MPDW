@@ -2766,7 +2766,7 @@ hasil <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_nvda.ts,hasil, ylab="Saham Harga (USD)",
         xlab="Periode (Tahun)", 
         col = "green4", lwd = 3.5,
-        main="Plot Difference Saham NVIDIA")
+        main="Plot Ramal Saham NVIDIA")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham NVIDA diramalkan akan terus Melonjak naik setiap periodenya.
@@ -2818,9 +2818,6 @@ datatable(akurasi, filter = 'top',
 data2 <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Date >= as.Date("2022-01-01")) 
-
-rownames(data2) <- NULL
-str(data2)
 ```
 
 ```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
@@ -2901,3 +2898,5 @@ chart
 ```
 
 Dari Semua data ujinya memiliki pola yang cenderung tren naik.
+
+### Perbandingan Data Hasil Forcast
