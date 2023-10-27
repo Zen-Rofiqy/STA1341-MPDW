@@ -2926,8 +2926,8 @@ ggplot(data_plot, aes(x = Periode, y = Harga, color = "Saham NVIDIA")) +
 ```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
 #Pnggabungan data
 data_plot <- data.frame(
-  Periode = data2$Date %>% 
-    filter(Date <= data2$Date[ceiling(0.8 * length(data2$Date)/7)]) ,
+  Periode = data2 %>% select(Date) %>%
+    filter(Date < as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7)])) ,
   Harga = c(as.vector(train_aapl.ts), as.vector(train_amzn.ts), 
             as.vector(train_goog.ts), as.vector(train_meta.ts), 
             as.vector(train_msft.ts), as.vector(train_nflx.ts), 
@@ -2948,4 +2948,8 @@ ggplot(data_plot, aes(x = Periode, y = Harga, color = Saham)) +
                                 MSFT="deepskyblue2", META="dodgerblue3", 
                                 AAPL="lightskyblue4",
                                 GOOG="gold3", AMZN="orange2") )
+```
+
+```{r}
+str(data_plot)
 ```
