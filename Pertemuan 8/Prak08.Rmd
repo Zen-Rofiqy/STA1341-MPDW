@@ -2823,7 +2823,7 @@ rownames(data2) <- NULL
 str(data2)
 ```
 
-```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
 chart <-
 ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
@@ -2878,7 +2878,8 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_rect(data=data2, aes(xmin=as.Date(min(Date)), 
                             xmax=Date[ceiling(0.8 * length(Date)/7)], 
                             ymin=0, ymax=max(`Adj Close`)),
-              color="grey20", alpha=0.3) +
+            color="transparent", fill="grey20", alpha=0.3, 
+            inherit.aes = FALSE) +
   
   annotate( "text", 
             x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
