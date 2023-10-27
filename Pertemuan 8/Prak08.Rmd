@@ -2874,25 +2874,29 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     xintercept = data2$Date[ceiling(0.8 * length(data2$Date)/7)] , 
              linetype = "dotted", color = "black", linewidth = 2) +
   
-  #Label Data Latih dan uji
-  geom_rect(data = NULL, aes(xmin = as.Date(min(data2$Date), 
-                             xmax = data2$Date[ceiling(0.8 * 
-                                               length(data2$Date)/7)]),
-            ymin = -Inf, ymax = Inf), fill = "gray", alpha = 0.3) +
-  geom_text(aes(x = as.Date(min(data2$Date) + 
-               (data2$Date[ceiling(0.8 * length(data2$Date)/7)] - 
-                  min(data2$Date))/2, y = max(`Adj Close`)/2),
-            label = "Data Latih", hjust = 0.5, vjust = 0.5, size = 4)) +
+  #Label Data Latih 
+  geom_rect(data=data2, aes(xmin=as.Date(min(Date)), 
+                            xmax=Date[ceiling(0.8 * length(Date)/7)], 
+                            ymin=-Inf, ymax=Inf),
+              color="grey20", alpha=0.3, inherit.aes = FALSE) +
   
-  geom_rect(data = NULL, aes(xmin = data2$Date[ceiling(0.8 * 
-                                               length(data2$Date)/7)], 
-                             xmax = as.Date("2023-09-28"),
-            ymin = -Inf, ymax = Inf), fill = "lightblue", alpha = 0.3) +
-  geom_text(aes(x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7)] +
-                    (as.Date("2023-09-28") - 
-                    data2$Date[ceiling(0.8 * length(data2$Date)/7)])/2, 
-                y = max(`Adj Close`)/2),
-            label = "Data Uji", hjust = 0.5, vjust = 0.5, size = 4))
+  geom_text(data=data2, aes(x = as.Date(min(Date) + 
+               (Date[ceiling(0.8 * length(Date)/7)] - 
+                  min(Date))/2, y = max(`Adj Close`)/2)),
+            label = "Data Latih", hjust = 0.5, vjust = 0.5, size = 4) +
+  
+  #Label Data Uji
+  geom_rect(data=data2, aes(xmin=Date[ceiling(0.8 * length(Date)/7)], 
+                            xmax = as.Date("2023-09-28"),
+                            ymin = -Inf, 
+                            ymax = Inf), 
+            color = "lightblue", alpha = 0.3, inherit.aes = FALSE) +
+  
+  geom_text(data=data2, aes(x=as.Date(Date[ceiling(0.8 * length(Date)/7)] +
+                              (as.Date("2023-09-28") - 
+                              Date[ceiling(0.8 * length(Date)/7)])/2, 
+                            y=max(`Adj Close`)/2)),
+            label = "Data Uji", hjust = 0.5, vjust = 0.5, size = 4)
             
 chart
 
