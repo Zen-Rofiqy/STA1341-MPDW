@@ -2575,7 +2575,7 @@ cat(" Lambda :", lambda_nvda,
     "Batas Bawah :", min(sk_nvda), "\n Batas Atas  :", max(sk_nvda) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.33$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.6$ dan batas atas $-0.05$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
@@ -2596,9 +2596,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_nvda.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
-
-Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 7, 11, & 17. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
 ### Uji ADF
 
@@ -2620,9 +2618,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_nvda.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13.
-
-Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 7, 11, & 17. Maka model tidak dapat di identifikasi dengan plot ACF.
 
 ### Plot PACF
 
@@ -2630,9 +2626,7 @@ Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut of
 pacf(train_nvda.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15.
-
-Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+Berdasarkan plot tersebut, terlihat bahwa plot PACF cuts off pada lag ke 7, 11, & 17. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
@@ -2652,10 +2646,10 @@ datatable(model.tentaif_nvda, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(5,1,6)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(5,1,6)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2158.74$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
 
 ```{r}
-model_nvda.da <- Arima(train_nvda.diff, order=c(5,1,6), method="ML")
+model_nvda.da <- Arima(train_nvda.diff, order=c(4,1,5), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -2682,9 +2676,7 @@ acf(sisaan_nvda.da)
 pacf(sisaan_nvda.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tidak menyebar normal ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki ragam yang homogen. Plot ACF dan PACF sisaan `ARIMA(5,1,6)` juga tidak signifikan pada lag 13 yang menandakan saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
-
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2714,7 +2706,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7336$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.4189$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 #### Sisaan homogen
 
@@ -2728,7 +2720,7 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.1776$ yang lebih besar dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
 #### Nilai tengah sama dengan nol
 
@@ -2743,7 +2735,7 @@ Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. H
 >
 > $H_1$ : nilai tengah sisaan tidak sama dengan 0
 
-Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.3043$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.07029$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
 ## **Peramalan** {.tabset}
 
@@ -2764,7 +2756,7 @@ data.ramalan_nvda.da <- ramalan_nvda.da$mean
 plot(ramalan_nvda.da, xlab="Periode (Tahun)", col = "green4", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(5,1,6)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_nvda.ts[length(train_nvda.ts)] #nilai akhir data latih
@@ -2798,7 +2790,7 @@ row.names(akurasi.nvda) <- "NVDA"
 akurasi.nvda
 ```
 
-Didapatkan nilai MAPE sebesar $9.308578\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(5,1,6)` sudah sangat baik.
+Didapatkan nilai MAPE sebesar $9.299182\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah sangat baik.
 
 # Perbandingan Antar Saham
 
