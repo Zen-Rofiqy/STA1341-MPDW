@@ -2899,3 +2899,5 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
 chart
 
 ```
+
+Dari Semua data ujinya memiliki pola yang cenderung tren naik.
