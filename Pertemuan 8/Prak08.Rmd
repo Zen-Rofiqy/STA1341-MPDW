@@ -2080,6 +2080,8 @@ acf(train_msft.diff)
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
+Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off.
+
 ### Uji ADF
 
 ```{r message=FALSE, warning=FALSE}
@@ -2345,6 +2347,8 @@ acf(train_nflx.diff)
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
+Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off.
+
 ### Uji ADF
 
 ```{r message=FALSE, warning=FALSE}
@@ -2609,6 +2613,8 @@ acf(train_nvda.diff)
 ```
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+
+Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off.
 
 ### Uji ADF
 
