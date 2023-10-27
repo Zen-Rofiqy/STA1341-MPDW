@@ -2809,3 +2809,74 @@ akurasi <- rbind(akurasi.aapl, akurasi.amzn, akurasi.goog, akurasi.meta,
 datatable(akurasi, filter = 'top', 
           options = list(pageLength = 5))
 ```
+
+## Perbandingan Hasil Forcast
+
+### Perbandingan Data Train dan Test
+
+```{r}
+data2 <- data %>%
+  select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
+  filter(Date >= as.Date("2022-01-01")) 
+
+rownames(data2) <- NULL
+str(data2)
+```
+
+```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+chart <-
+ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
+  #Color
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  
+    scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = 1, "MSFT" = 1, 
+                                "META" = 1, "AAPL" = 1, "GOOG" = 1, 
+                                "AMZN" = 1)) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Time Series MAANG",
+       subtitle = "Seperti apa sih pola deret waktu saham MAANG?\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 80, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data2$Date)), 
+               data2$Date[ceiling(1.00025 * length(data2$Date))])
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = data2$Date[ceiling(0.8 * length(data2$Date))] , 
+             linetype = "dotted", color = "red", linewidth = 2)
+chart
+
+#Export Chart
+ggsave("01_Time Series MAANG.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+```
