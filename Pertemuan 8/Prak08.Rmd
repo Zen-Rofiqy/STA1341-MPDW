@@ -1100,7 +1100,7 @@ datatable(model.tentaif_aapl, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1624.99$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model ``` ARIMA``(0,1,1) ``` .
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1624.99$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
 
 ```{r}
 model_aapl.da <- Arima(train_aapl.diff, order=c(0,1,1), method="ML")
@@ -1236,7 +1236,7 @@ datatable(perbandingan_aapl.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.aapl <- accuracy(ts(hasil[-1]), head(test_aapl.ts, n=h)) %>%
+akurasi.aapl <- accuracy(ts(ramal_aapl[-1]), head(test_aapl.ts, n=h)) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_aapl.da[["method"]]) %>% 
   relocate(Model, .before = 1)
@@ -1486,7 +1486,7 @@ Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menurun s
 ### Perbandingan
 
 ```{r}
-perbandingan_amzn.da <- matrix(data=c(head(test_amzn.ts, n=h), hasil[-1]),
+perbandingan_amzn.da <- matrix(data=c(head(test_amzn.ts, n=h), ramal_amzn[-1]),
                      nrow = h, ncol = 2)
 colnames(perbandingan_amzn.da) <- c("Aktual","Hasil Forecast")
 datatable(perbandingan_amzn.da, filter = 'top', 
@@ -1494,7 +1494,7 @@ datatable(perbandingan_amzn.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.amzn <- accuracy(ts(hasil[-1]), head(test_amzn.ts, n=h)) %>%
+akurasi.amzn <- accuracy(ts(ramal_amzn[-1]), head(test_amzn.ts, n=h)) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_amzn.da[["method"]]) %>% 
   relocate(Model, .before = 1)
@@ -1745,7 +1745,7 @@ Dapat dilihat bahwa rata-rata harga saham Google diramalkan akan terus menurun s
 ### Perbandingan
 
 ```{r}
-perbandingan_goog.da <- matrix(data=c(head(test_goog.ts, n=h), hasil[-1]),
+perbandingan_goog.da <- matrix(data=c(head(test_goog.ts, n=h), ramal_goog[-1]),
                      nrow = h, ncol = 2)
 colnames(perbandingan_goog.da) <- c("Aktual","Hasil Forecast")
 datatable(perbandingan_goog.da, filter = 'top', 
@@ -1753,7 +1753,7 @@ datatable(perbandingan_goog.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.goog <- accuracy(ts(hasil[-1]), head(test_goog.ts, n=h)) %>%
+akurasi.goog <- accuracy(ts(ramal_goog[-1]), head(test_goog.ts, n=h)) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_goog.da[["method"]]) %>% 
   relocate(Model, .before = 1)
@@ -2003,7 +2003,7 @@ Dapat dilihat bahwa rata-rata harga saham META diramalkan akan terus menaik seti
 ### Perbandingan
 
 ```{r}
-perbandingan_meta.da <- matrix(data=c(head(test_meta.ts, n=h), hasil[-1]),
+perbandingan_meta.da <- matrix(data=c(head(test_meta.ts, n=h), ramal_meta[-1]),
                      nrow = h, ncol = 2)
 colnames(perbandingan_meta.da) <- c("Aktual","Hasil Forecast")
 datatable(perbandingan_meta.da, filter = 'top', 
@@ -2011,7 +2011,7 @@ datatable(perbandingan_meta.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.meta <- accuracy(ts(hasil[-1]), head(test_meta.ts, n=h)) %>%
+akurasi.meta <- accuracy(ts(ramal_meta[-1]), head(test_meta.ts, n=h)) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_meta.da[["method"]]) %>% 
   relocate(Model, .before = 1)
@@ -2262,7 +2262,7 @@ Dapat dilihat bahwa rata-rata harga saham Microsoft diramalkan akan terus konsta
 ### Perbandingan
 
 ```{r}
-perbandingan_msft.da <- matrix(data=c(head(test_msft.ts, n=h), hasil[-1]),
+perbandingan_msft.da <- matrix(data=c(head(test_msft.ts, n=h), ramal_msft[-1]),
                      nrow = h, ncol = 2)
 colnames(perbandingan_msft.da) <- c("Aktual","Hasil Forecast")
 datatable(perbandingan_msft.da, filter = 'top', 
@@ -2270,7 +2270,7 @@ datatable(perbandingan_msft.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.msft <- accuracy(ts(hasil[-1]), head(test_msft.ts, n=h)) %>%
+akurasi.msft <- accuracy(ts(ramal_msft[-1]), head(test_msft.ts, n=h)) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_msft.da[["method"]]) %>% 
   relocate(Model, .before = 1)
@@ -2521,7 +2521,7 @@ Dapat dilihat bahwa rata-rata harga saham Netfilx diramalkan akan terus menaik s
 ### Perbandingan
 
 ```{r}
-perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=h), hasil[-1]),
+perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=h), ramal_nflx[-1]),
                      nrow = h, ncol = 2)
 colnames(perbandingan_nflx.da) <- c("Aktual","Hasil Forecast")
 datatable(perbandingan_nflx.da, filter = 'top', 
@@ -2529,7 +2529,7 @@ datatable(perbandingan_nflx.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.nflx <- accuracy(ts(hasil[-1]), head(test_nflx.ts, n=h)) %>%
+akurasi.nflx <- accuracy(ts(ramal_nflx[-1]), head(test_nflx.ts, n=h)) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_nflx.da[["method"]]) %>% 
   relocate(Model, .before = 1)
@@ -2780,7 +2780,7 @@ Dapat dilihat bahwa rata-rata harga saham NVIDA diramalkan akan terus Melonjak n
 ### Perbandingan
 
 ```{r}
-perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=h), hasil[-1]),
+perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=h), ramal_nvda[-1]),
                      nrow = h, ncol = 2)
 colnames(perbandingan_nvda.da) <- c("Aktual","Hasil Forecast")
 datatable(perbandingan_nvda.da, filter = 'top', 
@@ -2788,7 +2788,7 @@ datatable(perbandingan_nvda.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.nvda <- accuracy(ts(hasil[-1]), head(test_nvda.ts, n=h)) %>%
+akurasi.nvda <- accuracy(ts(ramal_nvda[-1]), head(test_nvda.ts, n=h)) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_nvda.da[["method"]]) %>% 
   relocate(Model, .before = 1)
