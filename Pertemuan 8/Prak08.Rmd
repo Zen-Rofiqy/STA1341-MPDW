@@ -972,6 +972,12 @@ tseries::adf.test(train_aapl.diff)
 
 Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
 
+### Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+Box.test(train_aapl.diff, type = "Ljung-Box")
+```
+
 ## **Identifikasi Model** {.tabset}
 
 ### Plot ACF
