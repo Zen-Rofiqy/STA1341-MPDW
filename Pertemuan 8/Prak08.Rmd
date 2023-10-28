@@ -79,7 +79,7 @@ Kami akan menggunakan peubah `Adj Close (Adjusted Close)`, Karena sesuai dengan 
 
 Tujuan dari praktikum ini adalah untuk menganalisis pola perkiraan pergerakan harga tujuh saham teknologi terkemuka dengan harapan dapat memberikan rekomendasi kepada pembaca mengenai saham mana yang sebaiknya dipertimbangkan untuk dibeli atau diinvestasikan secara signifikan di antara tujuh perusahaan teknologi besar tersebut.
 
-## Referensi 
+## Referensi
 
 -   [Referensi Warna](https://bookdown.org/hneth/ds4psy/ds4psy_files/figure-html/apx-color-sample-1.png){.uri}
 
@@ -681,7 +681,7 @@ ggsave("06_Time Series Microsoft.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 20)
 ```
 
-Dalam gambaran grafik deret waktu yang diberikan, sekitar $53.81%\$ data menunjukkan adanya [tren penurunan]{.underline} yang tampak. Lalu, pada tanggal `2022-11-03`, terjadi perubahan pola menjadi tren [kenaikan]{.underline}. Karakteristik tanggal dan persentase perubahan pola ini serupa dengan yang dapat ditemukan pada pergerakan saham Google dan META.
+Dalam gambaran grafik deret waktu yang diberikan, sekitar \$53.81%\$ data menunjukkan adanya [tren penurunan]{.underline} yang tampak. Lalu, pada tanggal `2022-11-03`, terjadi perubahan pola menjadi tren [kenaikan]{.underline}. Karakteristik tanggal dan persentase perubahan pola ini serupa dengan yang dapat ditemukan pada pergerakan saham Google dan META.
 
 **Pembagian Data Training Dan Test.**
 
@@ -1100,7 +1100,7 @@ datatable(model.tentaif_aapl, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1624.99$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA``(0,1,1)` .
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1624.99$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model ``` ARIMA``(0,1,1) ``` .
 
 ```{r}
 model_aapl.da <- Arima(train_aapl.diff, order=c(0,1,1), method="ML")
@@ -1228,7 +1228,7 @@ Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan terus menurun se
 ### Perbandingan
 
 ```{r}
-perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=h), hasil[-1]),
+perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=h), ramal_aapl[-1]),
                      nrow = h, ncol = 2)
 colnames(perbandingan_aapl.da) <- c("Aktual","Hasil Forecast")
 datatable(perbandingan_aapl.da, filter = 'top', 
@@ -2503,7 +2503,7 @@ data.ramalan_nflx.da <- ramalan_nflx.da$mean
 plot(ramalan_nflx.da, xlab="Periode (Hari)", col = "firebrick3", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(``0,1,1``)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan ``` ARIMA(``0,1,1``) ``` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_nflx.ts[length(train_nflx.ts)] #nilai akhir data latih
