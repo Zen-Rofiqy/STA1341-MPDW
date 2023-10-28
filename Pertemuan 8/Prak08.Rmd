@@ -338,7 +338,7 @@ data2 <- data %>%
   select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Date >= as.Date("2022-01-01")) 
 #Banyaknya hari untuk di ramal 
-h <- nrow(data2)/7 - round(nrow(data2)/7 *80/100) - 5; h
+h <- nrow(test_aapl); h
 ```
 
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
@@ -2894,7 +2894,9 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
              linetype = "dotted", color = "black", linewidth = 2) 
             
 chart
-
+#Export Chart
+ggsave("09_banding_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
 ```
 
 Dari Semua data ujinya memiliki pola yang cenderung tren naik.
@@ -2904,7 +2906,7 @@ Dari Semua data ujinya memiliki pola yang cenderung tren naik.
 ```{r}
 #Pnggabungan data
 data3 <- data.frame(
-  Date = data2 %>% select(Date) %>%
+  Date = data2 %>% dplyr::select(Date) %>%
     filter(Date <= 
            as.Date(data2$Date[(ceiling(0.8 * nrow(data2)/7))]) + h) ,
   `Adj Close` = c(as.vector(train_aapl.ts), ramal_aapl,
@@ -2988,6 +2990,9 @@ ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
   geom_vline( #Buat garis batas data
     xintercept = as.Date(max(data2$Date)) , 
              linetype = "dotted", color = "black", linewidth = 2)
+#Export Chart
+ggsave("09_banding_ramal.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
 ```
 
 ```{r dpi=300, fig1, fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
