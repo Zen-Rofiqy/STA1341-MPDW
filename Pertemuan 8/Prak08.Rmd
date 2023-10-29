@@ -165,9 +165,48 @@ missing_dates <- setdiff(full_date_range, dates)
 if (length(missing_dates) == 0) {
   cat("Semua tanggal ada dalam data.\n")
 } else {
-  cat("Terdapat tanggal yang tidak ada dalam data sebanyak", length(missing_dates), "tanggal atau hari")
+  cat("Tanggal yang tidak ada dalam data sebanyak", length(missing_dates),
+      "\nAtau sebanyak", length(missing_dates) * 7, 
+      "Data Hilang dari ke-7 perusahaan yang ada")
+}
+```
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+install_load('purrr')
+# Fungsi untuk mengisi data yang hilang
+fill_missing_data <- function(name) {
+  data_filtered <- data %>%
+    filter(Name == name)
+  
+  full_date_range <- seq(min(data$Date), max(data$Date), by = "days")
+  data_frame_template <- data.frame(Date = full_date_range)
+  
+  # Menambahkan kolom "Name" sesuai dengan perusahaan yang diproses
+  data_frame_template$Name <- name
+  
+  data_filled <- merge(data_frame_template, data_filtered, 
+                       by = c("Date", "Name"), all.x = TRUE)
+  return(data_filled)
 }
 
+# Menggunakan purrr::map untuk memproses setiap nama perusahaan
+filled_data_list <- map(unique(data$Name), fill_missing_data)
+
+# Gabungkan data-data yang telah diisi menjadi satu data frame
+final_data <- do.call(rbind, filled_data_list)
+
+# Urutkan data berdasarkan "Name" terlebih dahulu, kemudian "Date"
+final_data <- final_data %>%
+  dplyr::select(1, 2, 7) %>%
+  arrange(Name, Date)
+
+#Input Data Hilang
+install_load('imputeTS')
+
+data <- na_interpolation(final_data$`Adj Close`)
+ggplot_na_imputations(final_data$`Adj Close`, data)
+
+data <- data.frame(final_data$Date, final_data$Name, data)
 ```
 
 ### Data Cleaned
