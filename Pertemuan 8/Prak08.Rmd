@@ -221,6 +221,17 @@ data <- final_data %>% select(Date, Name) %>%
 
 Data sudah di imputasi.
 
+**Cek ukuran data**
+
+```{r}
+cat("Ukuran data awal adalah", nrow(data2),
+    "Banyaknya peride data yang hilang", length(missing_dates),
+    "(PerSaham.", length(missing_dates) * 7, "Jika semua)",
+    "\nUkuran data yang baru seharusnya", 
+    nrow(data2) + length(missing_dates) * 7,
+    "\nIni sudah sesuai dengan Ukuran data input (", nrow(data), ")")
+```
+
 ### Data Cleaned
 
 ```{r}
