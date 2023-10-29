@@ -215,7 +215,7 @@ install_load('imputeTS')
 data <- na_interpolation(final_data$`Adj Close`)
 ggplot_na_imputations(final_data$`Adj Close`, data)
 
-data <- final_data %>% select(Date, Name) %>% 
+data <- final_data %>% select(Name, Date) %>% 
   mutate(`Adj Close` = data)
 ```
 
@@ -225,12 +225,14 @@ Data sudah di imputasi.
 
 ```{r}
 cat("Ukuran data awal adalah", nrow(data2),
-    "Banyaknya peride data yang hilang", length(missing_dates),
+    "\nBanyaknya peride data yang hilang", length(missing_dates),
     "(PerSaham.", length(missing_dates) * 7, "Jika semua)",
     "\nUkuran data yang baru seharusnya", 
     nrow(data2) + length(missing_dates) * 7,
     "\nIni sudah sesuai dengan Ukuran data input (", nrow(data), ")")
 ```
+
+Data sudah benar, siap untuk dianalisis.
 
 ### Data Cleaned
 
@@ -355,7 +357,6 @@ Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NV
 
 ```{r}
 aapl <- data %>%
-  dplyr::select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Name == "AAPL", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
 rownames(aapl) <- NULL
@@ -417,7 +418,6 @@ train_aapl.ts <- ts(train_aapl[,3])
 test_aapl.ts <- ts(train_aapl[,3])
 
 data2 <- data %>%
-  dplyr::select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Date >= as.Date("2022-01-01")) 
 #Banyaknya hari untuk di ramal 
 h <- nrow(test_aapl); h
@@ -449,7 +449,6 @@ Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terli
 
 ```{r}
 amzn <- data %>%
-  dplyr::select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Name == "AMZN", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
 rownames(amzn) <- NULL
@@ -537,7 +536,6 @@ Dari plot deret waktu data latih ($80\%$ dari data asli), terlihat bahwa data me
 
 ```{r}
 goog <- data %>%
-  dplyr::select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Name == "GOOG", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
 rownames(goog) <- NULL
@@ -625,7 +623,6 @@ Melalui plot deret waktu dari data latih ($80\%$ dari data asli), terlihat bahwa
 
 ```{r}
 meta <- data %>%
-  dplyr::select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Name == "META", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
 rownames(meta) <- NULL
@@ -713,7 +710,6 @@ Berdasarkan grafik deret waktu data latih ($80\%$ dari data asli), tampak bahwa 
 
 ```{r}
 msft <- data %>%
-  dplyr::select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Name == "MSFT", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
 rownames(msft) <- NULL
@@ -801,7 +797,6 @@ Dari visualisasi grafik deret waktu pada data latih ($80\%$ dari data asli), ter
 
 ```{r}
 nflx <- data %>%
-  dplyr::select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Name == "NFLX", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
 rownames(nflx) <- NULL
@@ -889,7 +884,6 @@ Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terli
 
 ```{r}
 nvda <- data %>%
-  dplyr::select(1, 2, 7) %>%  # Memilih kolom 1, 2, dan 7
   filter(Name == "NVDA", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
 
 rownames(nvda) <- NULL
@@ -1308,7 +1302,7 @@ ramal_aapl <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_aapl.ts, ramal_aapl, xlab="Periode (Hari)", 
         col = "lightskyblue4", lwd = 3,
         ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham Apple Selama 79 Hari Kedepan")
+        main="Plot Ramalan Saham Apple Selama 115 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan terus menurun setiap periodenya.
@@ -1566,7 +1560,7 @@ ramal_amzn <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_amzn.ts, ramal_amzn, xlab="Periode (Hari)", 
         col = "orange2", lwd = 3,
         ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham Amazon Selama 79 Hari Kedepan")
+        main="Plot Ramalan Saham Amazon Selama 115 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menurun setiap periodenya.
@@ -1825,7 +1819,7 @@ ramal_goog <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_goog.ts, ramal_goog, xlab="Periode (Hari)", 
         col = "gold3", lwd = 3.5,
         ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham Google Selama 79 Hari Kedepan")
+        main="Plot Ramalan Saham Google Selama 115 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Google diramalkan akan terus menurun setiap periodenya.
@@ -2083,7 +2077,7 @@ ramal_meta <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_meta.ts, ramal_meta, xlab="Periode (Hari)", 
         col = "dodgerblue3", lwd = 3.5,
         ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham META Selama 79 Hari Kedepan")
+        main="Plot Ramalan Saham META Selama 115 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham META diramalkan akan terus menaik setiap periodenya.
@@ -2342,7 +2336,7 @@ ramal_msft <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_msft.ts, ramal_msft, xlab="Periode (Hari)", 
         ylab="Saham Harga (USD)",
         col = "deepskyblue2", lwd = 3.5,
-        main="Plot Ramalan Saham Microsoft Selama 79 Hari Kedepan")
+        main="Plot Ramalan Saham Microsoft Selama 115 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Microsoft diramalkan akan terus konstan setiap periodenya.
@@ -2390,7 +2384,7 @@ tseries::adf.test(train_nflx.ts)
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.1799$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.11159$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
@@ -2555,7 +2549,7 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.9795$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.91155$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
 #### Nilai tengah sama dengan nol
 
@@ -2601,7 +2595,7 @@ ramal_nflx <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_nflx.ts, ramal_nflx, ylab="Saham Harga (USD)", 
         xlab="Periode (Hari)", 
         col = "firebrick3", lwd = 3.5,
-        main="Plot Ramalan Saham Netflix Selama 79 Hari Kedepan")
+        main="Plot Ramalan Saham Netflix Selama 115 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Netfilx diramalkan akan terus menaik setiap periodenya.
@@ -2860,7 +2854,7 @@ ramal_nvda <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
 ts.plot(train_nvda.ts, ramal_nvda, ylab="Saham Harga (USD)",
         xlab="Periode (Tahun)", 
         col = "green4", lwd = 3.5,
-        main="Plot Ramal Saham NVIDIA Selama 79 Hari Kedepan")
+        main="Plot Ramal Saham NVIDIA Selama 115 Hari Kedepan")
 ```
 
 Dapat dilihat bahwa rata-rata harga saham NVIDA diramalkan akan terus Melonjak naik setiap periodenya.
@@ -3031,7 +3025,7 @@ ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
   annotate( "text", color="violetred",
             x = as.Date(data3$Date[ceiling(0.9 * length(data3$Date)/7)]) , 
             y = max(data3$`Adj Close`) * 0.95, 
-    label = "Data Ramal\n79 Hari", size=10) +
+    label = "Data Ramal\n115 Hari", size=10) +
   #Time Series
   geom_line(aes(color=Name), linewidth=1.5) +
   #Warna Saham
@@ -3042,7 +3036,7 @@ ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Ramalan Saham MAANG",
-       subtitle = "Peramalan Saham MAANG Selama 79 Hari Kedepan\n") +
+       subtitle = "Peramalan Saham MAANG Selama 115 Hari Kedepan\n") +
   # Label / legend
   geom_text_repel(
     data=data3[data3$Date == max(data3$Date),], #Posisi di ujung data
