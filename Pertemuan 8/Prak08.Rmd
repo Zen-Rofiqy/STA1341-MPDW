@@ -1048,12 +1048,6 @@ tseries::adf.test(train_aapl.diff)
 
 Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
 
-### Plot Box-Cox
-
-```{r message=FALSE, warning=FALSE}
-Box.test(train_aapl.diff, type = "Ljung-Box")
-```
-
 ## **Identifikasi Model** {.tabset}
 
 ### Plot ACF
@@ -1275,8 +1269,28 @@ Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.2925$ yang lebih besar d
 
 ### Transformasi Data
 
-```{r}
+![](images/Screenshot 2023-10-29 231401.png){width="327"}
 
+Nilai *rounded value* ($\lambda$) optimum sebesar $0.11$. Sehingga akan dipilih Lambda yang nilainya dekat yakni sebesar $0$ dengan transformasi $\log(\mathbf{Y})$.
+
+```{r}
+install_load('fpp')
+# Transform data
+y <- log(aapl.ts)
+fit <- ets(y)
+fc <- forecast(fit, h=h, level=0.95)
+fvar <- ((fc$upper-fc$lower)/qnorm(0.975)/2)^2
+emu <- exp(fc$mean)
+# Back-transform forecasts
+fc$mean <- exp(fc$mean)
+fc$lower <- exp(fc$lower)
+fc$upper <- exp(fc$upper)
+fc$x <- aapl.ts
+# Plot result on original scale
+plot(fc)
+# Compute forecast mean
+fc$mean <- 1/(1+emu)^3*((a+b*emu)*(1+emu)^2 + fvar*(b-a)*emu*(1-emu)/2)
+lines(fc$mean,col='red')
 ```
 
 ## **Peramalan** {.tabset}
