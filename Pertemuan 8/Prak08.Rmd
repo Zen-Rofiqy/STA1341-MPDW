@@ -148,6 +148,12 @@ datatable(raw.data[                        # Subsetting
 
 Ternyata pada baris tersebut ada data karakter text yang merupakan label dari tiap kolomnya. Sehingga ketika diubah ke numerik akan menjadi `NA`. Maka saya akan menghapus baris tersebut.
 
+```{r}
+data <- data %>%
+  filter(!row_number() %in% unique(na.idx[, 1]))
+data2 <- data
+```
+
 ### Cek Periode Data
 
 ```{r}
@@ -171,14 +177,16 @@ if (length(missing_dates) == 0) {
 }
 ```
 
+**Inputasi Data**
+
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 install_load('purrr')
 # Fungsi untuk mengisi data yang hilang
 fill_missing_data <- function(name) {
-  data_filtered <- data %>%
+  data_filtered <- data2 %>%
     filter(Name == name)
   
-  full_date_range <- seq(min(data$Date), max(data$Date), by = "days")
+  full_date_range <- seq(min(data2$Date), max(data2$Date), by = "days")
   data_frame_template <- data.frame(Date = full_date_range)
   
   # Menambahkan kolom "Name" sesuai dengan perusahaan yang diproses
@@ -190,9 +198,10 @@ fill_missing_data <- function(name) {
 }
 
 # Menggunakan purrr::map untuk memproses setiap nama perusahaan
-filled_data_list <- map(unique(data$Name), fill_missing_data)
+filled_data_list <- map(unique(data2$Name), fill_missing_data)
 
 # Gabungkan data-data yang telah diisi menjadi satu data frame
+final_data <- data.frame()
 final_data <- do.call(rbind, filled_data_list)
 
 # Urutkan data berdasarkan "Name" terlebih dahulu, kemudian "Date"
@@ -206,14 +215,15 @@ install_load('imputeTS')
 data <- na_interpolation(final_data$`Adj Close`)
 ggplot_na_imputations(final_data$`Adj Close`, data)
 
-data <- data.frame(final_data$Date, final_data$Name, data)
+data <- final_data %>% select(Date, Name) %>% 
+  mutate(`Adj Close` = data)
 ```
+
+Data sudah di imputasi.
 
 ### Data Cleaned
 
 ```{r}
-data <- data %>%
-  filter(!row_number() %in% unique(na.idx[, 1]))
 datatable(data, filter = 'top', 
           options = list(pageLength = 5))
 ```
