@@ -993,7 +993,7 @@ tseries::adf.test(train_aapl.ts)
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.4788$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.5136$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
@@ -1013,7 +1013,7 @@ cat(" Lambda :", lambda_aapl,
     "Batas Bawah :", min(sk_aapl), "\n Batas Atas  :", max(sk_aapl) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.88$ dan batas atas $0.99$. Selang tersebut tidak memuat nilai satu (walaupun hampir) sehingga dapat dikatakan bahwa data saham Apple tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.11$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.67$ dan batas atas $0.88$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
@@ -1034,7 +1034,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_aapl.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 0. Hal ini menandakan data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 0, lag 13, dan lag 14. Hal ini menandakan data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
 ### Uji ADF
 
@@ -1062,7 +1062,7 @@ Box.test(train_aapl.diff, type = "Ljung-Box")
 acf(train_aapl.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 0. Sehingga model tidak dapat di identifikasi dengan plot ACF.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 0, lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
 ### Plot PACF
 
