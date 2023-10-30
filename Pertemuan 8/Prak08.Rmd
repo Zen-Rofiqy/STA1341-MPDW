@@ -2484,6 +2484,16 @@ Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
 Mengutip dari laman tersebut,
 
+| $\mathbf{\lambda}$ | **Transformation** |
+|:------------------:|:------------------:|
+|         -2         |      $1/x^2$       |
+|         -1         |       $1/x$        |
+|        -0.5        |    $1/\sqrt{x}$    |
+|         0          |    $\log{(x)}$     |
+|        0.5         |     $\sqrt{x}$     |
+|         1          |        $x$         |
+|         2          |       $x^2$        |
+
 Nilai *rounded value* ($\lambda$) optimum sebesar $-0.21$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
 ```{r}
