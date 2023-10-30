@@ -1385,7 +1385,7 @@ bc <- boxcox(train_amzn.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
 
 Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
 
-#### Dalam Rataan: Differencing
+### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_amzn.diff <- diff(train_amzn.ts.new, differences = 1) 
@@ -1647,9 +1647,9 @@ cat(" Lambda :", lambda_goog,
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.13$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.59$ dan batas atas $0.33$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Google tidak stasioner dalam ragam.
 
-### **Penanganan Ketidakstasioneran Data**
+## **Penanganan Ketidakstasioneran Data** {.tabset}
 
-#### Dalam Ragam: Transformasi Data
+### Dalam Ragam: Transformasi Data
 
 Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
@@ -1674,7 +1674,7 @@ bc <- boxcox(train_goog.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
 
 Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Google sudah stasioner dalam ragam.
 
-#### Dalam Rataan: Differencing
+### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_goog.diff <- diff(train_goog.ts.new, differences = 1) 
@@ -1937,9 +1937,9 @@ cat(" Lambda :", lambda_meta,
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.02$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.21$ dan batas atas $0.25$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
 
-### **Penanganan Ketidakstasioneran Data**
+## **Penanganan Ketidakstasioneran Data** {.tabset}
 
-#### Dalam Ragam: Transformasi Data
+### Dalam Ragam: Transformasi Data
 
 Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
@@ -1964,7 +1964,7 @@ bc <- boxcox(train_meta.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
 
 Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham META sudah stasioner dalam ragam.
 
-#### Dalam Rataan: Differencing
+### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_meta.diff <- diff(train_meta.ts.new, differences = 1) 
@@ -2226,9 +2226,9 @@ cat(" Lambda :", lambda_msft,
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.85$ dan batas atas $0.96$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
 
-### **Penanganan Ketidakstasioneran Data**
+## **Penanganan Ketidakstasioneran Data** {.tabset}
 
-#### Dalam Ragam: Transformasi Data
+### Dalam Ragam: Transformasi Data
 
 Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
@@ -2253,7 +2253,7 @@ bc <- boxcox(train_msft.ts.new ~ index, lambda = seq(-5, 7, by=0.01))
 
 Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Microsoft sudah stasioner dalam ragam.
 
-#### Dalam Rataan: Differencing
+### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_msft.diff <- diff(train_msft.ts.new, differences = 1) 
@@ -2516,9 +2516,9 @@ cat(" Lambda :", lambda_nflx,
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.38$ dan batas atas $0.25$. Selang tersebut tidak memuat nilai *1* sehingga dapat dikatakan bahwa data saham Netflix tidak stasioner dalam ragam.
 
-### **Penanganan Ketidakstasioneran Data**
+## **Penanganan Ketidakstasioneran Data** {.tabset}
 
-#### Dalam Ragam: Transformasi Data
+### Dalam Ragam: Transformasi Data
 
 Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
@@ -2543,7 +2543,7 @@ bc <- boxcox(train_nflx.ts.new ~ index, lambda = seq(-5, 7, by=0.01))
 
 Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
 
-#### Dalam Rataan: Differencing
+### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_nflx.diff <- diff(train_nflx.ts.new, differences = 1) 
@@ -2806,9 +2806,9 @@ cat(" Lambda :", lambda_nvda,
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.09$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.28$ dan batas atas $0.47$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
 
-### **Penanganan Ketidakstasioneran Data**
+## **Penanganan Ketidakstasioneran Data** {.tabset}
 
-#### Dalam Ragam: Transformasi Data
+### Dalam Ragam: Transformasi Data
 
 Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
@@ -2825,7 +2825,7 @@ bc <- boxcox(train_nvda.ts.new ~ index, lambda = seq(-5, 7, by=0.01))
 
 Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
 
-#### Dalam Rataan: Differencing
+### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_nvda.diff <- diff(train_nvda.ts.new, differences = 1) 
