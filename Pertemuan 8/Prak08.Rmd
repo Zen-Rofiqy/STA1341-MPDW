@@ -2282,7 +2282,7 @@ datatable(model.tentaif_msft, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1982.37$ dimiliki oleh model `ARIMA(2,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,3)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2421.48$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_msft.da <- Arima(train_msft.diff, order=c(0,1,1), method="ML")
