@@ -1017,6 +1017,8 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.
 
 ### **Penanganan Ketidakstasioneran Data**
 
+![](images/Screenshot 2023-10-29 231401.png){width="327"}
+
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
 plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
