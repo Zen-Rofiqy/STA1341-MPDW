@@ -1376,14 +1376,10 @@ Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
 Mengutip dari laman tersebut,
 
-$$  \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika } \text{ } \lambda \ne 0  \\   \log(x) & \text{jika } \text{ } \lambda = 0    \end{cases}    $$
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $-0.5$, Sehingga akan menggunakan transformasi $1/\sqrt{x}$.
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
 ```{r}
-train_amzn.ts.new <- 1/sqrt(train_amzn.ts)
+train_amzn.ts.new <- log(train_amzn.ts)
 bc <- boxcox(train_amzn.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
 ```
 
@@ -1457,7 +1453,7 @@ datatable(model.tentaif_amzn, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-3061.78$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2101.57$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_amzn.da <- Arima(train_amzn.diff, order=c(0,1,1), method="ML")
@@ -1517,7 +1513,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7336$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.9723$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**.
 
 #### Sisaan homogen
 
@@ -1531,7 +1527,7 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.01499$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.002668$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
 
 #### Nilai tengah sama dengan nol
 
@@ -1546,7 +1542,7 @@ Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. H
 >
 > $H_1$ : nilai tengah sisaan tidak sama dengan 0
 
-Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.3043$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.523$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
 ## **Peramalan** {.tabset}
 
@@ -1573,7 +1569,7 @@ Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1
 pt_1 <- train_amzn.ts[length(train_amzn.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_amzn.da
 #Transformasi Balik
-ramal_amzn <- hasil.forc.Diff^2
+ramal_amzn <- exp(hasil.forc.Diff)
 #Diff inv
 ramal_amzn <- diffinv(ramal_amzn, differences = 1) + pt_1
 
@@ -1605,7 +1601,7 @@ row.names(akurasi.amzn) <- "AMZN"
 datatable(akurasi.amzn)
 ```
 
-Didapatkan nilai MAPE sebesar $12.04369\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah baik.
+Didapatkan nilai MAPE sebesar $35.30528\%$ (lebih dari $20\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah cukup baik.
 
 # Google
 
@@ -1629,7 +1625,7 @@ tseries::adf.test(train_goog.ts)
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.4787$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3766$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
@@ -1649,14 +1645,29 @@ cat(" Lambda :", lambda_goog,
     "Batas Bawah :", min(sk_goog), "\n Batas Atas  :", max(sk_goog) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.51$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.23$ dan batas atas $1.25$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Google stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.13$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.59$ dan batas atas $0.33$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Google tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
+
+#### Dalam Ragam: Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.13$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
+
+```{r}
+train_goog.ts.new <- log(train_goog.ts)
+bc <- boxcox(train_goog.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
+```
+
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
 
 #### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
-train_goog.diff <- diff(train_goog.ts, differences = 1) 
+train_goog.diff <- diff(train_goog.ts.new, differences = 1) 
 plot.ts(train_goog.diff, lty=1, xlab="Periode (Hari)", 
         col = "gold3", lwd = 3.5,
         main="Plot Difference Saham Google")
@@ -1672,7 +1683,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_goog.diff)
 ```
 
-Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+Berdasarkan plot ACF tersebut, terlihat bahwa cuts off 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
 ### Uji ADF
 
@@ -1694,7 +1705,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_goog.diff)
 ```
 
-Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot ACF.
+Berdasarkan plot ACF tersebut, terlihat bahwa cuts off 13. Maka model tidak dapat di identifikasi dengan plot ACF.
 
 ### Plot PACF
 
@@ -1702,7 +1713,7 @@ Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off
 pacf(train_goog.diff)
 ```
 
-Sama dengan plot ACF nya, pada plot PACF terlihat tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+Pada plot PACF terlihat tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
@@ -2836,7 +2847,7 @@ Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *tails off*. Maka
 eacf(train_nvda.diff)
 ```
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat ujung segitiga pada pola segitiga nol. Dalam hal ini model tentatif yang terbentuk adalah ARIMA(1,1,2), ARIMA(1,1,1), ARIMA(0,1,1), ARIMA(0,1,2), ARIMA(0,1,3), ARIMA(1,1,3), ARIMA(2,1,3),ARIMA(3,1,3). Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat
 
 ## **Pendugaan Parameter Model Tentatif**
 
@@ -2847,7 +2858,7 @@ datatable(model.tentaif_nvda, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2158.74$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1578.14$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
@@ -2877,14 +2888,14 @@ acf(sisaan_nvda.da)
 pacf(sisaan_nvda.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **normal** ditandai dengan tititk-titiknya cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **tidak normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
 #### Sisaan Menyebar Normal
 
 ```{r}
-ks.test(sisaan_nvda.da,"pnorm")  #tak tolak H0 > sisaan menyebar normal
+shapiro.test(sisaan_nvda.da)  #tak tolak H0 > sisaan menyebar normal
 ```
 
 Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
@@ -2893,7 +2904,7 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 >
 > $H_1$ : Sisaan tidak menyebar normal
 
-Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times 10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.933\times 10^{-10}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
 
 #### Sisaan saling bebas/tidak ada autokorelasi
 
@@ -2907,7 +2918,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.4189$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.8017$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 #### Sisaan homogen
 
@@ -2921,7 +2932,7 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.1776$ yang lebih besar dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.4553$ yang lebih besar dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
 #### Nilai tengah sama dengan nol
 
@@ -2936,7 +2947,7 @@ Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. H
 >
 > $H_1$ : nilai tengah sisaan tidak sama dengan 0
 
-Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.07029$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.214$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
 ## **Peramalan** {.tabset}
 
@@ -2946,7 +2957,7 @@ Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut i
 
 ```{r}
 #---FORECAST---#
-ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = h) 
+ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = length(test_nvda.ts)) 
 ramalan_nvda.da
 ```
 
@@ -2957,7 +2968,7 @@ data.ramalan_nvda.da <- ramalan_nvda.da$mean
 plot(ramalan_nvda.da, xlab="Periode (Tahun)", col = "green4", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_nvda.ts[length(train_nvda.ts)] #nilai akhir data latih
@@ -2987,7 +2998,8 @@ datatable(perbandingan_nvda.da, filter = 'top',
 ```
 
 ```{r}
-akurasi.nvda <- accuracy(ts(ramal_nvda[-1]), head(test_nvda.ts, n=h)) %>%
+akurasi.nvda <- accuracy(ts(ramal_nvda[-1]), head(test_nvda.ts, 
+                                                  n=length(test_nvda.ts))) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_nvda.da[["method"]]) %>% 
   relocate(Model, .before = 1)
@@ -2995,7 +3007,7 @@ row.names(akurasi.nvda) <- "NVDA"
 datatable(akurasi.nvda)
 ```
 
-Didapatkan nilai MAPE sebesar $9.299182\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah sangat baik.
+Didapatkan nilai MAPE sebesar $16.67131\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah baik.
 
 # Perbandingan Antar Saham
 
