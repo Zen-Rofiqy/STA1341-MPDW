@@ -1368,7 +1368,7 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0
 
 ### **Penanganan Ketidakstasioneran Data**
 
-#### Transformasi Data
+#### Dalam Ragam: Transformasi Data
 
 Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
@@ -1376,15 +1376,19 @@ Mengutip dari laman tersebut,
 
 $$  \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika } \text{ } \lambda \ne 0  \\   \log(x) & \text{jika } \text{ } \lambda = 0    \end{cases}    $$
 
-Nilai *rounded value* ($\lambda$) optimum sebesar $1.68 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
 
 ```{r}
 train_amzn.ts.new <- (train_amzn.ts^lambda_amzn-1)/lambda_amzn
 bc <- boxcox(train_amzn.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
 ```
 
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
+
+#### Dalam Rataan: Differencing
+
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
-train_amzn.diff <- diff(train_amzn.ts, differences = 1) 
+train_amzn.diff <- diff(train_amzn.ts.new, differences = 1) 
 plot.ts(train_amzn.diff, lty=1, xlab="Periode (Hari)", 
         col = "orange2", lwd = 3.5,
         main="Plot Difference Saham Amazon")
@@ -1400,7 +1404,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_amzn.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF tidak ada satupun lag yang cuts off. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
 ### Uji ADF
 
@@ -1422,7 +1426,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_amzn.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 13. Sehingga model tidak dapat di identifikasi dengan plot ACF.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF tidak ada satupun lag yang cuts off. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
 ### Plot PACF
 
@@ -1430,7 +1434,7 @@ Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada l
 pacf(train_amzn.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 13 dan 15. Sehingga model tidak dapat di identifikasi dengan plot PACF.
+Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 20. Sehingga model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
