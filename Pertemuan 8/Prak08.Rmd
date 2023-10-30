@@ -2150,7 +2150,7 @@ row.names(akurasi.meta) <- "META"
 datatable(akurasi.meta)
 ```
 
-Didapatkan nilai MAPE sebesar $4.507078\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
+Didapatkan nilai MAPE sebesar $4.766333\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
 
 # Microsoft
 
@@ -2174,7 +2174,7 @@ tseries::adf.test(train_msft.ts)
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.6967$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.5748$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
@@ -2194,7 +2194,7 @@ cat(" Lambda :", lambda_msft,
     "Batas Bawah :", min(sk_msft), "\n Batas Atas  :", max(sk_msft) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.92$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-1.8$ dan batas atas $-0.03$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.85$ dan batas atas $0.96$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
@@ -2204,18 +2204,14 @@ Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
 Mengutip dari laman tersebut,
 
-$$  \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika } \text{ } \lambda \ne 0  \\   \log(x) & \text{jika } \text{ } \lambda = 0    \end{cases}    $$
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $-0.5$, Sehingga akan menggunakan transformasi $1/\sqrt{x}$.
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.21$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
 ```{r}
 train_msft.ts.new <- log(train_msft.ts)
 bc <- boxcox(train_msft.ts.new ~ index, lambda = seq(-5, 7, by=0.01))
 ```
 
-Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Microsoft sudah stasioner dalam ragam.
 
 #### Dalam Rataan: Differencing
 
@@ -2236,7 +2232,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_msft.diff)
 ```
 
-Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+Berdasarkan plot ACF tersebut, terlihat bahwa cuts off pada lag 5 dan 15. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
 ### Uji ADF
 
@@ -2258,7 +2254,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_msft.diff)
 ```
 
-Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot ACF.
+Berdasarkan plot ACF tersebut, terlihat bahwa cuts off pada lag 5 dan 15. Maka model tidak dapat di identifikasi dengan plot ACF.
 
 ### Plot PACF
 
@@ -2266,7 +2262,7 @@ Berdasarkan plot ACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off
 pacf(train_msft.diff)
 ```
 
-Berdasarkan plot PACF tersebut, terlihat bahwa tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+Berdasarkan plot PACF tersebut, terlihat bahwa cuts off pada lag 14. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
