@@ -1013,11 +1013,26 @@ cat(" Lambda :", lambda_aapl,
     "Batas Bawah :", min(sk_aapl), "\n Batas Atas  :", max(sk_aapl) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.11$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.67$ dan batas atas $0.88$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $1.68$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.64$ dan batas atas $2.72$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
-![](images/Screenshot 2023-10-29 231401.png){width="327"}
+#### Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+$$
+ \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika } \text{ } \lambda \ne 0  \\   \log(x) & \text{jika } \text{ } \lambda = 0    \end{cases}  
+$$
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $1.68 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
+
+```{r}
+train_aapl.ts <- (train_aapl.ts^lambda_aapl-1)/lambda_aapl
+bc <- boxcox(train_aapl.ts ~ index)
+```
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
@@ -1036,7 +1051,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_aapl.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 0, lag 13, dan lag 14. Hal ini menandakan data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Hal ini menandakan data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
 
 ### Uji ADF
 
@@ -1058,7 +1073,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_aapl.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 0, lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
 ### Plot PACF
 
@@ -1208,7 +1223,7 @@ acf(sisaan_aapl.da)
 pacf(sisaan_aapl.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar** **normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(``2,1,3``)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar** **normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(2,1,3)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1271,7 +1286,7 @@ Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.2925$ yang lebih besar d
 
 ### Transformasi Data
 
-![](images/Screenshot 2023-10-29 231401.png){width="327"}
+![](images/Screenshot%202023-10-29%20231401.png){width="327"}
 
 Nilai *rounded value* ($\lambda$) optimum sebesar $0.11$. Sehingga akan dipilih Lambda yang nilainya dekat yakni sebesar $0$ dengan transformasi $\log(\mathbf{Y})$.
 
