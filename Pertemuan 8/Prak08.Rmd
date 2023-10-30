@@ -2737,9 +2737,7 @@ tseries::adf.test(train_nvda.ts)
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.9594$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
-
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar 0.9227 yang lebih besar dari taraf nyata 5% sehingga menandakan bahwa data tidak stasioner dalam rataan. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model dalam rataan kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.922$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
@@ -2759,7 +2757,7 @@ cat(" Lambda :", lambda_nvda,
     "Batas Bawah :", min(sk_nvda), "\n Batas Atas  :", max(sk_nvda) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.33$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.6$ dan batas atas $-0.05$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.09$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.28$ dan batas atas $0.47$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
 
@@ -2799,7 +2797,7 @@ Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rat
 acf(train_nvda.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 7, 11, & 17. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF tails off dan membentuk pola naik turun.
 
 ### Uji ADF
 
@@ -2821,7 +2819,7 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil 
 acf(train_nvda.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 7, 11, & 17. Maka model tidak dapat di identifikasi dengan plot ACF.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *tails of*. Maka model tidak dapat di identifikasi dengan plot ACF.
 
 ### Plot PACF
 
@@ -2829,7 +2827,7 @@ Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 7, 11, &
 pacf(train_nvda.diff)
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot PACF cuts off pada lag ke 7, 11, & 17. Maka model tidak dapat di identifikasi dengan plot PACF.
+Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *tails off*. Maka model tidak dapat di identifikasi dengan plot PACF.
 
 ### Plot EACF
 
@@ -2849,7 +2847,7 @@ datatable(model.tentaif_nvda, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2158.74$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2158.74$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
