@@ -2484,11 +2484,7 @@ Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
 Mengutip dari laman tersebut,
 
-$$  \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika } \text{ } \lambda \ne 0  \\   \log(x) & \text{jika } \text{ } \lambda = 0    \end{cases}    $$
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $-0.5$, Sehingga akan menggunakan transformasi $1/\sqrt{x}$.
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.21$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
 ```{r}
 train_nflx.ts.new <- log(train_nflx.ts)
