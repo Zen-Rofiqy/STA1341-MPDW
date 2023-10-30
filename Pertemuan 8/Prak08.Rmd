@@ -1376,7 +1376,6 @@ Mengutip dari laman tersebut,
 |         1          |        $x$         |
 |         2          |       $x^2$        |
 
-
 Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
 ```{r}
@@ -1665,7 +1664,6 @@ Mengutip dari laman tersebut,
 |        0.5         |     $\sqrt{x}$     |
 |         1          |        $x$         |
 |         2          |       $x^2$        |
-
 
 Nilai *rounded value* ($\lambda$) optimum sebesar $-0.13$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
@@ -1957,7 +1955,6 @@ Mengutip dari laman tersebut,
 |         1          |        $x$         |
 |         2          |       $x^2$        |
 
-
 Nilai *rounded value* ($\lambda$) optimum sebesar $-0.21$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
 ```{r}
@@ -2246,7 +2243,6 @@ Mengutip dari laman tersebut,
 |        0.5         |     $\sqrt{x}$     |
 |         1          |        $x$         |
 |         2          |       $x^2$        |
-
 
 Nilai *rounded value* ($\lambda$) optimum sebesar $-0.21$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
