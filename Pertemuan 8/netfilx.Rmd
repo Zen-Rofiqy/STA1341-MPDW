@@ -1,0 +1,1174 @@
+---
+title: "Netflix"
+author: "G1401211094 Hanifa Rahmacindia Nasution"
+date: "2023-10-30"
+output: html_document
+---
+
+```{r, warning=FALSE, message = FALSE}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+```
+
+# Library
+
+```{r}
+library(rio)
+library(ggplot2)
+library(tsibble)
+library(tseries)
+library(MASS)
+library(forecast)
+library(TSA)
+library(TTR)
+library(aTSA)
+library(graphics)
+```
+
+# Data Preparation {.tabset}
+
+## Import Data
+
+```{r, warning=FALSE, message = FALSE}
+install_load('rio')
+raw.data <- import("https://raw.githubusercontent.com/HanifaNasution/Praktikum-MPDW/main/Data/NFLX.csv")
+```
+
+## Data Checking
+
+Cek Tipe data.
+
+```{r}
+str(raw.data)
+```
+
+Tanggal masih berupa data Karakter, harus diubah.
+
+Cek Data kosong.
+
+```{r}
+sum(is.na(raw.data))
+```
+
+Tidak ada data kosong.
+
+## Penyesuaian Tipe Data
+
+Semua tipe data masih berupa character. Harus diubah menjadi tipe data yang sesuai.
+
+```{r, warning=FALSE, message = FALSE}
+install_load('dplyr')
+data <- raw.data %>%  
+  mutate(
+    Date = as.Date(raw.data[, 2], format = "%m/%d/%y"), #Mengubah menjadi Date 
+    across(3:ncol(raw.data), as.numeric)                #Mengubah menjadi Numerik
+  )
+str(data)
+```
+
+## Rechecking Data
+
+Cek kembali data kosong.
+
+```{r}
+cat('Banyaknya Data Kosong', sum(is.na(data)))
+```
+
+Sudah tidak ada data kosong
+
+## Cek Periode Data
+
+```{r}
+install_load("lubridate")
+
+dates <- as.Date(data$Date)
+
+# Buat rentang waktu mulai dari tanggal pertama hingga tanggal terakhir dalam data
+complete_dates <- seq(as.Date("2018-07-30"), as.Date("2023-07-28"), by = "days")
+complete_ts_data <- ts(NA, start = c(2023,07,30), frequency = 1)
+
+# Bandingkan rentang waktu dengan tanggal yang ada dalam data
+missing_dates <- setdiff(complete_dates, dates) 
+
+# Jika 'missing_dates' kosong, maka semua tanggal sudah ada dalam data
+if (length(missing_dates) == 0) {
+  cat("Semua tanggal ada dalam data.\n")
+} else {
+  cat("Terdapat tanggal yang tidak ada dalam data sebanyak", length(missing_dates), "tanggal atau hari")
+}
+```
+
+Terdapat 567 tanggal kosong Pada pemodelan time series data kosong tersebut perlu diimputasi karena syarat pemodelan data hari harus continue dengan rentang waktu seragam
+
+### Merge Data dengan Data Periode Lengkap
+
+```{r}
+complete_dates <- data.frame(Date=complete_dates)
+data1 <- merge(complete_dates, data, by = "Date",all.x=TRUE)
+data1$Name <- "NFLX"
+data1
+```
+
+## Imputasi Data Kosong
+
+```{r}
+library(imputeTS)
+
+data.full<- na_interpolation(data1)
+data.full
+
+str(data.full)
+```
+
+Tampak data memiliki 1825 baris data Data awal sebelum diimputasi ada 1258 dengan data hilang sebanyak 567 Data setelah imputasi sebesar 1825 = 1258 + 567 Sehingga data sudah penuh dan bisa dilakukan pemodelan time series
+
+# Eksplorasi Data
+
+```{r, warning=FALSE, message = FALSE}
+install_load('ggplot2','extrafont')
+# font_import(); loadfonts() #Run ini sekali aja
+theme.ts <- list(
+  theme(legend.position = "none",
+        axis.text.x = element_text(hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 20, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        )
+theme.ts1 <- list(
+  theme(legend.position = "none",
+        axis.text.x = element_text(hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 50, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        )
+```
+
+## Time Series Full
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(data.full$`Adj Close`)
+min_date <- data.full$Date[which.min(data.full$`Adj Close`)]
+max_date <- data.full$Date[which.max(data.full$`Adj Close`)]
+percentage.min <- (which.min(data.full$`Adj Close`) / nrow(data.full)) * 100
+percentage.max <- (which.max(data.full$`Adj Close`) / nrow(data.full)) * 100
+
+chart <-
+ggplot(data.full, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("lightskyblue4")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga Penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Seperti apa sih pola deret waktu saham Netflix?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage.min, 2), "%)",
+                         "   ",min_date)),
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") + 
+  geom_vline(xintercept = as.numeric(max_date),
+             linetype = "dotted", color = "grey30", linewidth = 1.5) + 
+  geom_text(aes(x = max_date-1*350, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Tertinggi\n","(",round(percentage.max, 2), "%)",
+                         "   ",max_date)), 
+            vjust = -2.5, hjust = 0, size = 7, color = "grey30") 
+chart
+```
+
+Tampak bahwa saham mengalami titik terendah pada tanggal 11 Mei 2022 yang mana berada pada 75,73% data, setelah mengalami waktu tertinggi pada tanggal 17 November 2021 yang mana berada pada 66,14% data Jika dilihat dari tahun `2019-2021`, semua saham cenderung memiliki pola trend naik. Lalu dari akhir `2021-2022` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun lalu naik kembali
+
+## Time Series Mulai 1 Januari 2022
+
+```{r}
+nflx <- data.full %>%
+  filter(Name == "NFLX", Date >= as.Date("2022-01-01"))  # Filter data saham Netflix tahun 2022 ke atas
+
+rownames(nflx) <- NULL
+str(nflx)
+```
+
+Mengubah `Adj Close` Menjadi *Time series.*
+
+```{r}
+nflx.ts <- ts(nflx[,7])
+```
+
+Ringkasan Data `Adj CLose.`
+
+```{r}
+summary(nflx.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(nflx$`Adj Close`)
+min_date <- nflx$Date[which.min(nflx$`Adj Close`)]
+max_date <- nflx$Date[which.max(nflx$`Adj Close`)]
+percentage.min <- (which.min(nflx$`Adj Close`) / nrow(nflx)) * 100
+
+chart1 <-
+ggplot(nflx, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("lightskyblue4")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga Penutup',
+       title = "Time Series Saham Netflix Mulai 1 Januari 2022",
+       subtitle = "Seperti apa sih pola deret waktu saham Netflix?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage.min, 2), "%)",
+                         "   ",min_date)),
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30")
+chart1
+```
+
+Nilai saham mengalami titik terendah pada tanggal 11 Mei 2022 yang mana berada pada 22,82% data Melihat dari 1 Januari 2022 sampai titik terendah, saham Netflix terus mengalami penurunan Namun setelah titik terendah berangsur mulai mengalami trend naik
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_nflx <- nflx[1: round(nrow(nflx) *80/100),]
+test_nflx <- nflx[round(nrow(nflx) *80/100 +1): nrow(nflx),]
+train_nflx.ts <- ts(train_nflx[,7])
+test_nflx.ts <- ts(train_nflx[,7])
+
+#Banyaknya hari untuk di ramal 
+h <- nrow(test_nflx); h
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart2 <-
+ggplot() + 
+  geom_line(data = train_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga Penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("lightskyblue4", "grey30")) + theme.ts1
+chart2
+```
+
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun lalu naik. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik [tidak stasioner dalam ragam] dan tidak bergerak dalam 1 nilai yang sama sehingga dapat disimpulkan bahwa data [tidak stasioner dalam ragam maupun rataan]{.underline}.
+
+# Uji Stasioneritas Data {.tabset}
+
+## Plot ACF
+
+```{r}
+acf(train_nflx.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan. Selain itu data juga tidak membentuk gelombang sinus.
+
+## Uji ADF
+
+```{r}
+tseries::adf.test(train_nflx.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.2557$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+## Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+
+index <- seq(1:round(nrow(nflx) *80/100))
+bc = boxcox(train_nflx.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_train.nflx <- bc$x[which.max(bc$y)]
+#SK
+sk_train.nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_train.nflx,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_train.nflx), "\n Batas Atas  :", max(sk_train.nflx) )
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.38$ dan batas atas $0.25$. Selang tersebut tidak memuat nilai *1* sehingga dapat dikatakan bahwa data saham Netflix tidak stasioner dalam ragam.
+
+### Penanganan Ketidakstasioneran
+
+#### Skenario 1 (Ragam baru Rataan)
+
+```{r}
+train_nflx2 <- BoxCox(train_nflx.ts, lambda_train.nflx)
+train_nflx2.ts <- ts(train_nflx2)
+```
+
+*Pengecekan Stasioner Ragam Kembali Pasca Penanganan Ragam*
+
+```{r message=FALSE, warning=FALSE}
+index <- seq(1:round(nrow(nflx) *80/100))
+bc = boxcox(train_nflx2.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_train.nflx2 <- bc$x[which.max(bc$y)]
+#SK
+sk_train.nflx2 <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_train.nflx2,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_train.nflx2), "\n Batas Atas  :", max(sk_train.nflx2))
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.83$ yang mana sudah mendekati lambda *1* dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-1.35$ dan batas atas $2.97$. Selang tersebut memuat nilai *1* sehingga dapat dikatakan bahwa data saham Netflix telah stasioner dalam ragam.
+
+*Pengecekan Stasioner Rataan Kembali Pasca Penanganan Ragam*
+
+*Plot ACF*
+
+```{r}
+acf(train_nflx2.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data pasca penanganan stasioner ragam tidak stasioner dalam rataan. Selain itu data juga tidak membentuk gelombang sinus.
+
+*Uji ADF*
+
+```{r}
+tseries::adf.test(train_nflx2.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.5006$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data pasca penanganan stasioner ragam **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+#### Penanganan Ketidakstasioneran Rataan
+
+```{r}
+train_nflx2.diff<-diff(train_nflx2.ts,differences = 1) 
+plot.ts(train_nflx2.diff, lty=1, xlab="Waktu", ylab="Data Saham Netflix Difference 1", main="Plot Saham Netflix Differencing")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah mulai tampak stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data). Jadi, data telah stasioner rataan pula
+
+#### Plot ACF
+
+```{r}
+acf(train_nflx2.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 21. Hal ini menandakan data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+
+#### Uji ADF
+
+```{r}
+tseries::adf.test(train_nflx2.diff)
+```
+
+$H_0$ : Data tidak stasioner dalam rataan
+
+$H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar 0.01 yang lebih kecil dari taraf nyata 5% sehingga tolak $H_0$ atau data stasioner dalam rataan. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF pasca differencing, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan
+
+#### Skenario 2 (Rataan baru Ragam)
+
+```{r}
+train_nflx.diff<-diff(train_nflx.ts,differences = 1) 
+plot.ts(train_nflx.diff, lty=1, xlab="Waktu", ylab="Data Saham Netflix Difference 1", main="Plot Saham Netflix Differencing")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah mulai tampak stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data). Jadi, data telah stasioner rataan pula
+
+*Pengecekan Stasioner Ragam Kembali Pasca Penanganan Rataan*
+
+#### ERROR Karena Boxcox gak bisa buat negatif
+
+```{r message=FALSE, warning=FALSE}
+#index <- seq(2:(round(nrow(nflx) *80/100)))
+#bc = boxcox(train_nflx.diff~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+#lambda_train.nflx.diff <- bc$x[which.max(bc$y)]
+#SK
+#sk_train.nflx.diff <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+#cat(" Lambda :", lambda_train.nflx.diff,
+#    "\n\n Selang Kepercyaan 95% \n",
+#    "Batas Bawah :", min(sk_train.nflx.diff), "\n Batas Atas  :", max(sk_train.nflx.diff))
+```
+
+## Identifikasi Model
+
+### Plot ACF
+
+```{r}
+acf(train_nflx2.diff)
+```
+
+Berdasarkan plot ACF, tampak bahwa data membentuk gelombang sinus dan cut off di lag 21
+
+### Plot PACF
+
+```{r}
+pacf(train_nflx2.diff)
+```
+
+Berdasarkan plot PACF, tampak bahwa data membentuk gelombang sinus dan cut off di lag 21
+
+### Plot EACF
+
+```{r}
+eacf(train_nflx2.diff)
+```
+
+Berdasarkan plot EACF, didapat beberapa model tentatif, yaitu ARIMA (0,1,1), ARIMA (1,1,1), ARIMA (2,1,2), ARIMA (3,1,3), ARIMA (4,1,3), ARIMA (5,1,3)
+
+## Pendugaan Parameter Model Tentatif
+
+### ARIMA {.tabset}
+
+#### ARIMA(0,1,1)
+
+```{r}
+model1=Arima(train_nflx2.diff, order=c(0,1,1),method="ML")
+summary(model1) #AIC= -2068.36
+lmtest::coeftest(model1) #semua signifikan
+```
+
+#### ARIMA(1,1,1)
+
+```{r}
+model2=Arima(train_nflx2.diff, order=c(1,1,1),method="ML")
+summary(model2) #AIC= -2066.43
+lmtest::coeftest(model2) #ar1 tidak signifikan
+```
+
+#### ARIMA(2,1,2)
+
+```{r}
+model3=Arima(train_nflx2.diff, order=c(2,1,2),method="ML")
+summary(model3) #AIC= -2062.6
+lmtest::coeftest(model3) #tidak ada parameter signifikan dan 3 parameter NaN
+```
+
+#### ARIMA(3,1,3)
+
+```{r}
+model4=Arima(train_nflx2.diff, order=c(3,1,3),method="ML")
+summary(model4) #AIC= -2058.78
+lmtest::coeftest(model4) #tidak ada parameter signifikan
+```
+
+#### ARIMA(4,1,3)
+
+```{r}
+model5=Arima(train_nflx2.diff, order=c(4,1,3),method="ML")
+summary(model5) #AIC= -2065.22
+lmtest::coeftest(model5) #ar3 dan ar4 tidak signifikan
+```
+
+#### ARIMA(5,1,3)
+
+```{r}
+model6=Arima(train_nflx2.diff, order=c(5,1,3),method="ML")
+summary(model6) #AIC= -2063.22
+lmtest::coeftest(model6) #ar3, ar4, dan ar5 tidak signifikan
+```
+
+### ARIMA dengan Kombinasi Intercept dan Drift
+
+#### Model Tanpa Intersept dan Drift (Data train dikasih diff) {.tabset}
+
+##### ARIMA(0,1,1) aic = -2079.41; tidak ada signifikan
+
+```{r}
+model1a <- arima(train_nflx2, order=c(0,1,1), method="ML")
+lmtest::coeftest(model1a)
+model1a
+```
+
+##### ARIMA(0,1,2) aic = -2077.76; tidak ada signifikan
+
+```{r}
+model1b <- arima(train_nflx2, order=c(0,1,2), method="ML")
+lmtest::coeftest(model1b)
+model1b
+```
+
+##### ARIMA(1,1,1) aic = -2078.09; tidak ada signifikan
+
+```{r}
+model2a <- arima(train_nflx2, order=c(1,1,1), method="ML")
+lmtest::coeftest(model2a)
+model2a
+```
+
+##### ARIMA(1,1,2) aic = -2076.15; tidak ada signifikan
+
+```{r}
+model2b <- arima(train_nflx2, order=c(1,1,2), method="ML")
+lmtest::coeftest(model2b)
+model2b
+```
+
+##### ARIMA(2,1,2) aic = -2074.24; tidak ada signifikan
+
+```{r}
+model3a <- arima(train_nflx2, order=c(2,1,2), method="ML")
+lmtest::coeftest(model3a)
+model3a
+```
+
+##### ARIMA(2,1,3) aic = -2072.16; tidak ada signifikan
+
+```{r}
+model3b <- arima(train_nflx2, order=c(2,1,3), method="ML")
+lmtest::coeftest(model3b)
+model3b
+```
+
+##### ARIMA(3,1,3) aic = -2070.12; tidak ada signifikan
+
+```{r}
+model4a <- arima(train_nflx2, order=c(3,1,3), method="ML")
+lmtest::coeftest(model4a)
+model4a
+```
+
+##### ARIMA(3,1,4) aic = -2076.25; tidak ada signifikan
+
+```{r}
+model4b <- arima(train_nflx2, order=c(3,1,4), method="ML")
+lmtest::coeftest(model4b)
+model4b
+```
+
+##### ARIMA(4,1,3) aic = -2076.24; tidak ada signifikan
+
+```{r}
+model5a <- arima(train_nflx2, order=c(4,1,3), method="ML")
+lmtest::coeftest(model5a)
+model5a
+```
+
+##### ARIMA(4,1,4) aic = -2073.15; ar3 dan ma3 signifikan 5%
+
+```{r}
+model5b <- arima(train_nflx2, order=c(4,1,4), method="ML")
+lmtest::coeftest(model5b)
+model5b
+```
+
+##### ARIMA(4,1,5) aic = -2071.61; tidak ada signifikan
+
+```{r}
+model5c <- arima(train_nflx2, order=c(4,1,5), method="ML")
+lmtest::coeftest(model5c)
+model5c
+```
+
+##### ARIMA(5,1,3) aic = -2075.03; ar3, ma1, dan ma3 signifikan
+
+```{r}
+model6a <- arima(train_nflx2, order=c(5,1,3), method="ML")
+lmtest::coeftest(model6a)
+model6a
+```
+
+##### ARIMA(5,1,4) aic = -2072.44; ar3 dan ma3 signifikan
+
+```{r}
+model6b <- arima(train_nflx2, order=c(5,1,4), method="ML")
+lmtest::coeftest(model6b)
+model6b
+```
+
+##### ARIMA(5,1,5) aic = -2069.55; tidak ada signifikan
+
+```{r}
+model6c <- arima(train_nflx2, order=c(5,1,5), method="ML")
+lmtest::coeftest(model6c)
+model6c
+```
+
+#### Model Dengan Intercept Tanpa Drift (data diff tanpa diff) {.tabset}
+
+##### ARIMA(0,1,1), aic = -2077.89; Tidak signifikan
+
+```{r}
+model1a <- arima(train_nflx2.diff, order=c(0,0,1), method="ML")
+lmtest::coeftest(model1a)
+model1a
+```
+
+##### ARIMA(0,1,2) aic = -2076.22; tidak ada signifikan
+
+```{r}
+model1b <- arima(train_nflx2.diff, order=c(0,0,2), method="ML")
+lmtest::coeftest(model1b)
+model1b
+```
+
+##### ARIMA(1,1,1) aic = -2076.49; tidak ada signifikan
+
+```{r}
+model2a <- arima(train_nflx2.diff, order=c(1,0,1), method="ML")
+lmtest::coeftest(model2a)
+model2a
+```
+
+##### ARIMA(1,1,2) aic = -2074.58; tidak ada signifikan
+
+```{r}
+model2b <- arima(train_nflx2.diff, order=c(1,0,2), method="ML")
+lmtest::coeftest(model2b)
+model2b
+```
+
+##### ARIMA(2,1,2) aic = -2072.64; tidak ada signifikan
+
+```{r}
+model3a <- arima(train_nflx2.diff, order=c(2,0,2), method="ML")
+lmtest::coeftest(model3a)
+model3a
+```
+
+##### ARIMA(2,1,3) aic = -2070.58; tidak ada signifikan
+
+```{r}
+model3b <- arima(train_nflx2.diff, order=c(2,0,3), method="ML")
+lmtest::coeftest(model3b)
+model3b
+```
+
+##### ARIMA(3,1,3) aic = -2068.12; tidak ada signifikan
+
+```{r}
+model4a <- arima(train_nflx2.diff, order=c(3,0,3), method="ML")
+lmtest::coeftest(model4a)
+model4a
+```
+
+##### ARIMA(3,1,4) aic = -2073.67; tidak ada signifikan
+
+```{r}
+model4b <- arima(train_nflx2.diff, order=c(3,0,4), method="ML")
+lmtest::coeftest(model4b)
+model4b
+```
+
+##### ARIMA(4,1,3) aic = -2073.61; tidak ada signifikan
+
+```{r}
+model5a <- arima(train_nflx2.diff, order=c(4,0,3), method="ML")
+lmtest::coeftest(model5a)
+model5a
+```
+
+##### ARIMA(4,1,4) aic = -2071.54; tidak ada signifikan
+
+```{r}
+model5b <- arima(train_nflx2.diff, order=c(4,0,4), method="ML")
+lmtest::coeftest(model5b)
+model5b
+```
+
+##### ARIMA(4,1,5) aic = -2071.61; ar3 dan ma3 signifikan
+
+```{r}
+model5c <- arima(train_nflx2.diff, order=c(4,0,5), method="ML")
+lmtest::coeftest(model5c)
+model5c
+```
+
+##### ARIMA(5,1,3) aic = -2073.31; ada yang tidak signifikan
+
+```{r}
+model6a <- arima(train_nflx2.diff, order=c(5,0,3), method="ML")
+lmtest::coeftest(model6a)
+model6a
+```
+
+##### ARIMA(5,1,4) aic = -2072.44; ada yang tidak signifikan
+
+```{r}
+model6b <- arima(train_nflx2.diff, order=c(5,0,4), method="ML")
+lmtest::coeftest(model6b)
+model6b
+```
+
+##### ARIMA(5,1,5) aic = -2067.73; tidak ada signifikan
+
+```{r}
+model6c <- arima(train_nflx2.diff, order=c(5,0,5), method="ML")
+lmtest::coeftest(model6c)
+model6c
+```
+
+##### ARIMA(5,1,6) aic = -2073.48; tidak ada signifikan
+
+```{r}
+model6d <- arima(train_nflx2.diff, order=c(5,0,6), method="ML")
+lmtest::coeftest(model6d)
+model6d
+```
+
+##### ARIMA(5,1,7) aic = -2071.55; tidak ada signifikan
+
+```{r}
+model6e <- arima(train_nflx2.diff, order=c(5,0,7), method="ML")
+lmtest::coeftest(model6e)
+model6e
+```
+
+#### Model Tanpa Intercept Dengan Drift (data train dikasih diff + include.drift) {.tabset}
+
+##### ARIMA(0,1,1) AIC=-2075,84 ; Tidak signifikan
+
+```{r}
+model1a <- Arima(train_nflx2, order=c(0,1,1), include.drift=TRUE)
+lmtest::coeftest(model1a)
+model1a
+```
+
+##### ARIMA(0,1,2) aic = -2074.13; tidak ada signifikan
+
+```{r}
+model1b <- Arima(train_nflx2, order=c(0,1,2), include.drift=TRUE)
+lmtest::coeftest(model1b)
+model1b
+```
+
+##### ARIMA(1,1,1) aic = -2078.09; tidak ada signifikan ERROR karena tidak stasioner di warningnya
+
+```{r}
+#model2a <- Arima(train_nflx2, order=c(1,1,1), include.drift=TRUE)
+#lmtest::coeftest(model2a)
+#model2a
+```
+
+##### ARIMA(1,1,2) aic = -2072.45; tidak ada signifikan
+
+```{r}
+model2b <- Arima(train_nflx2, order=c(1,1,2), include.drift=TRUE)
+lmtest::coeftest(model2b)
+model2b
+```
+
+##### ARIMA(2,1,2) aic = -2069.68; tidak ada signifikan
+
+```{r}
+model3a <- Arima(train_nflx2, order=c(2,1,2), include.drift=TRUE)
+lmtest::coeftest(model3a)
+model3a
+```
+
+##### ARIMA(2,1,3) aic = -2072.16; tidak ada signifikan ERROR karena tidak stasioner diwarningnya
+
+```{r}
+#model3b <- Arima(train_nflx2, order=c(2,1,3), include.drift=TRUE)
+#lmtest::coeftest(model3b)
+#model3b
+```
+
+##### ARIMA(3,1,3) aic = -2066.52; tidak ada signifikan
+
+```{r}
+model4a <- Arima(train_nflx2, order=c(3,1,3), include.drift=TRUE)
+lmtest::coeftest(model4a)
+model4a
+```
+
+##### ARIMA(3,1,4) aic = -2072.5; tidak ada signifikan
+
+```{r}
+model4b <- Arima(train_nflx2, order=c(3,1,4), include.drift=TRUE)
+lmtest::coeftest(model4b)
+model4b
+```
+
+##### ARIMA(4,1,3) aic = -2072.42; tidak ada signifikan
+
+```{r}
+model5a <- Arima(train_nflx2, order=c(4,1,3), include.drift=TRUE)
+lmtest::coeftest(model5a)
+model5a
+```
+
+##### ARIMA(4,1,4) aic = -2073.15; semua parameter signifikan, tetapi drift tidak
+
+```{r}
+model5b <- Arima(train_nflx2, order=c(4,1,4), include.drift=TRUE)
+lmtest::coeftest(model5b)
+model5b
+```
+
+*Coba-coba* AIC = -2074.35, intercept tidak signifikan
+
+```{r}
+model5b <- Arima(train_nflx2, order=c(4,1,4), include.drift=FALSE)
+lmtest::coeftest(model5b)
+model5b
+```
+
+*Semua Signifikan dengan AIC = -2076.75*
+
+```{r}
+model5b1 <- arima(train_nflx2, order=c(4,1,4)) ##kalo kayak gini default method nya CSS-ML
+lmtest::coeftest(model5b1)
+model5b1
+```
+
+##### ARIMA(4,1,5) aic = -2065.35; tidak ada signifikan
+
+```{r}
+model5c <- Arima(train_nflx2, order=c(4,1,5), include.drift=TRUE)
+lmtest::coeftest(model5c)
+model5c
+```
+
+##### ARIMA(5,1,3) aic = -2070.85; tidak semua signifikan
+
+```{r}
+model6a <- Arima(train_nflx2, order=c(5,1,3), include.drift=TRUE)
+lmtest::coeftest(model6a)
+model6a
+```
+
+##### ARIMA(5,1,4) aic = -2068.88; ar5 dan drift tidak signifikan
+
+```{r}
+model6b <- Arima(train_nflx2, order=c(5,1,4), include.drift=TRUE)
+lmtest::coeftest(model6b)
+model6b
+```
+
+##### ARIMA(5,1,5) aic = -2062; tidak semua signifikan
+
+```{r}
+model6c <- Arima(train_nflx2, order=c(5,1,5), include.drift=TRUE)
+lmtest::coeftest(model6c)
+model6c
+```
+
+#### Model Dengan Intercept dan Drift (data diff tidak dikasih diff + include.drift) {.tabset}
+
+##### ARIMA(0,1,1), aic = -2078.5; intercept signifikan
+
+```{r}
+model1a <- Arima(train_nflx2.diff, order=c(0,0,1), include.drift=TRUE)
+lmtest::coeftest(model1a)
+model1a
+```
+
+##### ARIMA(0,1,2) aic = -2076.59; intercept signifikan
+
+```{r}
+model1b <- Arima(train_nflx2.diff, order=c(0,0,2), include.drift=TRUE)
+lmtest::coeftest(model1b)
+model1b
+```
+
+##### ARIMA(1,1,1) aic = -2076.58; intercept signifikan
+
+```{r}
+model2a <- Arima(train_nflx2.diff, order=c(1,0,1), include.drift=TRUE)
+lmtest::coeftest(model2a)
+model2a
+```
+
+##### ARIMA(1,1,2) aic = -2074.62; intercept signifikan
+
+```{r}
+model2b <- Arima(train_nflx2.diff, order=c(1,0,2), include.drift=TRUE)
+lmtest::coeftest(model2b)
+model2b
+```
+
+##### ARIMA(2,1,2) aic = -2072.57; intercept signifikan lainnya tidak
+
+```{r}
+model3a <- Arima(train_nflx2.diff, order=c(2,0,2), include.drift=TRUE)
+lmtest::coeftest(model3a)
+model3a
+```
+
+##### ARIMA(2,1,3) aic = -2070.49; tidak semua signifikan
+
+```{r}
+model3b <- Arima(train_nflx2.diff, order=c(2,0,3), include.drift=TRUE)
+lmtest::coeftest(model3b)
+model3b
+```
+
+##### ARIMA(3,1,3) aic = -2075.62; intercept signifikan
+
+```{r}
+model4a <- Arima(train_nflx2.diff, order=c(3,0,3), include.drift=TRUE)
+lmtest::coeftest(model4a)
+model4a
+```
+
+##### ARIMA(3,1,4) aic = -2074.74; intercept signifikan
+
+```{r}
+model4b <- Arima(train_nflx2.diff, order=c(3,0,4), include.drift=TRUE)
+lmtest::coeftest(model4b)
+model4b
+```
+
+##### ARIMA(4,1,3) aic = -2072.98; tidak semua signifikan
+
+```{r}
+model5a <- Arima(train_nflx2.diff, order=c(4,0,3), include.drift=TRUE)
+lmtest::coeftest(model5a)
+model5a
+```
+
+##### ARIMA(4,1,4) aic = -2075.81; hanya drift tidak signifikan
+
+```{r}
+model5b <- Arima(train_nflx2.diff, order=c(4,0,4), include.drift=TRUE)
+lmtest::coeftest(model5b)
+model5b
+```
+
+*Coba-coba*
+
+```{r}
+model5b <- Arima(train_nflx2.diff, order=c(4,0,4), include.drift=FALSE)
+lmtest::coeftest(model5b)
+model5b
+```
+
+*Coba-coba* signifikan, AIC = -2074.75
+
+```{r}
+model5b2 <- Arima(train_nflx2, order=c(4,1,4), include.drift=FALSE)
+lmtest::coeftest(model5b2)
+model5b2
+```
+
+##### ARIMA(4,1,5) aic = -2073; tidak semua signifikan
+
+```{r}
+model5c <- Arima(train_nflx2.diff, order=c(4,0,5), include.drift=TRUE)
+lmtest::coeftest(model5c)
+model5c
+```
+
+##### ARIMA(5,1,3) aic = -2075.05; ada yang tidak signifikan
+
+```{r}
+model6a <- Arima(train_nflx2.diff, order=c(5,0,3), include.drift=TRUE)
+lmtest::coeftest(model6a)
+model6a
+```
+
+##### ARIMA(5,1,4) aic = -2074.46; ada yang tidak signifikan
+
+```{r}
+model6b <- Arima(train_nflx2.diff, order=c(5,0,4), include.drift=TRUE)
+lmtest::coeftest(model6b)
+model6b
+```
+
+##### ARIMA(5,1,5) aic = -2073.71; ada yang tidak signifikan
+
+```{r}
+model6c <- Arima(train_nflx2.diff, order=c(5,0,5), include.drift=TRUE)
+lmtest::coeftest(model6c)
+model6c
+```
+
+##### ARIMA(5,1,6) aic = -2071.08; ada yang tidak signifikan
+
+```{r}
+model6d <- Arima(train_nflx2.diff, order=c(5,0,6), include.drift=TRUE)
+lmtest::coeftest(model6d)
+model6d
+```
+
+##### ARIMA(5,1,7) aic = -2067.53; intercept signifikan
+
+```{r}
+model6e <- Arima(train_nflx2.diff, order=c(5,0,7), include.drift=TRUE)
+lmtest::coeftest(model6e)
+model6e
+```
+
+## Analisis Sisaan
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal. Model terbaik dilihat dari model dengan seluruh parameter signifikan dan AIC paling kecil Didapat model dengan semua parameter signifikan adalah ARIMA (0,1,1) dengan AIC -2068.36 menggunakan metode ML, ARIMA(4,1,4) dengan AIC -2074,75 tanpa intercept dan drift menggunakan metode CSS-ML Karena ARIMA (4,1,4) lebih kecil AIC nya maka dipilih model ARIMA (4,1,4) sebagai model terbaik
+
+### Eksplorasi Sisaan
+
+```{r}
+#Eksplorasi
+sisaan.model5b2 <- model5b2$residuals
+par(mfrow=c(2,2))
+qqnorm(sisaan.model5b2)
+qqline(sisaan.model5b2, col = "blue", lwd = 2)
+plot(c(1:length(sisaan.model5b2)),sisaan.model5b2)
+acf(sisaan.model5b2)
+pacf(sisaan.model5b2)
+par(mfrow = c(1,1))
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan tampak menyebar normal karena hampir mengikuti garis $45^{\circ}$ secara penuh. Kemudian dapat dilihat juga lebar pita sisaan yang tidak sama menandakan bahwa sisaan memiliki ragam yang tidak homogen. Selain itu, plot ACF dan PACF sisaan ARIMA(4,1,4) signifikan pada lag ke-21 sehingga sisaan tidak saling bebas. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+### Uji Formal
+
+```{r}
+#1) Sisaan Menyebar Normal
+ks.test(sisaan.model5b2,"pnorm") 
+#tolak H0 > sisaan tidak menyebar normal
+```
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+$H_0$ : Sisaan menyebar normal
+
+$H_1$ : Sisaan tidak menyebar normal
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar 2.2e-16 yang lebih kecil dari taraf nyata 5% sehingga tolak $H_0$ dan menandakan bahwa sisaan tidak menyebar normal. Hal ini tidak sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+
+```{r}
+#2) Sisaan saling bebas/tidak ada autokorelasi
+Box.test(sisaan.model5b2, type = "Ljung") 
+#tak tolak H0 > sisaan saling bebas
+```
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+$H_0$ : Sisaan saling bebas
+
+$H_1$ : Sisaan tidak tidak saling bebas
+
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar 0.6662 yang lebih besar dari taraf nyata 5% sehingga tak tolak $H_0$ dan menandakan bahwa sisaan saling bebas. Hal ini berbeda dengan eksplorasi.
+
+```{r}
+#3) Sisaan homogen
+Box.test((sisaan.model5b2)^2, type = "Ljung") 
+#tak tolak H0 > sisaan homogen
+```
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+$H_0$ : Ragam sisaan homogen
+
+$H_1$ : Ragam sisaan tidak homogen
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar 0.996 yang lebih besar dari taraf nyata 5% sehingga tak tolak $H_0$ dan menandakan bahwa ragam sisaan homogen. Hal ini berbeda dengan eksplorasi
+
+```{r}
+#4) Nilai tengah sisaan sama dengan nol
+t.test(sisaan.model5b2, mu = 0, conf.level = 0.95) 
+#tak tolak h0 > nilai tengah sisaan sama dengan 0
+```
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+$H_0$ : nilai tengah sisaan sama dengan 0
+
+$H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar 0.5041 yang lebih besar dari taraf nyata 5% sehingga tak tolak $H_0$ dan menandakan bahwa nilai tengah sisaan sama dengan nol. Hal ini sesuai dengan eksplorasi.
+
+Berdasarkan serangkaian uji diagnostik sisaan dapat diambil kesimpulan bahwa model5b2 yaitu ARIMA (4,1,4) melanggar asumsi kenormalan sehingga perlu ditransformasi
+
+## Overfitting
+
+Tahapan selanjutnya adalah *overfitting* dilakukan dengan menaikkan orde AR(p) dan MA(q) dari model ARIMA(4,1,4) untuk melihat apakah terdapat model lain yang lebih baik dari model saat ini. Kandidat model *overfitting* adalah ARIMA(5,1,4) dan ARIMA(4,1,5).
+
+```{r}
+#---OVERFITTING---#
+modela.model5b2=Arima(train_nflx.diff, order=c(5,1,4)) #menyesuaikan pakai metode CSS-ML
+summary(modela.model5b2) #3480.75
+lmtest::coeftest(modela.model5b2) #ar4, ar5, ma2 tidak signifikan
+
+modelb.model5b2=Arima(train_nflx.diff, order=c(4,1,5))
+summary(modelb.model5b2) #3480.22
+lmtest::coeftest(modelb.model5b2) #tidak ada parameter signifikan
+
+#model yang dipilih adalah model awal, yaitu ARIMA(1,1,1)
+```
+
+Berdasarkan kedua model hasil *overfitting* di atas, model ARIMA(5,1,4) dan ARIMA(4,1,5) tidak semua parameternya signifikan dan memiliki AIC yang lebih besar dibandingkan dengan model ARIMA(4,1,4). Oleh karena itu, model ARIMA(4,1,4) akan tetap digunakan untuk melakukan peramalan.
+
+## Peramalan
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk 115 periode ke depan (sebanyak data test).
+
+```{r}
+#---FORECAST---#
+ramalan.da <- forecast::forecast(sisaan.model5b2, h = 115) 
+ramalan.da
+data.ramalan.da <- ramalan.da$mean
+plot(ramalan.da)
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan ARIMA(4,1,4) cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+
+```{r}
+pt_1 <- train_nflx.ts[459] #nilai akhir data latih
+hasil.forc.Diff <- data.ramalan.da
+hasil <- ((hasil.forc.Diff*lambda_train.nflx)+1)^(1/lambda_train.nflx) #transformasi balik dari penanganan ragam menggunakan transformasi BoxCox
+hasil <- diffinv(hasil, differences = 1) + pt_1
+#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
+ts.plot(train_nflx.ts,hasil)
+```
+
+```{r}
+perbandingan.da<-matrix(data=c(head(test_nflx.ts, n=115), hasil[-1]),
+                     nrow = 115, ncol = 2)
+colnames(perbandingan.da)<-c("Aktual","Hasil Forecast")
+perbandingan.da
+accuracy(ts(hasil[-1]), head(test_nflx.ts, n=115))
+```
+
+Berdasarkan nilai MAPE yang didapat, yaitu sebesar 21.8% pada perbandingan nilai forecast dan aktual, dapat disimpulkan bahwa model yang dibangun memiliki MAPE dikisaran 20 sehingga model ARIMA (4,1,4) masih cukup baik untuk melakukan peramalan harga saham Netflix kedepannya.
