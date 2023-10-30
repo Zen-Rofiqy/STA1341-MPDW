@@ -1013,26 +1013,9 @@ cat(" Lambda :", lambda_aapl,
     "Batas Bawah :", min(sk_aapl), "\n Batas Atas  :", max(sk_aapl) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $1.68$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.64$ dan batas atas $2.72$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $1.68$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.64$ dan batas atas $2.72$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple stasioner dalam ragam. Sehingga data tidak perlu di transformasi.
 
 ### **Penanganan Ketidakstasioneran Data**
-
-#### Transformasi Data
-
-Referensi : <https://r-coder.com/box-cox-transformation-r/>
-
-Mengutip dari laman tersebut,
-
-$$
- \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika } \text{ } \lambda \ne 0  \\   \log(x) & \text{jika } \text{ } \lambda = 0    \end{cases}  
-$$
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $1.68 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
-
-```{r}
-train_aapl.ts <- (train_aapl.ts^lambda_aapl-1)/lambda_aapl
-bc <- boxcox(train_aapl.ts ~ index)
-```
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
@@ -1381,9 +1364,24 @@ cat(" Lambda :", lambda_amzn,
     "Batas Bawah :", min(sk_amzn), "\n Batas Bawah :", max(sk_amzn) )
 ```
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.21$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.33$ dan batas atas $0.74$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon tidak stasioner dalam ragam.
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.61$ dan batas atas $0.16$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon tidak stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
+
+#### Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+$$  \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika } \text{ } \lambda \ne 0  \\   \log(x) & \text{jika } \text{ } \lambda = 0    \end{cases}    $$
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $1.68 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
+
+```{r}
+train_amzn.ts.new <- (train_amzn.ts^lambda_amzn-1)/lambda_amzn
+bc <- boxcox(train_amzn.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
+```
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_amzn.diff <- diff(train_amzn.ts, differences = 1) 
