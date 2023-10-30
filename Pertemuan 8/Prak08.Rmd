@@ -1896,8 +1896,8 @@ Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.6539$ yang lebih besa
 
 ```{r message=FALSE, warning=FALSE}
 
-index <- seq(1:nrow(meta))
-bc = boxcox(meta.ts~index, lambda = seq(-2, 4, by=0.01))
+index <- seq(1:nrow(train_meta))
+bc = boxcox(train_meta.ts~index, lambda = seq(-2, 4, by=0.01))
 ```
 
 ```{r}
@@ -1927,7 +1927,7 @@ Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22 \ne 0$. Sehingga akan m
 Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $-0.5$, Sehingga akan menggunakan transformasi $1/\sqrt{x}$.
 
 ```{r}
-train_meta.ts.new <- 1/sqrt(train_meta.ts)
+train_meta.ts.new <- log(train_meta.ts)
 bc <- boxcox(train_meta.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
 ```
 
@@ -1936,7 +1936,7 @@ Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu seh
 #### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
-train_meta.diff <- diff(train_meta.ts, differences = 1) 
+train_meta.diff <- diff(train_meta.ts.new, differences = 1) 
 plot.ts(train_meta.diff, lty=1, xlab="Periode (Tahun)", 
         col = "dodgerblue3", lwd = 3.5,
         main="Plot Difference Saham META")
