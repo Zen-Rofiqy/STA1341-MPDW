@@ -343,16 +343,6 @@ ggsave("01_Time Series MAANG.png", chart, path = export.chart,
 
 Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Amazon**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
 
-**Berikut adalah list sesi `Rpubs` dari rentang tahun yang ada :**
-
--   [2019-2023](https://rpubs.com/ZenR_Prog/MPDW-Prak08-19-23){.uri} (Semua)
-
--   [2020-2023](https://rpubs.com/ZenR_Prog/MPDW-Prak08-20-23){.uri}
-
--   [2021-2023](https://rpubs.com/ZenR_Prog/MPDW-Prak08-21-23){.uri}
-
--   [2022-2023](https://rpubs.com/ZenR_Prog/MPDW-Prak08-22-23){.uri}
-
 ### Time Series Apple
 
 ```{r}
@@ -1301,7 +1291,7 @@ ts.plot(train_aapl.ts, ramal_aapl,  xlab="Periode (Hari)",
         main="Plot Ramalan Saham Apple Selama 115 Hari Kedepan")
 ```
 
-Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung menaik setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sedikit menaik setiap periodenya.
 
 ### Perbandingan
 
@@ -1580,7 +1570,7 @@ ts.plot(train_amzn.ts, ramal_amzn, xlab="Periode (Hari)",
         main="Plot Ramalan Saham Amazon Selama 115 Hari Kedepan")
 ```
 
-Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menaik setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menaik tajam setiap periodenya.
 
 ### Perbandingan
 
@@ -1860,7 +1850,7 @@ ts.plot(train_goog.ts, ramal_goog, xlab="Periode (Hari)",
         main="Plot Ramalan Saham Google Selama 115 Hari Kedepan")
 ```
 
-Dapat dilihat bahwa rata-rata harga saham Google diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham Google diramalkan akan terus menaik tajam setiap periodenya.
 
 ### Perbandingan
 
@@ -2012,7 +2002,7 @@ datatable(model.tentaif_meta, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2190.39$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1815.84$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
 
 ```{r}
 model_meta.da <- Arima(train_meta.diff, order=c(0,1,1), method="ML")
@@ -2072,7 +2062,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.4216$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7622$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 #### Sisaan homogen
 
@@ -2086,7 +2076,7 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.8527$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.966$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
 #### Nilai tengah sama dengan nol
 
@@ -2101,7 +2091,7 @@ Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. H
 >
 > $H_1$ : nilai tengah sisaan tidak sama dengan 0
 
-Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.1287$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.2364$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
 ## **Peramalan** {.tabset}
 
