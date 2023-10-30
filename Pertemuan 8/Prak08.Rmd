@@ -2562,7 +2562,7 @@ datatable(model.tentaif_nflx, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2516.73$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1759.09$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_nflx.da <- Arima(train_nflx.diff, order=c(0,1,1), method="ML")
@@ -2622,7 +2622,7 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 >
 > $H_1$ : Sisaan tidak tidak saling bebas
 
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.6015$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**.
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.8597$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**.
 
 #### Sisaan homogen
 
@@ -2636,7 +2636,7 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 >
 > $H_1$ : Ragam sisaan tidak homogen
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.91155$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.9961$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
 #### Nilai tengah sama dengan nol
 
@@ -2651,7 +2651,7 @@ Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. H
 >
 > $H_1$ : nilai tengah sisaan tidak sama dengan 0
 
-Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.08844$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.22$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
 ## **Peramalan** {.tabset}
 
@@ -2672,12 +2672,16 @@ data.ramalan_nflx.da <- ramalan_nflx.da$mean
 plot(ramalan_nflx.da, xlab="Periode (Hari)", col = "firebrick3", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan ``` ARIMA(``0,1,1``) ``` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_nflx.ts[length(train_nflx.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_nflx.da
-ramal_nflx <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
+#Transformasi Balik
+ramal_nflx <- exp(hasil.forc.Diff)
+#Diff inv
+ramal_nflx <- diffinv(ramal_nflx, differences = 1) + pt_1
+
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
 ts.plot(train_nflx.ts, ramal_nflx, ylab="Saham Harga (USD)", 
         xlab="Periode (Hari)", 
@@ -2703,10 +2707,10 @@ akurasi.nflx <- accuracy(ts(ramal_nflx[-1]), head(test_nflx.ts, n=h)) %>%
   cbind(Model = ramalan_nflx.da[["method"]]) %>% 
   relocate(Model, .before = 1)
 row.names(akurasi.nflx) <- "NFLX"
-akurasi.nflx
+datatable(akurasi.nflx)
 ```
 
-Didapatkan nilai MAPE sebesar $7.420446\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
+Didapatkan nilai MAPE sebesar $6.292792\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
 
 # NVIDIA
 
