@@ -1017,6 +1017,8 @@ Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $1.
 
 ### **Penanganan Ketidakstasioneran Data**
 
+#### Dalam Rataan: Differencing
+
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
 plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
@@ -1378,8 +1380,10 @@ $$  \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika }
 
 Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
 
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $-0.5$, Sehingga akan menggunakan transformasi $1/\sqrt{x}$.
+
 ```{r}
-train_amzn.ts.new <- (train_amzn.ts^lambda_amzn-1)/lambda_amzn
+train_amzn.ts.new <- 1/sqrt(train_amzn.ts)
 bc <- boxcox(train_amzn.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
 ```
 
@@ -1453,10 +1457,10 @@ datatable(model.tentaif_amzn, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1718.04$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-3061.78$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
-model_amzn.da <- Arima(train_amzn.diff, order=c(4,1,5), method="ML")
+model_amzn.da <- Arima(train_amzn.diff, order=c(0,1,1), method="ML")
 ```
 
 ## **Analisis Sisaan**
@@ -1483,7 +1487,7 @@ acf(sisaan_amzn.da)
 pacf(sisaan_amzn.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **menyebar normal** ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik-titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -1499,7 +1503,7 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 >
 > $H_1$ : Sisaan tidak menyebar normal
 
-Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2e-16$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.**
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.**
 
 #### Sisaan saling bebas/tidak ada autokorelasi
 
@@ -1563,12 +1567,16 @@ data.ramalan_amzn.da <- ramalan_amzn.da$mean
 plot(ramalan_amzn.da, col = "orange2", xlab="Periode (Hari)", lwd = 2.5)
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(4,1,5)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 pt_1 <- train_amzn.ts[length(train_amzn.ts)] #nilai akhir data latih
 hasil.forc.Diff <- data.ramalan_amzn.da
-ramal_amzn <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
+#Transformasi Balik
+ramal_amzn <- hasil.forc.Diff^2
+#Diff inv
+ramal_amzn <- diffinv(ramal_amzn, differences = 1) + pt_1
+
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
 ts.plot(train_amzn.ts, ramal_amzn, xlab="Periode (Hari)", 
         col = "orange2", lwd = 3,
@@ -1576,7 +1584,7 @@ ts.plot(train_amzn.ts, ramal_amzn, xlab="Periode (Hari)",
         main="Plot Ramalan Saham Amazon Selama 115 Hari Kedepan")
 ```
 
-Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menurun setiap periodenya.
+Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menaik setiap periodenya.
 
 ### Perbandingan
 
@@ -1597,7 +1605,7 @@ row.names(akurasi.amzn) <- "AMZN"
 datatable(akurasi.amzn)
 ```
 
-Didapatkan nilai MAPE sebesar $12.49469\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(4,1,5)` sudah baik.
+Didapatkan nilai MAPE sebesar $12.04369\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah baik.
 
 # Google
 
@@ -1644,6 +1652,8 @@ cat(" Lambda :", lambda_goog,
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.51$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.23$ dan batas atas $1.25$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Google stasioner dalam ragam.
 
 ### **Penanganan Ketidakstasioneran Data**
+
+#### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_goog.diff <- diff(train_goog.ts, differences = 1) 
@@ -1715,7 +1725,7 @@ datatable(model.tentaif_goog, filter = 'top',
 Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $1525.72$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
-model_goog.da <- Arima(train_goog.diff, order=c(0,1,1), method="ML")
+model_goog.da <- Arima(train_goog.diff, order=c(4,1,5), method="ML")
 ```
 
 ## **Analisis Sisaan**
