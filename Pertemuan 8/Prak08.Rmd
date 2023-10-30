@@ -1005,9 +1005,9 @@ cat(" Lambda :", lambda_aapl,
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $1.68$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.64$ dan batas atas $2.72$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple stasioner dalam ragam. Sehingga data tidak perlu di transformasi.
 
-### **Penanganan Ketidakstasioneran Data**
+## **Penanganan Ketidakstasioneran Data** {.tabset}
 
-#### Dalam Rataan: Differencing
+### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
 train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
@@ -1358,9 +1358,9 @@ cat(" Lambda :", lambda_amzn,
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.61$ dan batas atas $0.16$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon tidak stasioner dalam ragam.
 
-### **Penanganan Ketidakstasioneran Data**
+## **Penanganan Ketidakstasioneran Data** {.tabset}
 
-#### Dalam Ragam: Transformasi Data
+### Dalam Ragam: Transformasi Data
 
 Referensi : <https://r-coder.com/box-cox-transformation-r/>
 
