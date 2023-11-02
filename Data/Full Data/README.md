@@ -7,9 +7,9 @@
 > Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin 
 > menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.  
   
-* Jenis periode: Harian  
-* Rentang periode `Juli 2018` sampai ` Juli 2023`  
-* Variabel :
+* **Jenis periode**: Harian  
+* **Rentang periode** `Juli 2018` sampai ` Juli 2023`  
+* **Variabel** :
 1. **Open:** yakni Harga saham pada awal periode perdagangan tertentu. 
 Ini adalah harga saham pertama pada hari perdagangan tersebut.
 2. **High:** Harga tertinggi yang saham capai selama periode perdagangan tersebut. 
@@ -25,3 +25,13 @@ karena mencerminkan harga saham yang sebenarnya setelah penyesuaian.
 Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan tersebut.
 
 ## Cara mendapatkan data
+| **Gambar** | **Langkah**                                                  |
+|:----------:|--------------------------------------------------------------|
+|            | 1. Ke link [finance.yahoo.com](https://finance.yahoo.com/)   |
+|            | 2. Cari Saham berdasarkan Kode saham.                        |
+|            | 1. Ke Historical Data                                        |
+|            | 2. Pilih `Time Periode`                                      |
+|            | 3. Klik Done                                                 |
+|            | 1. Pilih `Frequency`                                         |
+|            | 2. Klik `Apply`                                              |
+|            | 3. Klik `Download`                                           |
