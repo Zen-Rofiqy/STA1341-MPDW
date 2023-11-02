@@ -25,13 +25,8 @@ karena mencerminkan harga saham yang sebenarnya setelah penyesuaian.
 Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan tersebut.
 
 ## Cara mendapatkan data
-| **Gambar** | **Langkah**                                                  |
-|:----------:|--------------------------------------------------------------|
-|            | 1. Ke link [finance.yahoo.com](https://finance.yahoo.com/)   |
-| ![Gambar1](/images/Screenshot 2023-11-02 162122.png)           | 2. Cari Saham berdasarkan Kode saham.                        |
-| ![Gambar2](Data/Full Data/images/Screenshot 2023-11-02 162552.png)           | 1. Ke Historical Data                                        |
-|            | 2. Pilih `Time Periode`                                      |
-|            | 3. Klik Done                                                 |
-| ![Gambar3](Data/Full Data/images/Screenshot 2023-11-02 163226.png)            | 1. Pilih `Frequency`                                         |
-|            | 2. Klik `Apply`                                              |
-|            | 3. Klik `Download`                                           |
+|                                                             **Gambar**                                                            | **Langkah**                                                                                              |
+|:---------------------------------------------------------------------------------------------------------------------------------:|----------------------------------------------------------------------------------------------------------|
+| ![Screenshot 2023-11-02 162122](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/be0c42bf-ee41-47fc-95ef-ae243cdd850b) | 1. Ke link [finance.yahoo.com](https://finance.yahoo.com/)  <br /> 2. Cari Saham berdasarkan Kode saham. |
+| ![Screenshot 2023-11-02 162552](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/ec552272-4004-4cf3-9d7b-061a82e27fa8) | 1. Ke Historical Data  <br /> 2. Pilih `Time Periode` <br /> 3. Klik Done                                |
+| ![Screenshot 2023-11-02 163226](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/1ad2092f-6366-41c7-a9e0-e3ea7f924146) | 1. Pilih `Frequency`  <br /> 2. Klik `Apply` <br /> 3. Klik `Download`                                   |
