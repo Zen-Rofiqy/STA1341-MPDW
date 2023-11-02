@@ -1,0 +1,3243 @@
+---
+title: "Pendugaan Parameter, Diagnostik Model, dan Peramalan"
+author: "Angga Fathan Rofiqy"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: hide
+    toc_depth: 3
+    number_sections: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    fig_caption: true
+pkgdown:
+  as_is: true
+---
+
+Kode di `Hide` dalam *default*, untuk menampilkan kode, klik `Code` .
+
+```{r, warning=FALSE, message = FALSE}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+```
+
+```{r}
+path <- function(){
+  gsub  ( "\\\\",  "/",  readClipboard ()  )
+}
+#Copy path, Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+```{r}
+#Export chart
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 8/Chart"
+```
+
+# Pendahuluan
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*2Yt3-zcGKc6MYuXCxgCL0A.jpeg)
+
+Dataset yang saya gunakan merupakan koleksi data harga saham historis periode Juli 2018 hingga Juli 2023 dari tujuh raksasa teknologi paling berpengaruh di dunia: Microsoft, Apple, Amazon, Nvidia, Google, Netflix, dan Meta (sebelumnya dikenal sebagai Facebook). Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.
+
+Dataset ini memilki data :
+
+1.  **Open:** yakni Harga saham pada awal periode perdagangan tertentu. Ini adalah harga saham pertama pada hari perdagangan tersebut.
+2.  **High:** Harga tertinggi yang saham capai selama periode perdagangan tersebut. Ini mencerminkan harga tertinggi yang pembeli bersedia bayar selama hari tersebut.
+3.  **Low:** Harga terendah yang saham capai selama periode perdagangan tersebut. Ini mencerminkan harga terendah yang penjual bersedia terima selama hari tersebut.
+4.  **Close:** Harga saham pada akhir periode perdagangan tertentu. Ini adalah harga saham terakhir pada hari perdagangan tersebut.
+5.  **Adj Close (Adjusted Close):** Harga penutup yang telah disesuaikan untuk memperhitungkan perubahan seperti pembagian saham atau dividen. Ini adalah harga penutup yang paling relevan untuk analisis jangka panjang, karena mencerminkan harga saham yang sebenarnya setelah penyesuaian.
+6.  **Volume:** Volume perdagangan saham selama periode tertentu. Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan tersebut.
+
+Kami akan menggunakan peubah `Adj Close (Adjusted Close)`, Karena sesuai dengan penjelasan diatas, peubah `Adj Close` adalah yang paling sesuai untuk dianalisis dibandingkan peubah lainnya.
+
+## Tujuan
+
+Tujuan dari praktikum ini adalah untuk menganalisis pola perkiraan pergerakan harga tujuh saham teknologi terkemuka dengan harapan dapat memberikan rekomendasi kepada pembaca mengenai saham mana yang sebaiknya dipertimbangkan untuk dibeli atau diinvestasikan secara signifikan di antara tujuh perusahaan teknologi besar tersebut.
+
+## Referensi
+
+-   [Referensi Warna](https://bookdown.org/hneth/ds4psy/ds4psy_files/figure-html/apx-color-sample-1.png){.uri}
+
+## Data Preparation {.tabset}
+
+### Import Data
+
+```{r, warning=FALSE, message = FALSE}
+install_load('rio')
+raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Data/MAANG%20Stock%20Prices.csv")
+```
+
+### Data Checking
+
+Cek Tipe data.
+
+```{r}
+str(raw.data)
+```
+
+Semua data Karakter, harus diubah.
+
+Cek Data kosong.
+
+```{r}
+sum(is.na(raw.data))
+```
+
+Tidak ada data kosong.
+
+### Penyesuaian Tipe Data
+
+Semua tipe data masih berupa character. Harus diubah menjadi tipe data yang sesuai.
+
+```{r, warning=FALSE, message = FALSE}
+install_load('dplyr')
+data <- raw.data %>%  
+  mutate(
+    Date = as.Date(raw.data[, 2], format = "%m/%d/%y"), #Mengubah menjadi Date 
+    across(3:ncol(raw.data), as.numeric)                #Mengubah menjadi Numerik
+  )
+str(data)
+```
+
+### Rechecking Data 
+
+Cek kembali data kosong.
+
+```{r}
+cat('Banyaknya Data Kosong', sum(is.na(data)))
+```
+
+Melihat baris, kolom mana data yang kosong.
+
+```{r message=FALSE, warning=FALSE}
+# Mencari indeks baris dan kolom yang mengandung NA
+na.idx <- which(is.na(data), arr.ind = TRUE)
+
+# Menampilkan data raw dengan baris dan kolom yang mengandung NA
+install_load('DT')
+datatable(raw.data[                        # Subsetting
+                unique(na.idx[, 1]),   # Vektor indeks baris yang mengandung NA
+                unique(na.idx[, 2])  ] # Vektor indeks kolom yang mengandung NA
+          )  
+```
+
+Ternyata pada baris tersebut ada data karakter text yang merupakan label dari tiap kolomnya. Sehingga ketika diubah ke numerik akan menjadi `NA`. Maka saya akan menghapus baris tersebut.
+
+```{r}
+data <- data %>%
+  filter(!row_number() %in% unique(na.idx[, 1]))
+data2 <- data
+```
+
+### Cek Periode Data
+
+```{r}
+install_load("lubridate")
+
+dates <- as.Date(data$Date)
+
+# Buat rentang waktu mulai dari tanggal pertama hingga tanggal terakhir dalam data
+full_date_range <- seq(min(dates), max(dates), by = "days")
+
+# Bandingkan rentang waktu dengan tanggal yang ada dalam data
+missing_dates <- setdiff(full_date_range, dates) 
+
+# Jika 'missing_dates' kosong, maka semua tanggal sudah ada dalam data
+if (length(missing_dates) == 0) {
+  cat("Semua tanggal ada dalam data.\n")
+} else {
+  cat("Tanggal yang tidak ada dalam data sebanyak", length(missing_dates),
+      "\nAtau sebanyak", length(missing_dates) * 7, 
+      "Data Hilang dari ke-7 perusahaan yang ada")
+}
+```
+
+**Inputasi Data**
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+install_load('purrr')
+# Fungsi untuk mengisi data yang hilang
+fill_missing_data <- function(name) {
+  data_filtered <- data2 %>%
+    filter(Name == name)
+  
+  full_date_range <- seq(min(data2$Date), max(data2$Date), by = "days")
+  data_frame_template <- data.frame(Date = full_date_range)
+  
+  # Menambahkan kolom "Name" sesuai dengan perusahaan yang diproses
+  data_frame_template$Name <- name
+  
+  data_filled <- merge(data_frame_template, data_filtered, 
+                       by = c("Date", "Name"), all.x = TRUE)
+  return(data_filled)
+}
+
+# Menggunakan purrr::map untuk memproses setiap nama perusahaan
+filled_data_list <- map(unique(data2$Name), fill_missing_data)
+
+# Gabungkan data-data yang telah diisi menjadi satu data frame
+final_data <- data.frame()
+final_data <- do.call(rbind, filled_data_list)
+
+# Urutkan data berdasarkan "Name" terlebih dahulu, kemudian "Date"
+final_data <- final_data %>%
+  dplyr::select(1, 2, 7) %>%
+  arrange(Name, Date)
+
+#Input Data Hilang
+install_load('imputeTS')
+
+data <- na_interpolation(final_data$`Adj Close`)
+ggplot_na_imputations(final_data$`Adj Close`, data)
+
+data <- final_data %>% select(Name, Date) %>% 
+  mutate(`Adj Close` = data)
+```
+
+Data sudah di imputasi.
+
+**Cek ukuran data**
+
+```{r}
+cat("Ukuran data awal adalah", nrow(data2),
+    "\nBanyaknya peride data yang hilang", length(missing_dates),
+    "(PerSaham.", length(missing_dates) * 7, "Jika semua)",
+    "\nUkuran data yang baru seharusnya", 
+    nrow(data2) + length(missing_dates) * 7,
+    "\nIni sudah sesuai dengan Ukuran data input (", nrow(data), ")")
+```
+
+Data sudah benar, siap untuk dianalisis.
+
+### Data Cleaned
+
+```{r}
+datatable(data, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+## Eksplorasi Data {.tabset}
+
+```{r, warning=FALSE, message = FALSE}
+install_load('ggplot2','extrafont')
+# font_import(); loadfonts() #Run ini sekali aja
+theme.ts <- list(
+  theme(legend.position = "none",
+        axis.text.x = element_text(hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 20, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        )
+theme.ts1 <- list(
+  theme(legend.position = "none",
+        axis.text.x = element_text(hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 50, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        )
+```
+
+### Time Series MAANG
+
+Melihat keseluruhan *Time Series* data saham.
+
+```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+install_load('viridis','ggrepel')
+#Plot
+chart <-
+ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
+  #Color
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
+                                "META" = .25, "AAPL" = .25, "GOOG" = .25, 
+                                "AMZN" = 1)) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Time Series MAANG",
+       subtitle = "Seperti apa sih pola deret waktu saham MAANG?\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data[data$Date == max(data$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 80, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date("2018-07-30"), as.Date("2023-12-28"))
+    #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date("2023-07-28")), 
+             linetype = "dotted", color = "red")
+chart
+
+#Export Chart
+ggsave("01_Time Series MAANG.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+```
+
+Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Amazon**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
+
+### Time Series Apple
+
+```{r}
+aapl <- data %>%
+  filter(Name == "AAPL", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(aapl) <- NULL
+str(aapl)
+```
+
+```{r}
+datatable(aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+aapl.ts <- ts(aapl[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(aapl.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(aapl$`Adj Close`)
+min_date <- aapl$Date[which.min(aapl$`Adj Close`)]
+percentage <- (which.min(aapl$`Adj Close`) / nrow(aapl)) * 100
+
+chart <-
+ggplot(aapl, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("lightskyblue4")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Apple",
+       subtitle = "Seperti apa sih pola deret waktu saham Apple?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("03_Time Series Apple.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $64.47\%$ dari data menunjukkan kecenderungan [musiman yang menurun secara multipel]{.underline}. Kemudian, pada tanggal `2023-01-05`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_aapl <- aapl[1: round(nrow(aapl) *80/100),]
+test_aapl <- aapl[round(nrow(aapl) *80/100 +1): nrow(aapl),]
+train_aapl.ts <- ts(train_aapl[,3])
+test_aapl.ts <- ts(train_aapl[,3])
+
+data2 <- data %>%
+  filter(Date >= as.Date("2022-01-01")) 
+#Banyaknya hari untuk di ramal 
+h <- nrow(test_aapl); h
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_aapl, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_aapl, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Apple",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("lightskyblue4", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("03_TS_AAPL_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun musiman multiplikatif. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan]{.underline}.
+
+### Time Series Amazon
+
+```{r}
+amzn <- data %>%
+  filter(Name == "AMZN", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(amzn) <- NULL
+str(amzn)
+```
+
+```{r}
+datatable(amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+amzn.ts <- ts(amzn[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(amzn.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(amzn$`Adj Close`)
+min_date <- amzn$Date[which.min(amzn$`Adj Close`)]
+percentage <- (which.min(amzn$`Adj Close`) / nrow(amzn)) * 100
+
+chart <-
+ggplot(amzn, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("orange2")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Amazon",
+       subtitle = "Seperti apa sih pola deret waktu saham Amazon?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Potong\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("02_Time Series Amazon.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dari grafik deret waktu yang ditampilkan, terlihat bahwa sekitar $63.2\%$ dari data menunjukkan kecenderungan [musiman yang menurun secara aditif]{.underline}. Selanjutnya, pada tanggal `2022-12-28`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_amzn <- amzn[1: round(nrow(amzn) *80/100),]
+test_amzn <- amzn[round(nrow(amzn) *80/100 +1): nrow(amzn),]
+train_amzn.ts <- ts(train_amzn[,3])
+test_amzn.ts <- ts(test_amzn[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_amzn, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_amzn, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Amazon",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("orange", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("02_TS_Amazon_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dari plot deret waktu data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun musiman secara aditif. Ini menunjukkan ketidakstabilan dalam nilai tengah dan variabilitas data latih, yang [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan absennya nilai tengah yang stabil. Hal ini juga mengindikasikan bahwa data uji [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan.]{.underline}
+
+### Time Series Google
+
+```{r}
+goog <- data %>%
+  filter(Name == "GOOG", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(goog) <- NULL
+str(goog)
+```
+
+```{r}
+datatable(goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+goog.ts <- ts(goog[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(goog.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(goog$`Adj Close`)
+min_date <- goog$Date[which.min(goog$`Adj Close`)]
+percentage <- (which.min(goog$`Adj Close`) / nrow(goog)) * 100
+
+chart <-
+ggplot(goog, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("gold3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Google",
+       subtitle = "Seperti apa sih pola deret waktu saham Google?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("04_Time Series Google.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Melalui visualisasi grafik deret waktu yang disuguhkan, tampaknya sekitar $53.81\%$ data menggambarkan [tren menurun]{.underline}. Lalu, pada tanggal `2021-11-03`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_goog <- goog[1: round(nrow(goog) *80/100),]
+test_goog <- goog[round(nrow(goog) *80/100 +1): nrow(goog),]
+train_goog.ts <- ts(train_goog[,3])
+test_goog.ts <- ts(test_goog[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_goog, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_goog, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Google",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("gold3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("04_TS_GOOG_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Melalui plot deret waktu dari data latih ($80\%$ dari data asli), terlihat bahwa data menggambarkan tren menurun yang cukup jelas. Hal ini menunjukkan bahwa data latih [tidak]{.underline} menunjukkan sifat [stasioneritas dalam rataan]{.underline}. Sementara itu, dalam plot data uji ($20\%$ dari data asli), tampaknya terdapat tren naik yang signifikan, dan tidak ada nilai tengah yang tetap. Ini juga mengindikasikan bahwa data uji [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan]{.underline}.
+
+### Time Series META
+
+```{r}
+meta <- data %>%
+  filter(Name == "META", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(meta) <- NULL
+str(meta)
+```
+
+```{r}
+datatable(meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+meta.ts <- ts(meta[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(meta.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(meta$`Adj Close`)
+min_date <- meta$Date[which.min(meta$`Adj Close`)]
+percentage <- (which.min(meta$`Adj Close`) / nrow(meta)) * 100
+
+chart <-
+ggplot(meta, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("dodgerblue3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham META",
+       subtitle = "Seperti apa sih pola deret waktu saham META?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("05_Time Series META.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Melalui grafik deret waktu yang disajikan, terlihat bahwa sekitar $53.81\%$ dari data menunjukkan kecenderungan [penurunan tren]{.underline}. Lalu, pada tanggal `2022-11-03`, terjadi perubahan pola menjadi [tren naik]{.underline}. Pola perubahan ini, beserta tanggal dan persentasenya, serupa dengan yang terlihat dalam pergerakan saham Google.
+
+**Pembagian Data Training Dan Test2**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_meta <- meta[1: round(nrow(meta) *80/100),]
+test_meta <- meta[round(nrow(meta) *80/100 +1): nrow(meta),]
+train_meta.ts <- ts(train_meta[,3])
+test_meta.ts <- ts(test_meta[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_meta, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_meta, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham META",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("dodgerblue3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("05_TS_META_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan grafik deret waktu data latih ($80\%$ dari data asli), tampak bahwa data menunjukkan kombinasi tren turun dan tren naik. Hal ini menunjukkan bahwa data latih [tidak]{.underline} memenuhi syarat [stasioneritas dalam rataan maupun ragam]{.underline}. Sementara itu, pada plot data uji ($20\%$ dari data asli), terlihat tren naik yang signifikan dan ketiadaan nilai tengah yang konsisten. Ini juga menandakan bahwa data uji [tidak]{.underline} memenuhi syarat [stasioneritas dalam rataan]{.underline}.
+
+### Time Series Microsoft
+
+```{r}
+msft <- data %>%
+  filter(Name == "MSFT", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(msft) <- NULL
+str(msft)
+```
+
+```{r}
+datatable(msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+msft.ts <- ts(msft[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(msft.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(msft$`Adj Close`)
+min_date <- msft$Date[which.min(msft$`Adj Close`)]
+percentage <- (which.min(msft$`Adj Close`) / nrow(msft)) * 100
+
+chart <-
+ggplot(msft, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("deepskyblue2")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Microsoft",
+       subtitle = "Seperti apa sih pola deret waktu saham Microsoft?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("06_Time Series Microsoft.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dalam gambaran grafik deret waktu yang diberikan, sekitar \$53.81%\$ data menunjukkan adanya [tren penurunan]{.underline} yang tampak. Lalu, pada tanggal `2022-11-03`, terjadi perubahan pola menjadi tren [kenaikan]{.underline}. Karakteristik tanggal dan persentase perubahan pola ini serupa dengan yang dapat ditemukan pada pergerakan saham Google dan META.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_msft <- msft[1: round(nrow(msft) *80/100),]
+test_msft <- msft[round(nrow(msft) *80/100 +1): nrow(msft),]
+train_msft.ts <- ts(train_msft[,3])
+test_msft.ts <- ts(test_msft[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_msft, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_msft, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Microsoft",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("deepskyblue2", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("06_TS_MSFT_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dari visualisasi grafik deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan adanya tren turun dan tren naik. Hal ini menunjukkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Sementara itu, dalam plot data uji ($20\%$ dari data asli), tampaknya terdapat tren kenaikan yang signifikan dan ketiadaan nilai tengah yang stabil. Hal ini juga menandakan bahwa data uji [tidak]{.underline} memenuhi persyaratan [stasioneritas dalam rataan.]{.underline}
+
+### Time Series Netflix
+
+```{r}
+nflx <- data %>%
+  filter(Name == "NFLX", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(nflx) <- NULL
+str(nflx)
+```
+
+```{r}
+datatable(nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+nflx.ts <- ts(nflx[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(nflx.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(nflx$`Adj Close`)
+min_date <- nflx$Date[which.min(nflx$`Adj Close`)]
+percentage <- (which.min(nflx$`Adj Close`) / nrow(nflx)) * 100
+
+chart <-
+ggplot(nflx, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("firebrick3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Seperti apa sih pola deret waktu saham Netflix?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("07_Time Series Netflix.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berbeda dari yang lain, berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $22.84\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-05-11`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_nflx <- nflx[1: round(nrow(nflx) *80/100),]
+test_nflx <- nflx[round(nrow(nflx) *80/100  +1): nrow(nflx),]
+train_nflx.ts <- ts(train_nflx[,3])
+test_nflx.ts <- ts(test_nflx[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("firebrick3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("07_TS_NFLX_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun yang drastis dan tren naik yang cukup mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan]{.underline}.
+
+### Time Series NVIDIA
+
+```{r}
+nvda <- data %>%
+  filter(Name == "NVDA", Date >= as.Date("2022-01-01"))  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(nvda) <- NULL
+str(nvda)
+```
+
+```{r}
+datatable(nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+nvda.ts <- ts(nvda[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(nvda.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(nvda$`Adj Close`)
+min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
+percentage <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
+
+chart <-
+ggplot(nvda, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("green4")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham NVIDIA",
+       subtitle = "Seperti apa sih pola deret waktu saham NVIDIA?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $50.25\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-10-14`, terjadi perubahan pola menjadi [tren naik]{.underline} dan menaik tajam pada Juli 2023.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_nvda <- nvda[1:488,]
+test_nvda <- nvda[489: nrow(nvda),]
+train_nvda.ts <- ts(train_nvda[,3])
+test_nvda.ts <- ts(test_nvda[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham NVIDIA",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("green4", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan.]{.underline}
+
+# Apple
+
+## Uji Stasioner Data {.tabset}
+
+```{r message=FALSE, warning=FALSE}
+install_load('tsibble','tseries')
+```
+
+### Plot ACF
+
+```{r}
+acf(train_aapl.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
+
+### Uji ADF
+
+```{r}
+tseries::adf.test(train_aapl.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.5136$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+### Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+install_load('MASS')
+index <- seq(1:nrow(train_aapl))
+bc = boxcox(train_aapl.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_aapl <- bc$x[which.max(bc$y)]
+#SK
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_aapl,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_aapl), "\n Batas Atas  :", max(sk_aapl) )
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $1.68$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.64$ dan batas atas $2.72$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple stasioner dalam ragam. Sehingga data tidak perlu di transformasi.
+
+## **Penanganan Ketidakstasioneran Data** {.tabset}
+
+### Dalam Rataan: Differencing
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
+plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "lightskyblue4", lwd = 3.5,
+        main="Plot Difference Saham Apple")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
+
+## Uji Ulang {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_aapl.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Hal ini menandakan data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+
+### Uji ADF
+
+```{r message=FALSE, warning=FALSE}
+tseries::adf.test(train_aapl.diff)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+
+## **Identifikasi Model** {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_aapl.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
+
+### Plot PACF
+
+```{r}
+pacf(train_aapl.diff)
+```
+
+Berdasarkan plot PACF tersebut, terlihat bahwa cuts off pada lag 13 dan 14. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot EACF
+
+```{r message=FALSE, warning=FALSE}
+install_load('TSA')
+eacf(train_aapl.diff)
+```
+
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Sebagai contoh :
+
+![](images/Screenshot%202023-10-15%20234003-01.png)
+
+Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+## **Pendugaan Parameter Model Tentatif**
+
+Untuk menduga parameter model tentatif, kami akan menggunakan function berdasarkan plot EACF yang sudah dirancang sebagai berikut.
+
+Keterangan parameter function :
+
+-   `data` = data Time Series baik yang sudah di `.diff` maupun belum
+
+-   `p_max` = ordo maksimal dari **AR**
+
+-   `d` = ordo **I**
+
+-   `q_max` = ordo maksimal dari **MA**
+
+-   `alpha` = alpha
+
+```{r message=FALSE, warning=FALSE}
+install_load('forecast')
+
+# Fungsi untuk menghitung model ARIMA dan menganalisis parameter
+model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
+  best_model <- NULL
+  best_aic <- Inf
+  eacf_result <- eacf(data)
+  models <- data.frame(Model = character(0), 
+                       AIC = numeric(0), 
+                       Signif = character(0), 
+                       Keterangan = character(0))
+  
+  for (p in 0:p_max) {
+    for (q in 1:q_max) {
+      #Pola Matriks segitiga bawah
+      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
+          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
+          !is.na(eacf_result$symbol[p + 2, q + 2])) {
+        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
+            eacf_result$symbol[p + 1, q + 2] == "o" && 
+            eacf_result$symbol[p + 2, q + 2] == "o") {
+      
+          model <- Arima(data, order = c(p, d, q), method = "ML")
+          aic <- AIC(model)
+          
+          # Mendapatkan nilai coef dari model
+          coeftest_result <- lmtest::coeftest(model)
+          
+          # jika lebih kecil dari alpha, maka signifikan
+          significant_params <- 
+            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] < alpha]  
+          
+          # jika lebih besar dari alpha, maka tidak signifikan
+          non_significant_params <- 
+            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] > alpha]  
+          
+          # Keterangan signifikansi
+          if (length(significant_params) == 0) {
+            keterangan <- "Semua parameter tidak signifikan"
+          } else if (length(significant_params) == nrow(coeftest_result)) {
+            keterangan <- "Semua parameter signifikan"
+          } else {
+            keterangan <- paste("Parameter yang tidak signifikan adalah", 
+                                paste(non_significant_params, collapse = ", "))
+          }
+          
+          models <- rbind(models, 
+                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q, ")", 
+                                             sep = ""), 
+                               AIC = aic, 
+                               Signif = paste(significant_params, 
+                                              collapse = ", "), 
+                               Keterangan = keterangan))
+          
+          #Identifikasi Best Model
+            if (keterangan == "Semua parameter signifikan" && 
+                !any(is.na(significant_params))) {
+              if (aic < best_aic) {
+                best_model <- model
+                best_aic <- aic
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  cat("\nModel ARIMA dengan AIC terkecil:\n")
+  print(best_model)
+
+  return(models)
+}
+
+# Panggil Fungsi
+model.tentaif_aapl <- 
+  model_tentatif(train_aapl.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2139.54$ dimiliki oleh model `ARIMA(2,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,3)` .
+
+```{r}
+model_aapl.da <- Arima(train_aapl.diff, order=c(2,1,3), method="ML")
+```
+
+## **Analisis Sisaan**
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
+
+### **Eksplorasi Sisaan**
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_aapl.da <- model_aapl.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_aapl.da) 
+qqline(sisaan_aapl.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_aapl.da)), sisaan_aapl.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_aapl.da) 
+pacf(sisaan_aapl.da) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar** **normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(2,1,3)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+### **Uji Formal** {.tabset}
+
+#### Sisaan Menyebar Normal
+
+```{r}
+ks.test(sisaan_aapl.da,"pnorm")  #tak tolak H0 > sisaan menyebar normal
+```
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $7.04\times10^{-11}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
+
+#### Sisaan saling bebas
+
+```{r}
+Box.test(sisaan_aapl.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
+```
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.8337$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Yang berarti tidak ada autokorelasi. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+
+#### Sisaan homogen
+
+```{r}
+Box.test((sisaan_aapl.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+```
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+> $H_0$ : Ragam sisaan homogen
+>
+> $H_1$ : Ragam sisaan tidak homogen
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.1129$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+#### Nilai tengah sama dengan nol
+
+```{r}
+#4) Nilai tengah sisaan sama dengan nol 
+t.test(sisaan_aapl.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
+```
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+> $H_0$ : nilai tengah sisaan sama dengan 0
+>
+> $H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.2925$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+## **Peramalan** {.tabset}
+
+### Ramal
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk h hari ke depan.
+
+```{r}
+#---FORECAST---#
+ramalan_aapl.da <- forecast::forecast(model_aapl.da, h = h) 
+ramalan_aapl.da
+```
+
+### Plot
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+data.ramalan_aapl.da <- ramalan_aapl.da$mean
+plot(ramalan_aapl.da, col = "lightskyblue4", xlab="Periode (Hari)", lwd = 2)
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+pt_1 <- train_aapl.ts[length(train_aapl.ts)] #nilai akhir data latih
+hasil.forc.Diff <- data.ramalan_aapl.da
+ramal_aapl <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
+#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
+ts.plot(train_aapl.ts, ramal_aapl,  xlab="Periode (Hari)", 
+        col = "lightskyblue4", lwd = 3,
+        ylab="Saham Harga (USD)",
+        main="Plot Ramalan Saham Apple Selama 115 Hari Kedepan")
+```
+
+Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sedikit menaik setiap periodenya.
+
+### Perbandingan
+
+```{r}
+perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=h), ramal_aapl[-1]),
+                     nrow = h, ncol = 2)
+colnames(perbandingan_aapl.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_aapl.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+```{r}
+akurasi.aapl <- accuracy(ts(ramal_aapl[-1]), head(test_aapl.ts, n=h)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_aapl.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.aapl) <- "AAPL"
+
+datatable(akurasi.aapl)
+```
+
+Didapatkan nilai MAPE sebesar $3.229058\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(2,1,3)` sudah sangat baik.
+
+# Amazon
+
+## Uji Stasioner Data {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_amzn.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
+
+### Uji ADF
+
+```{r}
+tseries::adf.test(train_amzn.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3326$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+### Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+index <- seq(1:nrow(train_amzn))
+bc = boxcox(train_amzn.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_amzn <- bc$x[which.max(bc$y)]
+#SK
+sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_amzn,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_amzn), "\n Batas Bawah :", max(sk_amzn) )
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.61$ dan batas atas $0.16$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon tidak stasioner dalam ragam.
+
+## **Penanganan Ketidakstasioneran Data** {.tabset}
+
+### Dalam Ragam: Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+| $\mathbf{\lambda}$ | **Transformation** |
+|:------------------:|:------------------:|
+|         -2         |      $1/x^2$       |
+|         -1         |       $1/x$        |
+|        -0.5        |    $1/\sqrt{x}$    |
+|         0          |    $\log{(x)}$     |
+|        0.5         |     $\sqrt{x}$     |
+|         1          |        $x$         |
+|         2          |       $x^2$        |
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
+
+```{r}
+train_amzn.ts.new <- log(train_amzn.ts)
+bc <- boxcox(train_amzn.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
+```
+
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
+
+### Dalam Rataan: Differencing
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+train_amzn.diff <- diff(train_amzn.ts.new, differences = 1) 
+plot.ts(train_amzn.diff, lty=1, xlab="Periode (Hari)", 
+        col = "orange2", lwd = 3.5,
+        main="Plot Difference Saham Amazon")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
+
+## Uji Ulang {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_amzn.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF tidak ada satupun lag yang cuts off. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+
+### Uji ADF
+
+```{r message=FALSE, warning=FALSE}
+tseries::adf.test(train_amzn.diff)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+
+## **Identifikasi Model** {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_amzn.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF tidak ada satupun lag yang cuts off. Sehingga model tidak dapat di identifikasi dengan plot ACF.
+
+### Plot PACF
+
+```{r}
+pacf(train_amzn.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 20. Sehingga model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot EACF
+
+```{r message=FALSE, warning=FALSE}
+eacf(train_amzn.diff)
+```
+
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+## **Pendugaan Parameter Model Tentatif**
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_amzn <- 
+  model_tentatif(train_amzn.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2101.57$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_amzn.da <- Arima(train_amzn.diff, order=c(0,1,1), method="ML")
+```
+
+## **Analisis Sisaan**
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
+
+### **Eksplorasi Sisaan**
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_amzn.da <- model_amzn.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_amzn.da) 
+qqline(sisaan_amzn.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_amzn.da)), sisaan_amzn.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_amzn.da) 
+pacf(sisaan_amzn.da) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik-titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+### **Uji Formal** {.tabset}
+
+#### Sisaan Menyebar Normal
+
+```{r}
+ks.test(sisaan_amzn.da,"pnorm")  #tak tolak H0 > sisaan menyebar normal
+```
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.**
+
+#### Sisaan saling bebas/tidak ada autokorelasi
+
+```{r}
+Box.test(sisaan_amzn.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
+```
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.9723$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**.
+
+#### Sisaan homogen
+
+```{r}
+Box.test((sisaan_amzn.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+```
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+> $H_0$ : Ragam sisaan homogen
+>
+> $H_1$ : Ragam sisaan tidak homogen
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.002668$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
+
+#### Nilai tengah sama dengan nol
+
+```{r}
+#4) Nilai tengah sisaan sama dengan nol 
+t.test(sisaan_amzn.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
+```
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+> $H_0$ : nilai tengah sisaan sama dengan 0
+>
+> $H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.523$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+## **Peramalan** {.tabset}
+
+### Ramal
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk h hari ke depan.
+
+```{r}
+#---FORECAST---#
+ramalan_amzn.da <- forecast::forecast(model_amzn.da, h = h) 
+ramalan_amzn.da
+```
+
+### Plot
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+data.ramalan_amzn.da <- ramalan_amzn.da$mean
+plot(ramalan_amzn.da, col = "orange2", xlab="Periode (Hari)", lwd = 2.5)
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+pt_1 <- train_amzn.ts[length(train_amzn.ts)] #nilai akhir data latih
+hasil.forc.Diff <- data.ramalan_amzn.da
+#Transformasi Balik
+ramal_amzn <- exp(hasil.forc.Diff)
+#Diff inv
+ramal_amzn <- diffinv(ramal_amzn, differences = 1) + pt_1
+
+#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
+ts.plot(train_amzn.ts, ramal_amzn, xlab="Periode (Hari)", 
+        col = "orange2", lwd = 3,
+        ylab="Saham Harga (USD)",
+        main="Plot Ramalan Saham Amazon Selama 115 Hari Kedepan")
+```
+
+Dapat dilihat bahwa rata-rata harga saham amazon diramalkan akan terus menaik tajam setiap periodenya.
+
+### Perbandingan
+
+```{r}
+perbandingan_amzn.da <- matrix(data=c(head(test_amzn.ts, n=h), ramal_amzn[-1]),
+                     nrow = h, ncol = 2)
+colnames(perbandingan_amzn.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_amzn.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+```{r}
+akurasi.amzn <- accuracy(ts(ramal_amzn[-1]), head(test_amzn.ts, n=h)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_amzn.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.amzn) <- "AMZN"
+datatable(akurasi.amzn)
+```
+
+Didapatkan nilai MAPE sebesar $35.30528\%$ (lebih dari $20\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah cukup baik.
+
+# Google
+
+## Uji Stasioner Data {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_goog.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
+
+### Uji ADF
+
+```{r}
+tseries::adf.test(train_goog.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3766$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+### Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+
+index <- seq(1:nrow(train_goog))
+bc = boxcox(train_goog.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_goog <- bc$x[which.max(bc$y)]
+#SK
+sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_goog,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_goog), "\n Batas Atas  :", max(sk_goog) )
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.13$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.59$ dan batas atas $0.33$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Google tidak stasioner dalam ragam.
+
+## **Penanganan Ketidakstasioneran Data** {.tabset}
+
+### Dalam Ragam: Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+| $\mathbf{\lambda}$ | **Transformation** |
+|:------------------:|:------------------:|
+|         -2         |      $1/x^2$       |
+|         -1         |       $1/x$        |
+|        -0.5        |    $1/\sqrt{x}$    |
+|         0          |    $\log{(x)}$     |
+|        0.5         |     $\sqrt{x}$     |
+|         1          |        $x$         |
+|         2          |       $x^2$        |
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.13$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
+
+```{r}
+train_goog.ts.new <- log(train_goog.ts)
+bc <- boxcox(train_goog.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
+```
+
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Google sudah stasioner dalam ragam.
+
+### Dalam Rataan: Differencing
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+train_goog.diff <- diff(train_goog.ts.new, differences = 1) 
+plot.ts(train_goog.diff, lty=1, xlab="Periode (Hari)", 
+        col = "gold3", lwd = 3.5,
+        main="Plot Difference Saham Google")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
+
+## Uji Ulang {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_goog.diff)
+```
+
+Berdasarkan plot ACF tersebut, terlihat bahwa cuts off 13. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+
+### Uji ADF
+
+```{r message=FALSE, warning=FALSE}
+tseries::adf.test(train_goog.diff)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+
+## **Identifikasi Model** {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_goog.diff)
+```
+
+Berdasarkan plot ACF tersebut, terlihat bahwa cuts off 13. Maka model tidak dapat di identifikasi dengan plot ACF.
+
+### Plot PACF
+
+```{r}
+pacf(train_goog.diff)
+```
+
+Pada plot PACF terlihat tidak ada satupun lag yang cut off. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot EACF
+
+```{r message=FALSE, warning=FALSE}
+
+eacf(train_goog.diff)
+```
+
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+## **Pendugaan Parameter Model Tentatif**
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_goog <- 
+  model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2301.96$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_goog.da <- Arima(train_goog.diff, order=c(0,1,1), method="ML")
+```
+
+## **Analisis Sisaan**
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
+
+### **Eksplorasi Sisaan**
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_goog.da <- model_goog.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_goog.da) 
+qqline(sisaan_goog.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_goog.da)), sisaan_goog.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_goog.da) 
+pacf(sisaan_goog.da) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+### **Uji Formal** {.tabset}
+
+#### Sisaan Menyebar Normal
+
+```{r}
+ks.test(sisaan_goog.da,"pnorm")  #tak tolak H0 > sisaan menyebar normal
+```
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+
+#### Sisaan saling bebas/tidak ada autokorelasi
+
+```{r}
+Box.test(sisaan_goog.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
+```
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.642$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+
+#### Sisaan homogen
+
+```{r}
+Box.test((sisaan_goog.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+```
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+> $H_0$ : Ragam sisaan homogen
+>
+> $H_1$ : Ragam sisaan tidak homogen
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.03988$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+#### Nilai tengah sama dengan nol
+
+```{r}
+#4) Nilai tengah sisaan sama dengan nol 
+t.test(sisaan_goog.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
+```
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+> $H_0$ : nilai tengah sisaan sama dengan 0
+>
+> $H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.4229$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+## **Peramalan** {.tabset}
+
+### Ramal
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk h hari ke depan.
+
+```{r}
+#---FORECAST---#
+ramalan_goog.da <- forecast::forecast(model_goog.da, h = h) 
+ramalan_goog.da
+```
+
+### Plot
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+data.ramalan_goog.da <- ramalan_goog.da$mean
+plot(ramalan_goog.da, xlab="Periode (Hari)", col = "gold3", lwd = 2.5)
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+pt_1 <- train_goog.ts[length(train_goog.ts)] #nilai akhir data latih
+hasil.forc.Diff <- data.ramalan_goog.da
+#Transformasi Balik
+ramal_goog <- exp(hasil.forc.Diff)
+#Diff inv
+ramal_goog <- diffinv(ramal_goog, differences = 1) + pt_1
+
+#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
+ts.plot(train_goog.ts, ramal_goog, xlab="Periode (Hari)", 
+        col = "gold3", lwd = 3.5,
+        ylab="Saham Harga (USD)",
+        main="Plot Ramalan Saham Google Selama 115 Hari Kedepan")
+```
+
+Dapat dilihat bahwa rata-rata harga saham Google diramalkan akan terus menaik tajam setiap periodenya.
+
+### Perbandingan
+
+```{r}
+perbandingan_goog.da <- matrix(data=c(head(test_goog.ts, n=h), ramal_goog[-1]),
+                     nrow = h, ncol = 2)
+colnames(perbandingan_goog.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_goog.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+```{r}
+akurasi.goog <- accuracy(ts(ramal_goog[-1]), head(test_goog.ts, n=h)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_goog.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.goog) <- "GOOG"
+datatable(akurasi.goog)
+```
+
+Didapatkan nilai MAPE sebesar $37.53469\%$ (lebih dari $20\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah cukup baik.
+
+# META
+
+## Uji Stasioner Data {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_meta.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
+
+### Uji ADF
+
+```{r}
+tseries::adf.test(train_meta.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.7406$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+### Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+
+index <- seq(1:nrow(train_meta))
+bc = boxcox(train_meta.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_meta <- bc$x[which.max(bc$y)]
+#SK
+sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_meta,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_meta), "\n Batas Atas  :", max(sk_meta) )
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.02$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.21$ dan batas atas $0.25$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+
+## **Penanganan Ketidakstasioneran Data** {.tabset}
+
+### Dalam Ragam: Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+| $\mathbf{\lambda}$ | **Transformation** |
+|:------------------:|:------------------:|
+|         -2         |      $1/x^2$       |
+|         -1         |       $1/x$        |
+|        -0.5        |    $1/\sqrt{x}$    |
+|         0          |    $\log{(x)}$     |
+|        0.5         |     $\sqrt{x}$     |
+|         1          |        $x$         |
+|         2          |       $x^2$        |
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.21$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
+
+```{r}
+train_meta.ts.new <- log(train_meta.ts)
+bc <- boxcox(train_meta.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
+```
+
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham META sudah stasioner dalam ragam.
+
+### Dalam Rataan: Differencing
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+train_meta.diff <- diff(train_meta.ts.new, differences = 1) 
+plot.ts(train_meta.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "dodgerblue3", lwd = 3.5,
+        main="Plot Difference Saham META")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
+
+## Uji Ulang {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_meta.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF tidak ada satupun yang cuts off. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+
+### Uji ADF
+
+```{r message=FALSE, warning=FALSE}
+tseries::adf.test(train_meta.diff)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+
+## **Identifikasi Model** {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_meta.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF tidak ada satupun yang cuts off. Maka model tidak dapat di identifikasi dengan plot ACF.
+
+### Plot PACF
+
+```{r}
+pacf(train_meta.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot PACF tidak ada satupun yang cuts off. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot EACF
+
+```{r message=FALSE, warning=FALSE}
+eacf(train_meta.diff)
+```
+
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+## **Pendugaan Parameter Model Tentatif**
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_meta <- 
+  model_tentatif(train_meta.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1815.84$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
+
+```{r}
+model_meta.da <- Arima(train_meta.diff, order=c(0,1,1), method="ML")
+```
+
+## **Analisis Sisaan**
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
+
+### **Eksplorasi Sisaan**
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_meta.da <- model_meta.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_meta.da) 
+qqline(sisaan_meta.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_meta.da)), sisaan_meta.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_meta.da) 
+pacf(sisaan_meta.da) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+### **Uji Formal** {.tabset}
+
+#### Sisaan Menyebar Normal
+
+```{r}
+ks.test(sisaan_meta.da,"pnorm")  #tak tolak H0 > sisaan menyebar normal
+```
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times 10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+
+#### Sisaan saling bebas/tidak ada autokorelasi
+
+```{r}
+Box.test(sisaan_meta.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
+```
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.7622$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+
+#### Sisaan homogen
+
+```{r}
+Box.test((sisaan_meta.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+```
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+> $H_0$ : Ragam sisaan homogen
+>
+> $H_1$ : Ragam sisaan tidak homogen
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.966$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+#### Nilai tengah sama dengan nol
+
+```{r}
+#4) Nilai tengah sisaan sama dengan nol 
+t.test(sisaan_meta.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
+```
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+> $H_0$ : nilai tengah sisaan sama dengan 0
+>
+> $H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.2364$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+## **Peramalan** {.tabset}
+
+### Ramal
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk h hari ke depan.
+
+```{r}
+#---FORECAST---#
+ramalan_meta.da <- forecast::forecast(model_meta.da, h = h) 
+ramalan_meta.da
+```
+
+### Plot
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+data.ramalan_meta.da <- ramalan_meta.da$mean
+plot(ramalan_meta.da, xlab="Periode (Tahun)", col = "dodgerblue3", lwd = 2.5)
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+pt_1 <- train_meta.ts[length(train_meta.ts)] #nilai akhir data latih
+hasil.forc.Diff <- data.ramalan_meta.da
+#Transformasi Balik
+ramal_meta <- exp(hasil.forc.Diff)
+#Diff inv
+ramal_meta <- diffinv(ramal_meta, differences = 1) + pt_1
+
+#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
+ts.plot(train_meta.ts, ramal_meta, xlab="Periode (Hari)", 
+        col = "dodgerblue3", lwd = 3.5,
+        ylab="Saham Harga (USD)",
+        main="Plot Ramalan Saham META Selama 115 Hari Kedepan")
+```
+
+Dapat dilihat bahwa rata-rata harga saham META diramalkan akan terus menaik setiap periodenya.
+
+### Perbandingan
+
+```{r}
+perbandingan_meta.da <- matrix(data=c(head(test_meta.ts, n=h), ramal_meta[-1]),
+                     nrow = h, ncol = 2)
+colnames(perbandingan_meta.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_meta.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+```{r}
+akurasi.meta <- accuracy(ts(ramal_meta[-1]), head(test_meta.ts, n=h)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_meta.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.meta) <- "META"
+datatable(akurasi.meta)
+```
+
+Didapatkan nilai MAPE sebesar $4.766333\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
+
+# Microsoft
+
+## Uji Stasioner Data {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_msft.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
+
+### Uji ADF
+
+```{r}
+tseries::adf.test(train_msft.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.5748$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+### Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+
+index <- seq(1:nrow(train_msft))
+bc = boxcox(train_msft.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_msft <- bc$x[which.max(bc$y)]
+#SK
+sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_msft,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_msft), "\n Batas Atas  :", max(sk_msft) )
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.85$ dan batas atas $0.96$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+
+## **Penanganan Ketidakstasioneran Data** {.tabset}
+
+### Dalam Ragam: Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+| $\mathbf{\lambda}$ | **Transformation** |
+|:------------------:|:------------------:|
+|         -2         |      $1/x^2$       |
+|         -1         |       $1/x$        |
+|        -0.5        |    $1/\sqrt{x}$    |
+|         0          |    $\log{(x)}$     |
+|        0.5         |     $\sqrt{x}$     |
+|         1          |        $x$         |
+|         2          |       $x^2$        |
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.21$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
+
+```{r}
+train_msft.ts.new <- log(train_msft.ts)
+bc <- boxcox(train_msft.ts.new ~ index, lambda = seq(-5, 7, by=0.01))
+```
+
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Microsoft sudah stasioner dalam ragam.
+
+### Dalam Rataan: Differencing
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+train_msft.diff <- diff(train_msft.ts.new, differences = 1) 
+plot.ts(train_msft.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "deepskyblue2", lwd = 3.5,
+        main="Plot Difference Saham Microsoft")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
+
+## Uji Ulang {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_msft.diff)
+```
+
+Berdasarkan plot ACF tersebut, terlihat bahwa cuts off pada lag 5 dan 15. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+
+### Uji ADF
+
+```{r message=FALSE, warning=FALSE}
+tseries::adf.test(train_msft.diff)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+
+## **Identifikasi Model** {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_msft.diff)
+```
+
+Berdasarkan plot ACF tersebut, terlihat bahwa cuts off pada lag 5 dan 15. Maka model tidak dapat di identifikasi dengan plot ACF.
+
+### Plot PACF
+
+```{r}
+pacf(train_msft.diff)
+```
+
+Berdasarkan plot PACF tersebut, terlihat bahwa cuts off pada lag 14. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot EACF
+
+```{r message=FALSE, warning=FALSE}
+
+eacf(train_msft.diff)
+```
+
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+## **Pendugaan Parameter Model Tentatif**
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_msft <- 
+  model_tentatif(train_msft.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2421.48$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_msft.da <- Arima(train_msft.diff, order=c(0,1,1), method="ML")
+```
+
+## **Analisis Sisaan**
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
+
+### **Eksplorasi Sisaan**
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_msft.da <- model_msft.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_msft.da) 
+qqline(sisaan_msft.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_msft.da)), sisaan_msft.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_msft.da) 
+pacf(sisaan_msft.da) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **menyebar tidak normal** ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+### **Uji Formal** {.tabset}
+
+#### Sisaan Menyebar Normal
+
+```{r}
+ks.test(sisaan_msft.da,"pnorm")  #tak tolak H0 > sisaan menyebar normal
+```
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times 10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+
+#### Sisaan saling bebas/tidak ada autokorelasi
+
+```{r}
+Box.test(sisaan_msft.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
+```
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.5821$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+
+#### Sisaan homogen
+
+```{r}
+Box.test((sisaan_msft.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+```
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+> $H_0$ : Ragam sisaan homogen
+>
+> $H_1$ : Ragam sisaan tidak homogen
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.2191$ yang lebih besar dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+#### Nilai tengah sama dengan nol
+
+```{r}
+#4) Nilai tengah sisaan sama dengan nol 
+t.test(sisaan_msft.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
+```
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+> $H_0$ : nilai tengah sisaan sama dengan 0
+>
+> $H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.1435$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+## **Peramalan** {.tabset}
+
+### Ramal
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk h hari ke depan.
+
+```{r}
+#---FORECAST---#
+ramalan_msft.da <- forecast::forecast(model_msft.da, h = h) 
+ramalan_msft.da
+```
+
+### Plot
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+data.ramalan_msft.da <- ramalan_msft.da$mean
+plot(ramalan_msft.da, xlab="Periode (Tahun)", col = "deepskyblue2", lwd = 2.5)
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+pt_1 <- train_msft.ts[length(train_msft.ts)] #nilai akhir data latih
+hasil.forc.Diff <- data.ramalan_msft.da
+#Transformasi Balik
+ramal_msft <- exp(hasil.forc.Diff)
+#Diff inv
+ramal_msft <- diffinv(ramal_msft, differences = 1) + pt_1
+
+#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
+ts.plot(train_msft.ts, ramal_msft, xlab="Periode (Hari)", 
+        ylab="Saham Harga (USD)",
+        col = "deepskyblue2", lwd = 3.5,
+        main="Plot Ramalan Saham Microsoft Selama 115 Hari Kedepan")
+```
+
+Dapat dilihat bahwa rata-rata harga saham Microsoft diramalkan akan terus menaik setiap periodenya.
+
+### Perbandingan
+
+```{r}
+perbandingan_msft.da <- matrix(data=c(head(test_msft.ts, n=h), ramal_msft[-1]),
+                     nrow = h, ncol = 2)
+colnames(perbandingan_msft.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_msft.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+```{r}
+akurasi.msft <- accuracy(ts(ramal_msft[-1]), head(test_msft.ts, n=h)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_msft.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.msft) <- "MSFT"
+datatable(akurasi.msft)
+```
+
+Didapatkan nilai MAPE sebesar $7.215409\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
+
+# Netflix
+
+## Uji Stasioner Data {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_nflx.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
+
+### Uji ADF
+
+```{r}
+tseries::adf.test(train_nflx.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.2557$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+### Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+
+index <- seq(1:nrow(train_nflx))
+bc = boxcox(train_nflx.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_nflx <- bc$x[which.max(bc$y)]
+#SK
+sk_nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_nflx,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_nflx), "\n Batas Atas  :", max(sk_nflx) )
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.06$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.38$ dan batas atas $0.25$. Selang tersebut tidak memuat nilai *1* sehingga dapat dikatakan bahwa data saham Netflix tidak stasioner dalam ragam.
+
+## **Penanganan Ketidakstasioneran Data** {.tabset}
+
+### Dalam Ragam: Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+| $\mathbf{\lambda}$ | **Transformation** |
+|:------------------:|:------------------:|
+|         -2         |      $1/x^2$       |
+|         -1         |       $1/x$        |
+|        -0.5        |    $1/\sqrt{x}$    |
+|         0          |    $\log{(x)}$     |
+|        0.5         |     $\sqrt{x}$     |
+|         1          |        $x$         |
+|         2          |       $x^2$        |
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.21$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
+
+```{r}
+train_nflx.ts.new <- log(train_nflx.ts)
+bc <- boxcox(train_nflx.ts.new ~ index, lambda = seq(-5, 7, by=0.01))
+```
+
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
+
+### Dalam Rataan: Differencing
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+train_nflx.diff <- diff(train_nflx.ts.new, differences = 1) 
+plot.ts(train_nflx.diff, lty=1, xlab="Periode (Hari)", 
+        col = "firebrick3", lwd = 3.5,
+        main="Plot Difference Saham Netflix")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
+
+## Uji Ulang {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_nflx.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag ke 21. Sejalan dengan penanganannya, data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
+
+### Uji ADF
+
+```{r message=FALSE, warning=FALSE}
+tseries::adf.test(train_nflx.diff)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+
+## **Identifikasi Model** {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_nflx.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *cuts off* pada lag ke 21. Maka model tidak dapat di identifikasi dengan plot ACF.
+
+### Plot PACF
+
+```{r}
+pacf(train_nflx.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *cuts off* pada lag ke 21 dan 22. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot EACF
+
+```{r message=FALSE, warning=FALSE}
+
+eacf(train_nflx.diff)
+```
+
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+## **Pendugaan Parameter Model Tentatif**
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_nflx <- 
+  model_tentatif(train_nflx.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1759.09$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_nflx.da <- Arima(train_nflx.diff, order=c(0,1,1), method="ML")
+```
+
+## **Analisis Sisaan**
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
+
+### **Eksplorasi Sisaan**
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_nflx.da <- model_nflx.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_nflx.da) 
+qqline(sisaan_nflx.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_nflx.da)), sisaan_nflx.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_nflx.da) 
+pacf(sisaan_nflx.da) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+### **Uji Formal** {.tabset}
+
+#### Sisaan Menyebar Normal
+
+```{r}
+ks.test(sisaan_nflx.da,"pnorm")  #tak tolak H0 > sisaan menyebar normal
+```
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.2\times 10^{-16}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+
+#### Sisaan saling bebas/tidak ada autokorelasi
+
+```{r}
+Box.test(sisaan_nflx.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
+```
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.8597$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**.
+
+#### Sisaan homogen
+
+```{r}
+Box.test((sisaan_nflx.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+```
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+> $H_0$ : Ragam sisaan homogen
+>
+> $H_1$ : Ragam sisaan tidak homogen
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.9961$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+#### Nilai tengah sama dengan nol
+
+```{r}
+#4) Nilai tengah sisaan sama dengan nol 
+t.test(sisaan_nflx.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
+```
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+> $H_0$ : nilai tengah sisaan sama dengan 0
+>
+> $H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.22$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+## **Peramalan** {.tabset}
+
+### Ramal
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk h hari ke depan.
+
+```{r}
+#---FORECAST---#
+ramalan_nflx.da <- forecast::forecast(model_nflx.da, h = h) 
+ramalan_nflx.da
+```
+
+### Plot
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+data.ramalan_nflx.da <- ramalan_nflx.da$mean
+plot(ramalan_nflx.da, xlab="Periode (Hari)", col = "firebrick3", lwd = 2.5)
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+pt_1 <- train_nflx.ts[length(train_nflx.ts)] #nilai akhir data latih
+hasil.forc.Diff <- data.ramalan_nflx.da
+#Transformasi Balik
+ramal_nflx <- exp(hasil.forc.Diff)
+#Diff inv
+ramal_nflx <- diffinv(ramal_nflx, differences = 1) + pt_1
+
+#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
+ts.plot(train_nflx.ts, ramal_nflx, ylab="Saham Harga (USD)", 
+        xlab="Periode (Hari)", 
+        col = "firebrick3", lwd = 3.5,
+        main="Plot Ramalan Saham Netflix Selama 115 Hari Kedepan")
+```
+
+Dapat dilihat bahwa rata-rata harga saham Netfilx diramalkan akan terus menaik setiap periodenya.
+
+### Perbandingan
+
+```{r}
+perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=h), ramal_nflx[-1]),
+                     nrow = h, ncol = 2)
+colnames(perbandingan_nflx.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_nflx.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+```{r}
+akurasi.nflx <- accuracy(ts(ramal_nflx[-1]), head(test_nflx.ts, n=h)) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_nflx.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.nflx) <- "NFLX"
+datatable(akurasi.nflx)
+```
+
+Didapatkan nilai MAPE sebesar $6.292792\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah sangat baik.
+
+# NVIDIA
+
+## Uji Stasioner Data {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_nvda.ts)
+```
+
+Berdasarkan plot ACF, terlihat bahwa data menurun secara perlahan (*tails of slowly*). Hal ini menjadi indikasi bahwa data tidak stasioner dalam rataan.
+
+### Uji ADF
+
+```{r}
+tseries::adf.test(train_nvda.ts)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.922$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+### Plot Box-Cox
+
+```{r message=FALSE, warning=FALSE}
+
+index <- seq(1:nrow(train_nvda))
+bc = boxcox(train_nvda.ts~index, lambda = seq(-2, 4, by=0.01))
+```
+
+```{r}
+#Nilai Rounded Lambda
+lambda_nvda <- bc$x[which.max(bc$y)]
+#SK
+sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+cat(" Lambda :", lambda_nvda,
+    "\n\n Selang Kepercyaan 95% \n",
+    "Batas Bawah :", min(sk_nvda), "\n Batas Atas  :", max(sk_nvda) )
+```
+
+Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $0.09$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.28$ dan batas atas $0.47$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham amazon tidak stasioner dalam ragam.
+
+## **Penanganan Ketidakstasioneran Data** {.tabset}
+
+### Dalam Ragam: Transformasi Data
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut,
+
+$$  \text{Transformasi}\begin{cases}  \frac{x^\lambda-1}{\lambda} & \text{jika } \text{ } \lambda \ne 0  \\   \log(x) & \text{jika } \text{ } \lambda = 0    \end{cases}    $$
+
+Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22 \ne 0$. Sehingga akan menggunakan transformasi$\frac{x^\lambda-1}{\lambda}$ .
+
+```{r}
+train_nvda.ts.new <- (train_nvda.ts^lambda_nvda-1)/lambda_nvda
+bc <- boxcox(train_nvda.ts.new ~ index, lambda = seq(-5, 7, by=0.01))
+```
+
+Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon sudah stasioner dalam ragam.
+
+### Dalam Rataan: Differencing
+
+```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+train_nvda.diff <- diff(train_nvda.ts.new, differences = 1) 
+plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "green4", lwd = 4,
+        main="Plot Difference Saham Amazon")
+```
+
+Berdasarkan plot data deret waktu, terlihat bahwa data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
+
+## Uji Ulang {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_nvda.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF tails off dan membentuk pola naik turun.
+
+### Uji ADF
+
+```{r message=FALSE, warning=FALSE}
+tseries::adf.test(train_nvda.diff)
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+
+## **Identifikasi Model** {.tabset}
+
+### Plot ACF
+
+```{r}
+acf(train_nvda.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cenderung *tails of*. Maka model tidak dapat di identifikasi dengan plot ACF.
+
+### Plot PACF
+
+```{r}
+pacf(train_nvda.diff)
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot PACF cenderung *tails off*. Maka model tidak dapat di identifikasi dengan plot PACF.
+
+### Plot EACF
+
+```{r message=FALSE, warning=FALSE}
+
+eacf(train_nvda.diff)
+```
+
+Identifikasi model menggunakan plot EACF dilakukan dengan melihat ujung segitiga pada pola segitiga nol. Dalam hal ini model tentatif yang terbentuk adalah ARIMA(1,1,2), ARIMA(1,1,1), ARIMA(0,1,1), ARIMA(0,1,2), ARIMA(0,1,3), ARIMA(1,1,3), ARIMA(2,1,3),ARIMA(3,1,3). Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat
+
+## **Pendugaan Parameter Model Tentatif**
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_nvda <- 
+  model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1578.14$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
+```
+
+## **Analisis Sisaan**
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
+
+### **Eksplorasi Sisaan**
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_nvda.da <- model_nvda.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_nvda.da) 
+qqline(sisaan_nvda.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_nvda.da)), sisaan_nvda.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_nvda.da) 
+pacf(sisaan_nvda.da) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **tidak normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+### **Uji Formal** {.tabset}
+
+#### Sisaan Menyebar Normal
+
+```{r}
+shapiro.test(sisaan_nvda.da)  #tak tolak H0 > sisaan menyebar normal
+```
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $2.933\times 10^{-10}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Hal ini sesuai dengan hasil eksplorasi menggunakan plot kuantil-kuantil normal.
+
+#### Sisaan saling bebas/tidak ada autokorelasi
+
+```{r}
+Box.test(sisaan_nvda.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
+```
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
+Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.8017$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+
+#### Sisaan homogen
+
+```{r}
+Box.test((sisaan_nvda.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+```
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+> $H_0$ : Ragam sisaan homogen
+>
+> $H_1$ : Ragam sisaan tidak homogen
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.4553$ yang lebih besar dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+#### Nilai tengah sama dengan nol
+
+```{r}
+#4) Nilai tengah sisaan sama dengan nol 
+t.test(sisaan_nvda.da, mu = 0, conf.level = 0.95)  #tak tolak h0 > nilai tengah sisaan sama dengan 0
+```
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+> $H_0$ : nilai tengah sisaan sama dengan 0
+>
+> $H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+Berdasarkan uji-ttersebut, didapat *p-value* sebesar $0.214$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+## **Peramalan** {.tabset}
+
+### Ramal
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk h hari ke depan.
+
+```{r}
+#---FORECAST---#
+ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = length(test_nvda.ts)) 
+ramalan_nvda.da
+```
+
+### Plot
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+data.ramalan_nvda.da <- ramalan_nvda.da$mean
+plot(ramalan_nvda.da, xlab="Periode (Tahun)", col = "green4", lwd = 2.5)
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+pt_1 <- train_nvda.ts[length(train_nvda.ts)] #nilai akhir data latih
+hasil.forc.Diff <- data.ramalan_nvda.da
+#Transformasi Balik
+ramal_nvda <- exp(hasil.forc.Diff)
+#Diff inv
+ramal_nvda <- diffinv(ramal_nvda, differences = 1) + pt_1
+
+#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
+ts.plot(train_nvda.ts, ramal_nvda, ylab="Saham Harga (USD)",
+        xlab="Periode (Tahun)", 
+        col = "green4", lwd = 3.5,
+        main="Plot Ramal Saham NVIDIA Selama 115 Hari Kedepan")
+```
+
+Dapat dilihat bahwa rata-rata harga saham NVIDA diramalkan akan terus Melonjak naik setiap periodenya.
+
+### Perbandingan
+
+```{r}
+perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=h), ramal_nvda[-1]),
+                     nrow = h, ncol = 2)
+colnames(perbandingan_nvda.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_nvda.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+```{r}
+akurasi.nvda <- accuracy(ts(ramal_nvda[-1]), head(test_nvda.ts, 
+                                                  n=length(test_nvda.ts))) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_nvda.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.nvda) <- "NVDA"
+datatable(akurasi.nvda)
+```
+
+Didapatkan nilai MAPE sebesar $16.67131\%$ (lebih dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah baik.
+
+# Perbandingan Antar Saham
+
+## Perbandingan Akurasi
+
+```{r}
+akurasi <- rbind(akurasi.aapl, akurasi.amzn, akurasi.goog, akurasi.meta,
+                 akurasi.msft, akurasi.nflx, akurasi.nvda) %>%
+  mutate(Keterangan = case_when(
+    MAPE < 10 ~ "Sangat Baik",
+    MAPE >= 10 & MAPE <= 20 ~ "Baik",
+    MAPE > 20 & MAPE <= 50 ~ "Layak",
+    MAPE > 50 ~ "Tidak Akurat"
+  )) %>% relocate(Keterangan, .before = 1)
+
+datatable(akurasi, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+## Perbandingan Hasil Forcast
+
+### Perbandingan Data Train dan Test
+
+```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
+chart <-
+ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  #Label Data Latih 
+  annotate( "rect", alpha=0.1, fill="seagreen",
+            xmin=as.Date(min(data2$Date)), 
+            xmax=data2$Date[ceiling(0.8 * length(data2$Date)/7)],
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="seagreen",
+            x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
+            y = max(data2$`Adj Close`) * 0.95, 
+    label = "Data Latih\n80%", size=10) + 
+  
+  #Label Data Uji
+  annotate( "rect", alpha=0.1, fill="violetred",
+            xmin=data2$Date[ceiling(0.8 * length(data2$Date)/7)], 
+            xmax=as.Date(max(data2$Date)),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="violetred",
+            x = as.Date(data2$Date[ceiling(0.9 * length(data2$Date)/7)]) , 
+            y = max(data2$`Adj Close`) * 0.95, 
+    label = "Data Uji\n20%", size=10) +
+  
+  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
+  #Color
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  
+    scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = 1, "MSFT" = 1, 
+                                "META" = 1, "AAPL" = 1, "GOOG" = 1, 
+                                "AMZN" = 1)) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Time Series MAANG",
+       subtitle = "Pembagian Data Latih dan data Uji\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data2$Date)), as.Date("2023-09-28"))
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = data2$Date[ceiling(0.8 * length(data2$Date)/7)] , 
+             linetype = "dotted", color = "black", linewidth = 2) 
+            
+chart
+#Export Chart
+ggsave("09_banding_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+```
+
+Dari Semua data ujinya memiliki pola yang cenderung tren naik.
+
+### Perbandingan Data Hasil Forcast
+
+```{r}
+#Pnggabungan data
+data3 <- data.frame(
+  Date = data2 %>% dplyr::select(Date)  ,
+  `Adj Close` = c(as.vector(train_aapl.ts), ramal_aapl[-1],
+                  as.vector(train_amzn.ts), ramal_amzn[-1],
+                  as.vector(train_goog.ts), ramal_goog[-1],
+                  as.vector(train_meta.ts), ramal_meta[-1],
+                  as.vector(train_msft.ts), ramal_msft[-1],
+                  as.vector(train_nflx.ts), ramal_nflx[-1],
+                  as.vector(train_nvda.ts), ramal_nvda[-1] ),
+  Name = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
+              each = length(train_aapl.ts) + h)
+)
+colnames(data3) <- c("Date", "Adj Close", "Name")
+```
+
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=TRUE, message = FALSE}
+chart <- 
+ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
+  #Label Data Asli 
+  annotate( "rect", alpha=0.1, fill="seagreen",
+            xmin=as.Date(min(data3$Date)), 
+            xmax=as.Date(data3$Date[ceiling(nrow(train_aapl))]),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="seagreen",
+            x = as.Date(data3$Date[ceiling(nrow(train_aapl)/2)]), 
+            y = max(data3$`Adj Close`) * 0.95, 
+    label = "Data Asli", size=10) + 
+  
+  #Label Data Ramal
+  annotate( "rect", alpha=0.1, fill="violetred",
+            xmin=as.Date(data3$Date[ceiling(nrow(train_aapl))]), 
+            xmax=as.Date(max(data3$Date)),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="violetred",
+            x = as.Date(data3$Date[ceiling(0.9 * length(data3$Date)/7)]) , 
+            y = max(data3$`Adj Close`) * 0.95, 
+    label = "Data Ramal\n115 Hari", size=10) +
+  #Time Series
+  geom_line(aes(color=Name), linewidth=1.5) +
+  #Warna Saham
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Ramalan Saham MAANG",
+       subtitle = "Peramalan Saham MAANG Selama 115 Hari Kedepan\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data3[data3$Date == max(data3$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data3$Date)), 
+               as.Date(max(data3$Date)) + 60)
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.Date(data3$Date[ceiling(nrow(train_aapl))]) , 
+             linetype = "dotted", color = "black", linewidth = 2)
+chart
+#Export Chart
+ggsave("09_banding_ramal.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
