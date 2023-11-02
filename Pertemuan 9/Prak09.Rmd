@@ -1300,15 +1300,6 @@ Identifikasi model dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel 
 Referensi : [Significance level of ACF and PACF in R](https://stackoverflow.com/questions/29996910/significance-level-of-acf-and-pacf-in-r){.uri}
 
 ```{r}
-N <- nrow(train_aapl)
-c(-1,1)*(exp(2*1.96/sqrt(N-3))-1)/(exp(2*1.96/sqrt(N-3))+1)
-
-acf(train_aapl.diff, plot=F)[["lag"]]
-acf(train_aapl.diff, plot=F)[["acf"]]
-
-acf(train_aapl.diff, plot = F)[["n.used"]] + 1
-
-
 acf.pacf <- function(dt){
   N <- acf(dt, plot = F)[["n.used"]] + 1
   sl <- c(-1,1)*(exp(2*1.96/sqrt(N-3))-1)/(exp(2*1.96/sqrt(N-3))+1)
@@ -1345,15 +1336,12 @@ acf.pacf_nflx <- acf.pacf(dt = train_nflx.diff) %>%
 acf.pacf_nvda <- acf.pacf(dt = train_nvda.diff) %>% 
   rename(NVDA.a=acf, NVDA.p=pacf)
 
-install_load('data.table')
-
 acf.pacf.tab <- (cbind(acf.pacf_aapl, acf.pacf_amzn, acf.pacf_goog, 
                       acf.pacf_meta, acf.pacf_msft, acf.pacf_nflx, 
                       acf.pacf_nvda))
-```
 
-```{r}
-acf(train_aapl.diff)
+datatable(acf.pacf.tab, filter = 'top', 
+          options = list(pageLength = 7))
 ```
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
