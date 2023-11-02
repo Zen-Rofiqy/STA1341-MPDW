@@ -1170,6 +1170,8 @@ index <- seq(1:nrow(train_nvda))
 bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-5, 6, by=.01)); title("NVDA")
 ```
 
+Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap rangkaian data sekarang mencakup nilai satu dalam selangnya, yang menunjukkan bahwa data tersebut sekarang sudah stasioner dalam ragam
+
 ### Dalam Rataan: Differencing
 
 ```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
@@ -1706,73 +1708,6 @@ datatable(akurasi.amzn)
 Didapatkan nilai MAPE sebesar $35.30528\%$ (lebih dari $20\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(0,1,1)` sudah cukup baik.
 
 # Google
-
-## Uji Stasioner Data {.tabset}
-
-### Plot ACF
-
-```{r}
-acf(train_goog.ts)
-```
-
-Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
-
-### Uji ADF
-
-```{r}
-tseries::adf.test(train_goog.ts)
-```
-
-> $H_0$ : Data tidak stasioner dalam rataan
->
-> $H_1$ : Data stasioner dalam rataan
-
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3766$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
-
-### Plot Box-Cox
-
-```{r message=FALSE, warning=FALSE}
-
-index <- seq(1:nrow(train_goog))
-bc = boxcox(train_goog.ts~index, lambda = seq(-2, 4, by=0.01))
-```
-
-```{r}
-#Nilai Rounded Lambda
-lambda_goog <- bc$x[which.max(bc$y)]
-#SK
-sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
-cat(" Lambda :", lambda_goog,
-    "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_goog), "\n Batas Atas  :", max(sk_goog) )
-```
-
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.13$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.59$ dan batas atas $0.33$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Google tidak stasioner dalam ragam.
-
-## **Penanganan Ketidakstasioneran Data** {.tabset}
-
-### Dalam Ragam: Transformasi Data
-
-Referensi : <https://r-coder.com/box-cox-transformation-r/>
-
-Mengutip dari laman tersebut,
-
-| $\mathbf{\lambda}$ | **Transformation** |
-|:------------------:|:------------------:|
-|         -2         |      $1/x^2$       |
-|         -1         |       $1/x$        |
-|        -0.5        |    $1/\sqrt{x}$    |
-|         0          |    $\log{(x)}$     |
-|        0.5         |     $\sqrt{x}$     |
-|         1          |        $x$         |
-|         2          |       $x^2$        |
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $-0.13$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
-
-```{r}
-train_goog.ts.new <- log(train_goog.ts)
-bc <- boxcox(train_goog.ts.new ~ index, lambda = seq(-5, 6, by=0.01))
-```
 
 Setelah di transformasi, Gambar di atas menunjukkan selang memuat nilai satu sehingga dapat dikatakan bahwa data saham Google sudah stasioner dalam ragam.
 
