@@ -1,11 +1,11 @@
-# Dataset MAANG Stock Prices  
+# Dataset MAANG Stock Prices 📈
 `Link Dataset` : [finance.yahoo.com](https://finance.yahoo.com/)  
 
 ## Deskripsi
-Dataset ini merupakan koleksi data harga saham historis dari beberapa raksasa teknologi paling berpengaruh di dunia: 
-_Microsoft_, _Apple_, _Amazon_, _Nvidia_, _Google_, _Netflix_, dan _Meta_ (sebelumnya dikenal sebagai Facebook). 
-Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin 
-menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.  
+> Dataset ini merupakan koleksi data harga saham historis dari beberapa raksasa teknologi paling berpengaruh di dunia: 
+> _Microsoft_, _Apple_, _Amazon_, _Nvidia_, _Google_, _Netflix_, dan _Meta_ (sebelumnya dikenal sebagai Facebook). 
+> Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin 
+> menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.  
   
 * Jenis periode: Harian  
 * Rentang periode `Juli 2018` sampai ` Juli 2023`  
