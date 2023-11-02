@@ -1,15 +1,5 @@
-## Kendala
-Data tidak mencakup hari akhir pekan seperti sabtu dan minggu. Oleh karena itu pada pertemuan 8 kami memutuskan untuk **inputasi** data dengan interplolasi.
-Namun ternyata ada website yang menyediakan data harga saham lengkap di [finance.yahoo.com](https://finance.yahoo.com/).
-Sehingga daripada inputasi menggunakan program, lebih baik mengambil data sesungguhnya. Pada akhirnya kami memutuskan untuk menggunakan
-data saham yang sama, dengan rentang periode dari tahun `2022` hingga `31-Oktober-2023`.  
-  
-### Folder Data Baru
-Adapun data `csv` nya ada di folder [Full Data](https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data/Full%20Data)
-  
+![1_2Yt3-zcGKc6MYuXCxgCL0A](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/2ff74a64-c4db-43b8-9276-78a590c60ad2)
 # Dataset MAANG Stock Prices 📈
-> Notes : Data ini hanya digunakan sampai pertemuan 8.  
-  
 `Link Dataset` :  
 https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
   
@@ -34,3 +24,7 @@ seperti pembagian saham atau dividen. Ini adalah harga penutup yang paling relev
 karena mencerminkan harga saham yang sebenarnya setelah penyesuaian.
 7. **Volume:** Volume perdagangan saham selama periode tertentu. 
 Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan tersebut.
+
+## Catatan
+Data **tidak mencakup akhir pekan** seperti **sabtu** dan **minggu**. Oleh karena itu kami memutuskan untuk **inputasi** data dengan interplolasi.  
+> Harga saham tidak tersedia pada hari Sabtu dan Minggu karena umumnya bursa saham utama di seluruh dunia, termasuk yang berlokasi di Amerika Serikat, Eropa, dan Asia, menghentikan aktivitas perdagangan selama akhir pekan. Hal ini disebabkan oleh jadwal operasional bursa yang biasanya beroperasi pada hari kerja, dari Senin hingga Jumat, dengan jam perdagangan yang telah ditetapkan. Selain itu, akhir pekan digunakan untuk pemeliharaan sistem perdagangan, perbaikan infrastruktur, dan penyelesaian transaksi yang tertunda. Oleh karena itu, para investor dan pedagang tidak dapat melihat pergerakan harga saham selama hari libur akhir pekan, dan aktivitas perdagangan kembali dibuka pada hari kerja berikutnya.
