@@ -1233,15 +1233,32 @@ Akan dilakukan uji ulang untuk mengecek kestasioneran data dalam rataan.
 
 ### Plot ACF
 
-```{r fig.align=, fig.height=10, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+```{r}
+acf(train_goog.diff, ylim=c(-.1,.1))
+```
+
+```{r fig.align=, fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 par(mfrow=c(2,4))
-acf(train_aapl.diff, main=""); mtext("AAPL", side=3, line=1, cex=2, font=2)
-acf(train_amzn.diff, main=""); mtext("AMZN", side=3, line=1, cex=2, font=2)
-acf(train_goog.diff, main=""); mtext("GOOG", side=3, line=1, cex=2, font=2)
-acf(train_meta.diff, main=""); mtext("META", side=3, line=1, cex=2, font=2)
-acf(train_msft.diff, main=""); mtext("MSFT", side=3, line=1, cex=2, font=2)
-acf(train_nflx.diff, main=""); mtext("NFLX", side=3, line=1, cex=2, font=2)
-acf(train_nvda.diff, main=""); mtext("NVDA", side=3, line=1, cex=2, font=2)
+acf(train_aapl.diff, ylim=c(-.1,.1) , main="")
+mtext("AAPL", side=3, line=1, cex=2, font=2)
+
+acf(train_amzn.diff, ylim=c(-.1,.1) , main="")
+mtext("AMZN", side=3, line=1, cex=2, font=2)
+
+acf(train_goog.diff, ylim=c(-.1,.1) , main="")
+mtext("GOOG", side=3, line=1, cex=2, font=2)
+
+acf(train_meta.diff, ylim=c(-.1,.1) , main="")
+mtext("META", side=3, line=1, cex=2, font=2)
+
+acf(train_msft.diff, ylim=c(-.1,.1) , main="")
+mtext("MSFT", side=3, line=1, cex=2, font=2)
+
+acf(train_nflx.diff, ylim=c(-.1,.1) , main="")
+mtext("NFLX", side=3, line=1, cex=2, font=2)
+
+acf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+mtext("NVDA", side=3, line=1, cex=2, font=2)
 ```
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Hal ini menandakan data sudah stasioner dalam rataan dan ketidakstasioneran data telah berhasil tertangani.
