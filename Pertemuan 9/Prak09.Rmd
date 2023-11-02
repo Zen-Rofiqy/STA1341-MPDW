@@ -343,6 +343,70 @@ ggsave("01_Time Series MAANG.png", chart, path = export.chart,
 
 Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Amazon**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
 
+```{r}
+data2 <- data %>%
+  filter(Date >= as.Date("2022-01-01")) 
+```
+
+```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+install_load('viridis','ggrepel')
+#Plot
+chart <-
+ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
+  #Color
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
+                                "META" = .25, "AAPL" = .25, "GOOG" = .25, 
+                                "AMZN" = 1)) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Time Series MAANG",
+       subtitle = "Seperti apa sih pola deret waktu saham MAANG pada 2022-2023?\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data2$Date)), as.Date("2023-09-28"))
+    #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date("2023-07-28")), 
+             linetype = "dotted", color = "red")
+chart
+
+#Export Chart
+ggsave("01_Time Series MAANG_2022-2023.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+```
+
 ### Time Series Apple
 
 ```{r}
@@ -407,8 +471,6 @@ test_aapl <- aapl[round(nrow(aapl) *80/100 +1): nrow(aapl),]
 train_aapl.ts <- ts(train_aapl[,3])
 test_aapl.ts <- ts(train_aapl[,3])
 
-data2 <- data %>%
-  filter(Date >= as.Date("2022-01-01")) 
 #Banyaknya hari untuk di ramal 
 h <- nrow(test_aapl); h
 ```
