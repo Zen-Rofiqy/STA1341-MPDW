@@ -4,6 +4,9 @@ Namun ternyata ada website yang menyediakan data harga saham lengkap di [finance
 Sehingga daripada inputasi menggunakan program, lebih baik mengambil data sesungguhnya. Pada akhirnya kami memutuskan untuk menggunakan
 data saham yang sama, dengan rentang periode dari tahun `2022` hingga `31-Oktober-2023`.  
   
+### Folder Data Baru
+Adapun data `csv` nya ada di folder [`Full Data`](https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data/Full%20Data)
+  
 ## Dataset MAANG Stock Prices  
 Link Dataset :  
 https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
