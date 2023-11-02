@@ -5,7 +5,7 @@ Sehingga daripada inputasi menggunakan program, lebih baik mengambil data sesung
 data saham yang sama, dengan rentang periode dari tahun `2022` hingga `31-Oktober-2023`.  
   
 ### Folder Data Baru
-Adapun data `csv` nya ada di folder [`Full Data`](https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data/Full%20Data)
+Adapun data `csv` nya ada di folder [Full Data](https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data/Full%20Data)
   
 ## Dataset MAANG Stock Prices  
 > Notes : Data ini hanya digunakan sampai pertemuan 8.  
