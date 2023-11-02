@@ -28,10 +28,10 @@ Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan terseb
 | **Gambar** | **Langkah**                                                  |
 |:----------:|--------------------------------------------------------------|
 |            | 1. Ke link [finance.yahoo.com](https://finance.yahoo.com/)   |
-|            | 2. Cari Saham berdasarkan Kode saham.                        |
-|            | 1. Ke Historical Data                                        |
+| ![Gambar1](/images/Screenshot 2023-11-02 162122.png)           | 2. Cari Saham berdasarkan Kode saham.                        |
+| ![Gambar2](Data/Full Data/images/Screenshot 2023-11-02 162552.png)           | 1. Ke Historical Data                                        |
 |            | 2. Pilih `Time Periode`                                      |
 |            | 3. Klik Done                                                 |
-|            | 1. Pilih `Frequency`                                         |
+| ![Gambar3](Data/Full Data/images/Screenshot 2023-11-02 163226.png)            | 1. Pilih `Frequency`                                         |
 |            | 2. Klik `Apply`                                              |
 |            | 3. Klik `Download`                                           |
