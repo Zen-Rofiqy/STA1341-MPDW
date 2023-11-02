@@ -8,6 +8,7 @@ data saham yang sama, dengan rentang periode dari tahun `2022` hingga `31-Oktobe
 Adapun data `csv` nya ada di folder [`Full Data`](https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data/Full%20Data)
   
 ## Dataset MAANG Stock Prices  
+_Notes :_ Data ini hanya digunakan sampai pertemuan 8.  
 Link Dataset :  
 https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
   
