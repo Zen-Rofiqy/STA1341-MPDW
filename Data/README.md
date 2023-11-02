@@ -13,10 +13,10 @@ Adapun data `csv` nya ada di folder [Full Data](https://github.com/Zen-Rofiqy/ST
 `Link Dataset` :  
 https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
   
-Dataset ini merupakan koleksi data harga saham historis dari beberapa raksasa teknologi paling berpengaruh di dunia: 
-_Microsoft_, _Apple_, _Amazon_, _Nvidia_, _Google_, _Netflix_, dan _Meta_ (sebelumnya dikenal sebagai Facebook). 
-Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin 
-menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.  
+> Dataset ini merupakan koleksi data harga saham historis dari beberapa raksasa teknologi paling berpengaruh di dunia: 
+> _Microsoft_, _Apple_, _Amazon_, _Nvidia_, _Google_, _Netflix_, dan _Meta_ (sebelumnya dikenal sebagai Facebook). 
+> Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin 
+> menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.  
   
 * Jenis periode: Harian  
 * Rentang periode `Juli 2018` sampai ` Juli 2023`  
