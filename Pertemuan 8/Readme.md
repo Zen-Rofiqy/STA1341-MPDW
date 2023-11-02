@@ -1,12 +1,12 @@
 # Kelompok 5  
 ### Anggota :  
-|    **NIM**    |            **Nama**           |
-|:-------------:|:-----------------------------:|
-| `G1401211006` | Angga Fathan Rofiqy           |
-| `G1401211020` | Uiwang Nur Thoriq             |
-| `G1401211042` | Indra Maulana                 |
-| `G1401211094` | Hanifa   Rahmacindia Nasution |
-| `G1401211098` | Fajryanti   Kusuma Wardani    |  
+|    **NIM**    |            **Nama**           | **GitHub**                                          |
+|:-------------:|:-----------------------------:|-----------------------------------------------------|
+| `G1401211006` |      Angga Fathan Rofiqy      | [Zen-Rofiqy](https://github.com/Zen-Rofiqy )        |
+| `G1401211020` |       Uiwang Nur Thoriq       | [UiwangNT](https://github.com/UiwangNT)             |
+| `G1401211042` |         Indra Maulana         | [indraaa47](http://github.com/indraaa47)            |
+| `G1401211094` | Hanifa   Rahmacindia Nasution | [HanifaNasution](https://github.com/HanifaNasution) |
+| `G1401211098` |   Fajryanti   Kusuma Wardani  | [fajryanti](http://github.com/fajryanti)            |
   
 ## Link RPUBS
 Agar _memudahkan_ untuk dibaca..  
