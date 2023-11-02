@@ -1,7 +1,7 @@
 # Dataset MAANG Stock Prices  
-Link Dataset :  
-https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
-  
+`Link Dataset` : [finance.yahoo.com](https://finance.yahoo.com/)  
+
+## Deskripsi
 Dataset ini merupakan koleksi data harga saham historis dari beberapa raksasa teknologi paling berpengaruh di dunia: 
 _Microsoft_, _Apple_, _Amazon_, _Nvidia_, _Google_, _Netflix_, dan _Meta_ (sebelumnya dikenal sebagai Facebook). 
 Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin 
@@ -23,3 +23,5 @@ seperti pembagian saham atau dividen. Ini adalah harga penutup yang paling relev
 karena mencerminkan harga saham yang sebenarnya setelah penyesuaian.
 7. **Volume:** Volume perdagangan saham selama periode tertentu. 
 Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan tersebut.
+
+## Cara mendapatkan data
