@@ -1,4 +1,10 @@
-# Dataset MAANG Stock Prices  
+## Kendala
+Data tidak mencakup hari akhir pekan seperti sabtu dan minggu. Oleh karena itu pada pertemuan 8 kami memutuskan untuk **inputasi** data dengan interplolasi.
+Namun ternyata ada website yang menyediakan data harga saham lengkap di [finance.yahoo.com](https://finance.yahoo.com/).
+Sehingga daripada inputasi menggunakan program, lebih baik mengambil data sesungguhnya. Pada akhirnya kami memutuskan untuk menggunakan
+data saham yang sama, dengan rentang periode dari tahun `2022` hingga `31-Oktober-2023`.  
+  
+## Dataset MAANG Stock Prices  
 Link Dataset :  
 https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
   
