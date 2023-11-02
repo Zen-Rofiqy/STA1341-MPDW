@@ -1019,47 +1019,90 @@ ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
 
 Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan.]{.underline}
 
-# Apple
+# Stasioneritas
 
-## Uji Stasioner Data {.tabset}
-
-```{r message=FALSE, warning=FALSE}
-install_load('tsibble','tseries')
-```
+## Uji Stasioneritas
 
 ### Plot ACF
 
-```{r}
-acf(train_aapl.ts)
+```{r fig.align=, fig.height=10, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+install_load('tsibble','tseries')
+par(mfrow=c(2,4))
+acf(train_aapl.ts, main="AAPL"); acf(train_amzn.ts, main="AMZN")
+acf(train_goog.ts, main="GOOG"); acf(train_meta.ts, main="META")
+acf(train_msft.ts, main="MSFT"); acf(train_nflx.ts, main="NFLX")
+acf(train_nvda.ts, main="NVDA")
 ```
 
-Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
+Berdasarkan plot ACF, terlihat bahwa plot ACF seluruh data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data **tidak stasioner dalam rataan** dan tidak membentuk gelombang sinus.
 
 ### Uji ADF
 
 ```{r}
-tseries::adf.test(train_aapl.ts)
+adf <- data.frame(
+  p.value = c(tseries::adf.test(train_aapl.ts)[["p.value"]],
+               tseries::adf.test(train_amzn.ts)[["p.value"]],
+               tseries::adf.test(train_goog.ts)[["p.value"]],
+               tseries::adf.test(train_meta.ts)[["p.value"]],
+               tseries::adf.test(train_msft.ts)[["p.value"]],
+               tseries::adf.test(train_nflx.ts)[["p.value"]],
+               tseries::adf.test(train_nvda.ts)[["p.value"]]
+              )
+)
+adf$Keterangan <- ifelse(adf$p.value < 0.05, "Rataan Stasioner", 
+                         "Rataan Tidak Stasioner")
+rownames(adf) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+datatable(adf, filter = 'top', 
+          options = list(pageLength = 7))
 ```
 
 > $H_0$ : Data tidak stasioner dalam rataan
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.5136$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
-```{r message=FALSE, warning=FALSE}
+```{r fig.align=, fig.height=10, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 install_load('MASS')
 index <- seq(1:nrow(train_aapl))
-bc = boxcox(train_aapl.ts~index, lambda = seq(-2, 4, by=0.01))
+par(mfrow=c(2,4))
+
+bc =boxcox(train_aapl.ts~index, lambda=seq(-2, 4, by=.01)); title("AAPL")
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_amzn.ts~index, lambda=seq(-2, 4, by=.01)); title("AMZN")
+lambda_amzn <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_goog.ts~index, lambda=seq(-2, 4, by=.01)); title("GOOG")
+lambda_goog <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_meta.ts~index, lambda=seq(-2, 4, by=.01)); title("META")
+lambda_meta <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_msft.ts~index, lambda=seq(-2, 4, by=.01)); title("MSFT")
+lambda_msft <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_nflx.ts~index, lambda=seq(-2, 4, by=.01)); title("NFLX")
+lambda_nflx <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+index <- seq(1:nrow(train_nvda)) #Beda titik potong
+bc =boxcox(train_nvda.ts~index, lambda=seq(-2, 4, by=.01)); title("NVDA")
+lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
+#### Lambda dan Selang Kepercayaan
+
 ```{r}
-#Nilai Rounded Lambda
-lambda_aapl <- bc$x[which.max(bc$y)]
-#SK
-sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+
 cat(" Lambda :", lambda_aapl,
     "\n\n Selang Kepercyaan 95% \n",
     "Batas Bawah :", min(sk_aapl), "\n Batas Atas  :", max(sk_aapl) )
