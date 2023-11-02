@@ -7,7 +7,7 @@ data saham yang sama, dengan rentang periode dari tahun `2022` hingga `31-Oktobe
 ### Folder Data Baru
 Adapun data `csv` nya ada di folder [Full Data](https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data/Full%20Data)
   
-## Dataset MAANG Stock Prices  
+# Dataset MAANG Stock Prices 📈
 > Notes : Data ini hanya digunakan sampai pertemuan 8.  
   
 `Link Dataset` :  
