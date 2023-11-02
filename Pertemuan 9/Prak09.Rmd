@@ -1288,11 +1288,68 @@ Berdasarkan uji ADF tersebut, semua data saham mendapatkan *p-value* sebesar $0.
 
 # **Identifikasi Model** {.tabset}
 
+Identifikasi model dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel EACF. Mengutip dari postingan pada laman [medium.com](https://medium.com/@ooemma83/how-to-interpret-acf-and-pacf-plots-for-identifying-ar-ma-arma-or-arima-models-498717e815b6) **Panduan dasar** untuk menginterpretasikan plot ACF dan PACF adalah sebagai berikut :
+
+1.  Cari pola *tail off* pada ACF atau PACF.
+2.  Jika *tail off* terjadi pada ACF → **model AR** → *cut off* pada PACF akan memberikan nilai p untuk AR(p).
+3.  Jika *tail off* terjadi pada PACF → **model MA** → *cut off* pada ACF akan memberikan nilai q untuk MA(q).
+4.  Jika terjadi *tail off* pada kedua ACF dan PACF → **model ARMA**.
+
 ### Plot ACF
+
+Referensi : [Significance level of ACF and PACF in R](https://stackoverflow.com/questions/29996910/significance-level-of-acf-and-pacf-in-r){.uri}
 
 ```{r}
 N <- nrow(train_aapl)
-(exp(2*1.96/sqrt(N-3))-1)/(exp(2*1.96/sqrt(N-3))+1)
+c(-1,1)*(exp(2*1.96/sqrt(N-3))-1)/(exp(2*1.96/sqrt(N-3))+1)
+
+acf(train_aapl.diff, plot=F)[["lag"]]
+acf(train_aapl.diff, plot=F)[["acf"]]
+
+acf(train_aapl.diff, plot = F)[["n.used"]] + 1
+
+
+acf.pacf <- function(dt){
+  N <- acf(dt, plot = F)[["n.used"]] + 1
+  sl <- c(-1,1)*(exp(2*1.96/sqrt(N-3))-1)/(exp(2*1.96/sqrt(N-3))+1)
+  acf <- data.frame( lag = acf(dt, plot=F)[["lag"]], 
+                     acf = acf(dt, plot=F)[["acf"]] ) 
+  
+    cut.off1 <- acf %>%
+        filter(acf <= min(sl) | acf >= max(sl)) %>%
+        dplyr::select(lag); colnames(cut.off1) <- "acf"
+  
+  pacf <- data.frame(lag = pacf(dt, plot=F)[["lag"]], 
+                     acf = pacf(dt, plot=F)[["acf"]] ) 
+  
+    cut.off2 <- pacf %>%
+        filter(acf <= min(sl) | acf >= max(sl)) %>%
+        dplyr::select(lag); colnames(cut.off2) <- "pacf"
+    
+  cut.off <- merge(cut.off, cut.off2, by = 0, all = TRUE)[-1]
+  return(cut.off)
+}
+
+acf.pacf_aapl <- acf.pacf(dt = train_aapl.diff) %>% 
+  rename(AAPL.a=acf, AAPL.p=pacf)
+acf.pacf_amzn <- acf.pacf(dt = train_amzn.diff) %>% 
+  rename(AMZN.a=acf, AMZN.p=pacf)
+acf.pacf_goog <- acf.pacf(dt = train_goog.diff) %>% 
+  rename(GOOG.a=acf, GOOG.p=pacf)
+acf.pacf_meta <- acf.pacf(dt = train_meta.diff) %>% 
+  rename(META.a=acf, META.p=pacf)
+acf.pacf_msft <- acf.pacf(dt = train_msft.diff) %>% 
+  rename(MSFT.a=acf, MSFTL.p=pacf)
+acf.pacf_nflx <- acf.pacf(dt = train_nflx.diff) %>% 
+  rename(NFLX.a=acf, NFLX.p=pacf)
+acf.pacf_nvda <- acf.pacf(dt = train_nvda.diff) %>% 
+  rename(NVDA.a=acf, NVDA.p=pacf)
+
+install_load('data.table')
+
+acf.pacf.tab <- (cbind(acf.pacf_aapl, acf.pacf_amzn, acf.pacf_goog, 
+                      acf.pacf_meta, acf.pacf_msft, acf.pacf_nflx, 
+                      acf.pacf_nvda))
 ```
 
 ```{r}
