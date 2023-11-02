@@ -9,6 +9,7 @@ Adapun data `csv` nya ada di folder [`Full Data`](https://github.com/Zen-Rofiqy/
   
 ## Dataset MAANG Stock Prices  
 _Notes :_ Data ini hanya digunakan sampai pertemuan 8.  
+  
 Link Dataset :  
 https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
   
