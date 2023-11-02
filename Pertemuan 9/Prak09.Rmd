@@ -1099,14 +1099,33 @@ lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
+Gambar di atas menunjukkan bahwa hanya `AAPL` yang memuat *rounded value* ($\lambda$) di dalam selangnya. Sementara selainnya tidak memuatnya.
+
 #### Lambda dan Selang Kepercayaan
 
 ```{r}
+lsk <- data.frame(
+  Lambda = c(lambda_aapl, lambda_amzn, lambda_goog, lambda_meta, 
+             lambda_msft, lambda_nflx, lambda_nvda ),
+  Batas.Bawah = c(min(sk_aapl), min(sk_amzn), min(sk_goog), min(sk_meta),
+                  min(sk_msft), min(sk_nflx), min(sk_nvda)  ),
+  Batas.Atas = c(max(sk_aapl), max(sk_amzn), max(sk_goog), max(sk_meta),
+                 max(sk_msft), max(sk_nflx), max(sk_nvda)  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
 
-cat(" Lambda :", lambda_aapl,
-    "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_aapl), "\n Batas Atas  :", max(sk_aapl) )
+lsk$Keterangan <- apply(lsk, 1, function(row) {
+  ifelse(row["Batas.Bawah"] <= 1 && row["Batas.Atas"] >= 1,
+         "Ragam Stasioner",  "Ragam Tidak Stasioner")
+})
+
+rownames(lsk) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+
+datatable(lsk, filter = 'top', 
+          options = list(pageLength = 7))
 ```
+
+Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kepercayaan diatas yang menyatakan bahwa selain `AAPL`{style="caret-color: white;"} tidak ada yang memuat nilai satu di dalam selangnya. Ini berarti hanya `AAPL`{style="caret-color: white;"} yang stasioner dalam ragam. Selainnya tidak stasioner dalam ragam yang mana memerlukan transformasi data.
 
 Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $1.68$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.64$ dan batas atas $2.72$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple stasioner dalam ragam. Sehingga data tidak perlu di transformasi.
 
