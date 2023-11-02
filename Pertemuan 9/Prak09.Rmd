@@ -1125,11 +1125,50 @@ datatable(lsk, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kepercayaan diatas yang menyatakan bahwa selain `AAPL`{style="caret-color: white;"} tidak ada yang memuat nilai satu di dalam selangnya. Ini berarti hanya `AAPL`{style="caret-color: white;"} yang stasioner dalam ragam. Selainnya tidak stasioner dalam ragam yang mana memerlukan transformasi data.
+Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kepercayaan diatas yang menyatakan bahwa selain `AAPL`{style="caret-color: white;"} tidak ada yang memuat nilai satu di dalam selangnya. Ini mengindikasikan bahwa hanya `AAPL`{style="caret-color: white;"} yang memiliki **stasioneritas dalam ragam**, Sementara yang lain memerlukan transformasi data karena **tidak** memiliki sifat **stasioner dalam ragam**.
 
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $1.68$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $0.64$ dan batas atas $2.72$. Selang tersebut memuat nilai satu sehingga dapat dikatakan bahwa data saham Apple stasioner dalam ragam. Sehingga data tidak perlu di transformasi.
+## **Penanganan Ketidakstasioneran Data**
 
-## **Penanganan Ketidakstasioneran Data** {.tabset}
+### Dalam Ragam: Transformasi
+
+Referensi : <https://r-coder.com/box-cox-transformation-r/>
+
+Mengutip dari laman tersebut, formula transformasi data disesuaikan dengan nilai *rounded value* ($\lambda$) optimumnya.
+
+| $\mathbf{\lambda}$ | **Transformation** |
+|:------------------:|:------------------:|
+|         -2         |      $1/x^2$       |
+|         -1         |       $1/x$        |
+|        -0.5        |    $1/\sqrt{x}$    |
+|         0          |    $\log{(x)}$     |
+|        0.5         |     $\sqrt{x}$     |
+|         1          |        $x$         |
+|         2          |       $x^2$        |
+
+: Karena semua data saham yang tidak stasioner memiliki nilai *rounded value* ($\lambda$) optimum nya mendekati 0, maka transformasi yang digunakan adalah transformasi $\log{(x)}$ dengan transfromasi baliknya $e^x$ atau $\exp{(x)}$.
+
+#### Transformasi
+
+```{r fig.align=, fig.height=10, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
+#Transformasi
+train_amzn.ts.new <- log(train_amzn.ts)
+train_goog.ts.new <- log(train_goog.ts)
+train_meta.ts.new <- log(train_meta.ts)
+train_msft.ts.new <- log(train_msft.ts)
+train_nflx.ts.new <- log(train_nflx.ts)
+train_nvda.ts.new <- log(train_nvda.ts)
+
+#Plot BoxCox
+par(mfrow=c(2,3))
+index <- seq(1:nrow(train_aapl))
+bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-5, 6, by=.01)); title("AMZN")
+bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-5, 6, by=.01)); title("GOOG")
+bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-5, 6, by=.01)); title("META")
+bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-5, 6, by=.01)); title("MSFT")
+bc <-boxcox(train_nflx.ts.new ~index, lambda=seq(-5, 6, by=.01)); title("NFLX")
+index <- seq(1:nrow(train_nvda))
+bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-5, 6, by=.01)); title("NVDA")
+```
 
 ### Dalam Rataan: Differencing
 
@@ -1440,67 +1479,6 @@ datatable(akurasi.aapl)
 Didapatkan nilai MAPE sebesar $3.229058\%$ (kurang dari $10\%$) yang menandakan bahwa hasil peramalan dari model `ARIMA(2,1,3)` sudah sangat baik.
 
 # Amazon
-
-## Uji Stasioner Data {.tabset}
-
-### Plot ACF
-
-```{r}
-acf(train_amzn.ts)
-```
-
-Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data tidak stasioner dalam rataan dan tidak membentuk gelombang sinus.
-
-### Uji ADF
-
-```{r}
-tseries::adf.test(train_amzn.ts)
-```
-
-> $H_0$ : Data tidak stasioner dalam rataan
->
-> $H_1$ : Data stasioner dalam rataan
-
-Berdasarkan uji ADF tersebut, didapat *p-value* sebesar $0.3326$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
-
-### Plot Box-Cox
-
-```{r message=FALSE, warning=FALSE}
-index <- seq(1:nrow(train_amzn))
-bc = boxcox(train_amzn.ts~index, lambda = seq(-2, 4, by=0.01))
-```
-
-```{r}
-#Nilai Rounded Lambda
-lambda_amzn <- bc$x[which.max(bc$y)]
-#SK
-sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
-cat(" Lambda :", lambda_amzn,
-    "\n\n Selang Kepercyaan 95% \n",
-    "Batas Bawah :", min(sk_amzn), "\n Batas Bawah :", max(sk_amzn) )
-```
-
-Gambar di atas menunjukkan nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$ dan pada selang kepercayaan $95\%$ nilai memiliki batas bawah $-0.61$ dan batas atas $0.16$. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data saham Amazon tidak stasioner dalam ragam.
-
-## **Penanganan Ketidakstasioneran Data** {.tabset}
-
-### Dalam Ragam: Transformasi Data
-
-Referensi : <https://r-coder.com/box-cox-transformation-r/>
-
-Mengutip dari laman tersebut,
-
-| $\mathbf{\lambda}$ | **Transformation** |
-|:------------------:|:------------------:|
-|         -2         |      $1/x^2$       |
-|         -1         |       $1/x$        |
-|        -0.5        |    $1/\sqrt{x}$    |
-|         0          |    $\log{(x)}$     |
-|        0.5         |     $\sqrt{x}$     |
-|         1          |        $x$         |
-|         2          |       $x^2$        |
-
-Nilai *rounded value* ($\lambda$) optimum sebesar $-0.22$. Nilai ini mendekati nilai $0$, Sehingga akan menggunakan transformasi $\log{(x)}$.
 
 ```{r}
 train_amzn.ts.new <- log(train_amzn.ts)
