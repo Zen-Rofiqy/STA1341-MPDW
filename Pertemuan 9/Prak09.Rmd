@@ -1797,8 +1797,6 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 
 ```{r}
 #tak tolak H0 > sisaan homogen
-Box.test((sisaan_aapl.da)^2, type = "Ljung")  
-
 homogen <- data.frame(
   p.value = c(Box.test((sisaan_aapl.da)^2, type = "Ljung")[["p.value"]],
               Box.test((sisaan_amzn.da)^2, type = "Ljung")[["p.value"]], 
@@ -1810,7 +1808,7 @@ homogen <- data.frame(
               )
 ) 
 homogen$Keterangan <- ifelse(homogen$p.value < 0.05, 
-                              "Sisaan TTidak Homogen", 
+                              "Sisaan Tidak Homogen", 
                               "Sisaan Homogen")
 
 homogen$p.value <- ifelse(homogen$p.value == 0, "< 2.2e-16",
