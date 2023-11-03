@@ -1751,7 +1751,7 @@ datatable(r.normal, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Berdasarkan uji KS tersebut, didapat *p-value* sebesar $7.04\times10^{-11}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $7.04\times10^{-11}$ pada `AAPL` sedangkan lainnya sangat kecil yakni kurang dari $2.2\times10^{-16}$. Semua *p-value* nya kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
 
 #### Sisaan saling bebas
 
