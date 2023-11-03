@@ -1729,7 +1729,7 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 
 ```{r}
 #tak tolak H0 > sisaan menyebar normal
-r.normal <- data.frame(
+normal <- data.frame(
   p.value = c(ks.test(sisaan_aapl.da, "pnorm")[["p.value"]],
               ks.test(sisaan_amzn.da, "pnorm")[["p.value"]],
               ks.test(sisaan_goog.da, "pnorm")[["p.value"]],
@@ -1739,15 +1739,15 @@ r.normal <- data.frame(
               ks.test(sisaan_nvda.da, "pnorm")[["p.value"]]
               )
 ) 
-r.normal$Keterangan <- ifelse(r.normal$p.value < 0.05, 
+normal$Keterangan <- ifelse(normal$p.value < 0.05, 
                               "Sisaan Tidak Menyebar Normal", 
                               "Sisaan Menyebar Normal")
 
-r.normal$p.value <- ifelse(r.normal$p.value == 0, "< 2.2e-16",
-                           sprintf("%.2e", r.normal$p.value) )
+normal$p.value <- ifelse(normal$p.value == 0, "< 2.2e-16",
+                           sprintf("%.2e", normal$p.value) )
 
-rownames(r.normal) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
-datatable(r.normal, filter = 'top', 
+rownames(normal) <- unique(data$Name)
+datatable(normal, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
@@ -1756,7 +1756,28 @@ Berdasarkan uji KS tersebut, didapat *p-value* sebesar $7.04\times10^{-11}$ pada
 #### Sisaan saling bebas
 
 ```{r}
-Box.test(sisaan_aapl.da, type = "Ljung")  #tak tolak H0 > sisaan saling bebas
+#tak tolak H0 > sisaan saling bebas
+
+bebas <- data.frame(
+  p.value = c(Box.test(sisaan_aapl.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_amzn.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_goog.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_meta.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_msft.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_nflx.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_nvda.da, type = "Ljung")[["p.value"]]
+              )
+) 
+bebas$Keterangan <- ifelse(bebas$p.value < 0.05, 
+                              "Sisaan Tidak Saling Bebas", 
+                              "Sisaan Saling Bebas")
+
+bebas$p.value <- ifelse(bebas$p.value == 0, "< 2.2e-16",
+                           round(bebas$p.value, 2) )
+
+rownames(bebas) <- unique(data$Name)
+datatable(bebas, filter = 'top', 
+          options = list(pageLength = 7))
 ```
 
 Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
