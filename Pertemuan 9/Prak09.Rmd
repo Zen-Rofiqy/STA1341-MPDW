@@ -1753,7 +1753,7 @@ datatable(normal, filter = 'top',
 
 Berdasarkan uji KS tersebut, didapat *p-value* sebesar $7.04\times10^{-11}$ pada `AAPL` sedangkan lainnya sangat kecil yakni kurang dari $2.2\times10^{-16}$. Semua *p-value* nya kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
 
-#### Sisaan saling bebas
+### Sisaan saling bebas
 
 Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
 
@@ -1763,7 +1763,6 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 
 ```{r}
 #tak tolak H0 > sisaan saling bebas
-
 bebas <- data.frame(
   p.value = c(Box.test(sisaan_aapl.da, type = "Ljung")[["p.value"]],
               Box.test(sisaan_amzn.da, type = "Ljung")[["p.value"]],
@@ -1788,7 +1787,7 @@ datatable(bebas, filter = 'top',
 
 Berdasarkan uji Ljung-Box tersebut, semua *p-value* nya lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Yang berarti tidak ada autokorelasi. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
-#### Sisaan homogen
+### Sisaan homogen
 
 Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 
@@ -1797,7 +1796,29 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 > $H_1$ : Ragam sisaan tidak homogen
 
 ```{r}
-Box.test((sisaan_aapl.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+#tak tolak H0 > sisaan homogen
+Box.test((sisaan_aapl.da)^2, type = "Ljung")  
+
+homogen <- data.frame(
+  p.value = c(Box.test((sisaan_aapl.da)^2, type = "Ljung")[["p.value"]],
+              Box.test((sisaan_amzn.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_goog.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_meta.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_msft.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_nflx.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_nvda.da)^2, type = "Ljung")[["p.value"]]
+              )
+) 
+homogen$Keterangan <- ifelse(homogen$p.value < 0.05, 
+                              "Sisaan TTidak Homogen", 
+                              "Sisaan Homogen")
+
+homogen$p.value <- ifelse(homogen$p.value == 0, "< 2.2e-16",
+                           round(homogen$p.value, 2) )
+
+rownames(homogen) <- unique(data$Name)
+datatable(homogen, filter = 'top', 
+          options = list(pageLength = 7))
 ```
 
 Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.1129$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
