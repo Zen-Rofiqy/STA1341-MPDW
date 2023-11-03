@@ -1561,11 +1561,9 @@ model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
 
 Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
 
-## **Eksplorasi Sisaan**
+## **Eksplorasi Sisaan** {.tabset}
 
-### Plot Sisaan {.tabset}
-
-#### AAPL
+### AAPL
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1587,7 +1585,7 @@ pacf(sisaan_aapl.da)
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar** **normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(2,1,3)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
-#### AMZN
+### AMZN
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1609,7 +1607,7 @@ pacf(sisaan_amzn.da)
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik-titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
-#### GOOG
+### GOOG
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1631,7 +1629,7 @@ pacf(sisaan_goog.da)
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
-#### META
+### META
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1653,7 +1651,7 @@ pacf(sisaan_meta.da)
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
-#### MSFT
+### MSFT
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1675,7 +1673,7 @@ pacf(sisaan_msft.da)
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **menyebar tidak normal** ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
-#### NFLX
+### NFLX
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1697,7 +1695,7 @@ pacf(sisaan_nflx.da)
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
-#### NVDA
+### NVDA
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1719,12 +1717,25 @@ pacf(sisaan_nvda.da)
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **tidak normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
-### **Uji Formal** {.tabset}
+## **Uji Formal** {.tabset}
 
-#### Sisaan Menyebar Normal
+### Sisaan Menyebar Normal
 
 ```{r}
-ks.test(sisaan_aapl.da,"pnorm")  #tak tolak H0 > sisaan menyebar normal
+#tak tolak H0 > sisaan menyebar normal
+ks.test(sisaan_aapl.da,"pnorm")  
+
+r.normal <- data.frame(
+  p.value = c(ks.test(sisaan_aapl.da, "pnorm")[["p.value"]],
+               ks.test(sisaan_aapl.da, "pnorm")[["p.value"]],
+              )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+r.normal$Keterangan <- ifelse(r.normal$p.value < 0.05, "Rataan Stasioner", 
+                         "Rataan Tidak Stasioner")
+rownames(r.normal) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+datatable(r.normal, filter = 'top', 
+          options = list(pageLength = 7))
 ```
 
 Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
