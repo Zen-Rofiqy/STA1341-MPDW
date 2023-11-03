@@ -1633,11 +1633,19 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 
 #### META
 
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
 #### MSFT
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **menyebar tidak normal** ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 #### NFLX
 
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
 #### NVDA
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **tidak normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2325,8 +2333,6 @@ acf(sisaan_meta.da)
 pacf(sisaan_meta.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
-
 ### **Uji Formal** {.tabset}
 
 #### Sisaan Menyebar Normal
@@ -2614,8 +2620,6 @@ abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 acf(sisaan_msft.da) 
 pacf(sisaan_msft.da) 
 ```
-
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **menyebar tidak normal** ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
@@ -2905,8 +2909,6 @@ acf(sisaan_nflx.da)
 pacf(sisaan_nflx.da) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
-
 ### **Uji Formal** {.tabset}
 
 #### Sisaan Menyebar Normal
@@ -3186,8 +3188,6 @@ abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 acf(sisaan_nvda.da) 
 pacf(sisaan_nvda.da) 
 ```
-
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **tidak normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ### **Uji Formal** {.tabset}
 
