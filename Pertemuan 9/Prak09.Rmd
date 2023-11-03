@@ -1727,12 +1727,18 @@ ks.test(sisaan_aapl.da,"pnorm")
 
 r.normal <- data.frame(
   p.value = c(ks.test(sisaan_aapl.da, "pnorm")[["p.value"]],
-               ks.test(sisaan_aapl.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_amzn.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_goog.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_meta.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_msft.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_nflx.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_nvda.da, "pnorm")[["p.value"]]
               )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
-r.normal$Keterangan <- ifelse(r.normal$p.value < 0.05, "Rataan Stasioner", 
-                         "Rataan Tidak Stasioner")
+r.normal$Keterangan <- ifelse(r.normal$p.value < 0.05, 
+                              "Sisaan Tidak Menyebar Normal", 
+                              "Sisaan Menyebar Normal")
 rownames(r.normal) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
 datatable(r.normal, filter = 'top', 
           options = list(pageLength = 7))
