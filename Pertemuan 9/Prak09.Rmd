@@ -1755,6 +1755,12 @@ Berdasarkan uji KS tersebut, didapat *p-value* sebesar $7.04\times10^{-11}$ pada
 
 #### Sisaan saling bebas
 
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
 ```{r}
 #tak tolak H0 > sisaan saling bebas
 
@@ -1780,25 +1786,19 @@ datatable(bebas, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
-
-> $H_0$ : Sisaan saling bebas
->
-> $H_1$ : Sisaan tidak tidak saling bebas
-
-Berdasarkan uji Ljung-Box tersebut, didapat *p-value* sebesar $0.8337$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Yang berarti tidak ada autokorelasi. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, semua *p-value* nya lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Yang berarti tidak ada autokorelasi. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 #### Sisaan homogen
-
-```{r}
-Box.test((sisaan_aapl.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
-```
 
 Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 
 > $H_0$ : Ragam sisaan homogen
 >
 > $H_1$ : Ragam sisaan tidak homogen
+
+```{r}
+Box.test((sisaan_aapl.da)^2, type = "Ljung")  #tak tolak H0 > sisaan homogen
+```
 
 Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.1129$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
