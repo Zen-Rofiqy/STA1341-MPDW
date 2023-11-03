@@ -1295,7 +1295,7 @@ Identifikasi model dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel 
 3.  Jika *tail off* terjadi pada PACF → **model MA** → *cut off* pada ACF akan memberikan nilai q untuk MA(q).
 4.  Jika terjadi *tail off* pada kedua ACF dan PACF → **model ARMA**.
 
-### Plot PACF
+## Plot ACF & PACF
 
 ```{r fig.align=, fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 par(mfrow=c(2,4))
@@ -1369,7 +1369,7 @@ datatable(acf.pacf.tab, filter = 'top',
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
-### Tabel EACF {.tabset}
+## Tabel EACF {.tabset}
 
 Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Sebagai contoh :
 
@@ -1377,7 +1377,7 @@ Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut ki
 
 Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
-#### AAPL
+### AAPL
 
 ```{r message=FALSE, warning=FALSE}
 install_load('TSA')
@@ -1467,43 +1467,97 @@ Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2139.54$ dimiliki o
 model_aapl.da <- Arima(train_aapl.diff, order=c(2,1,3), method="ML")
 ```
 
-#### AMZN
+### AMZN
 
 ```{r}
-eacf(train_amzn.diff)
+model.tentaif_amzn <- 
+  model_tentatif(train_amzn.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_amzn, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
-#### GOOG
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2101.57$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
-eacf(train_goog.diff)
+model_amzn.da <- Arima(train_amzn.diff, order=c(0,1,1), method="ML")
 ```
 
-#### META
+### GOOG
 
 ```{r}
-eacf(train_meta.diff)
+model.tentaif_goog <- 
+  model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_goog, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
-#### MSFT
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2301.96$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
-eacf(train_msft.diff)
+model_goog.da <- Arima(train_goog.diff, order=c(0,1,1), method="ML")
 ```
 
-#### NFLX
+### META
 
 ```{r}
-eacf(train_nflx.diff)
+model.tentaif_meta <- 
+  model_tentatif(train_meta.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_meta, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
-#### NVDA
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1815.84$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
 
 ```{r}
-eacf(train_nvda.diff)
+model_meta.da <- Arima(train_meta.diff, order=c(0,1,1), method="ML")
 ```
 
-## **Analisis Sisaan**
+### MSFT
+
+```{r}
+model.tentaif_msft <- 
+  model_tentatif(train_msft.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2421.48$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_msft.da <- Arima(train_msft.diff, order=c(0,1,1), method="ML")
+```
+
+### NFLX
+
+```{r}
+model.tentaif_nflx <- 
+  model_tentatif(train_nflx.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1759.09$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_nflx.da <- Arima(train_nflx.diff, order=c(0,1,1), method="ML")
+```
+
+### NVDA
+
+```{r}
+model.tentaif_nvda <- 
+  model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1578.14$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
+```
+
+# **Analisis Sisaan**
 
 Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
 
