@@ -1295,13 +1295,38 @@ Identifikasi model dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel 
 3.  Jika *tail off* terjadi pada PACF → **model MA** → *cut off* pada ACF akan memberikan nilai q untuk MA(q).
 4.  Jika terjadi *tail off* pada kedua ACF dan PACF → **model ARMA**.
 
-### Plot ACF
+### Plot PACF
+
+```{r fig.align=, fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+par(mfrow=c(2,4))
+pacf(train_aapl.diff, ylim=c(-.1,.1) , main="")
+mtext("AAPL", side=3, line=1, cex=2, font=2)
+
+pacf(train_amzn.diff, ylim=c(-.1,.1) , main="")
+mtext("AMZN", side=3, line=1, cex=2, font=2)
+
+pacf(train_goog.diff, ylim=c(-.1,.1) , main="")
+mtext("GOOG", side=3, line=1, cex=2, font=2)
+
+pacf(train_meta.diff, ylim=c(-.1,.1) , main="")
+mtext("META", side=3, line=1, cex=2, font=2)
+
+pacf(train_msft.diff, ylim=c(-.1,.1) , main="")
+mtext("MSFT", side=3, line=1, cex=2, font=2)
+
+pacf(train_nflx.diff, ylim=c(-.1,.1) , main="")
+mtext("NFLX", side=3, line=1, cex=2, font=2)
+
+pacf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+mtext("NVDA", side=3, line=1, cex=2, font=2)
+```
 
 Referensi : [Significance level of ACF and PACF in R](https://stackoverflow.com/questions/29996910/significance-level-of-acf-and-pacf-in-r){.uri}
 
 ```{r}
-acf.pacf <- function(dt){
-  N <- acf(dt, plot = F)[["n.used"]] + 1
+acf.pacf <- function(dt){ #Fungsi Deteksi Cut off plot ACF & PACF
+  N <- acf(dt, plot = F)[["n.used"]] + 1 #Banyaknya Data
+  #Garis Signifikan
   sl <- c(-1,1)*(exp(2*1.96/sqrt(N-3))-1)/(exp(2*1.96/sqrt(N-3))+1)
   acf <- data.frame( lag = acf(dt, plot=F)[["lag"]], 
                      acf = acf(dt, plot=F)[["acf"]] ) 
@@ -1317,28 +1342,26 @@ acf.pacf <- function(dt){
         filter(acf <= min(sl) | acf >= max(sl)) %>%
         dplyr::select(lag); colnames(cut.off2) <- "pacf"
     
-  cut.off <- merge(cut.off, cut.off2, by = 0, all = TRUE)[-1]
+  cut.off <- merge(cut.off1, cut.off2, by = 0, all = TRUE)[-1]
   return(cut.off)
 }
 
-acf.pacf_aapl <- acf.pacf(dt = train_aapl.diff) %>% 
-  rename(AAPL.a=acf, AAPL.p=pacf)
-acf.pacf_amzn <- acf.pacf(dt = train_amzn.diff) %>% 
-  rename(AMZN.a=acf, AMZN.p=pacf)
-acf.pacf_goog <- acf.pacf(dt = train_goog.diff) %>% 
-  rename(GOOG.a=acf, GOOG.p=pacf)
-acf.pacf_meta <- acf.pacf(dt = train_meta.diff) %>% 
-  rename(META.a=acf, META.p=pacf)
-acf.pacf_msft <- acf.pacf(dt = train_msft.diff) %>% 
-  rename(MSFT.a=acf, MSFTL.p=pacf)
-acf.pacf_nflx <- acf.pacf(dt = train_nflx.diff) %>% 
-  rename(NFLX.a=acf, NFLX.p=pacf)
-acf.pacf_nvda <- acf.pacf(dt = train_nvda.diff) %>% 
-  rename(NVDA.a=acf, NVDA.p=pacf)
+data_frames <- list(
+  train_aapl.diff, train_amzn.diff, train_goog.diff,
+  train_meta.diff, train_msft.diff, train_nflx.diff,
+  train_nvda.diff
+)
 
-acf.pacf.tab <- (cbind(acf.pacf_aapl, acf.pacf_amzn, acf.pacf_goog, 
-                      acf.pacf_meta, acf.pacf_msft, acf.pacf_nflx, 
-                      acf.pacf_nvda))
+name <- unique(data$Name)
+
+acf.pacf.tab <- data.frame()
+for(i in 1:length(name)){
+  dex <- data_frames[[i]] %>% acf.pacf() %>% 
+  rename(!!paste0(col_names[i], ".a") := acf, 
+         !!paste0(col_names[i], ".p") := pacf)
+  
+    acf.pacf.tab <- merge(acf.pacf.tab, dex, by=0, all=TRUE)[-1]
+}
 
 datatable(acf.pacf.tab, filter = 'top', 
           options = list(pageLength = 7))
@@ -1346,26 +1369,56 @@ datatable(acf.pacf.tab, filter = 'top',
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
-### Plot PACF
-
-```{r}
-pacf(train_aapl.diff)
-```
-
-Berdasarkan plot PACF tersebut, terlihat bahwa cuts off pada lag 13 dan 14. Maka model tidak dapat di identifikasi dengan plot PACF.
-
-### Plot EACF
-
-```{r message=FALSE, warning=FALSE}
-install_load('TSA')
-eacf(train_aapl.diff)
-```
+### Tabel EACF {.tabset}
 
 Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Sebagai contoh :
 
 ![](images/Screenshot%202023-10-15%20234003-01.png)
 
 Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+#### AAPL
+
+```{r message=FALSE, warning=FALSE}
+install_load('TSA')
+eacf(train_aapl.diff)
+```
+
+#### AMZN
+
+```{r}
+eacf(train_amzn.diff)
+```
+
+#### GOOG
+
+```{r}
+eacf(train_goog.diff)
+```
+
+#### META
+
+```{r}
+eacf(train_meta.diff)
+```
+
+#### MSFT
+
+```{r}
+eacf(train_msft.diff)
+```
+
+#### NFLX
+
+```{r}
+eacf(train_nflx.diff)
+```
+
+#### NVDA
+
+```{r}
+eacf(train_nvda.diff)
+```
 
 ## **Pendugaan Parameter Model Tentatif**
 
