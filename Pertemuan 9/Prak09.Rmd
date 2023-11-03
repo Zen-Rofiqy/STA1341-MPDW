@@ -1381,62 +1381,6 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 
 ```{r message=FALSE, warning=FALSE}
 install_load('TSA')
-eacf(train_aapl.diff)
-```
-
-#### AMZN
-
-```{r}
-eacf(train_amzn.diff)
-```
-
-#### GOOG
-
-```{r}
-eacf(train_goog.diff)
-```
-
-#### META
-
-```{r}
-eacf(train_meta.diff)
-```
-
-#### MSFT
-
-```{r}
-eacf(train_msft.diff)
-```
-
-#### NFLX
-
-```{r}
-eacf(train_nflx.diff)
-```
-
-#### NVDA
-
-```{r}
-eacf(train_nvda.diff)
-```
-
-## **Pendugaan Parameter Model Tentatif**
-
-Untuk menduga parameter model tentatif, kami akan menggunakan function berdasarkan plot EACF yang sudah dirancang sebagai berikut.
-
-Keterangan parameter function :
-
--   `data` = data Time Series baik yang sudah di `.diff` maupun belum
-
--   `p_max` = ordo maksimal dari **AR**
-
--   `d` = ordo **I**
-
--   `q_max` = ordo maksimal dari **MA**
-
--   `alpha` = alpha
-
-```{r message=FALSE, warning=FALSE}
 install_load('forecast')
 
 # Fungsi untuk menghitung model ARIMA dan menganalisis parameter
@@ -1521,6 +1465,42 @@ Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2139.54$ dimiliki o
 
 ```{r}
 model_aapl.da <- Arima(train_aapl.diff, order=c(2,1,3), method="ML")
+```
+
+#### AMZN
+
+```{r}
+eacf(train_amzn.diff)
+```
+
+#### GOOG
+
+```{r}
+eacf(train_goog.diff)
+```
+
+#### META
+
+```{r}
+eacf(train_meta.diff)
+```
+
+#### MSFT
+
+```{r}
+eacf(train_msft.diff)
+```
+
+#### NFLX
+
+```{r}
+eacf(train_nflx.diff)
+```
+
+#### NVDA
+
+```{r}
+eacf(train_nvda.diff)
 ```
 
 ## **Analisis Sisaan**
