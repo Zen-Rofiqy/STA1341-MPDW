@@ -1561,7 +1561,7 @@ model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
 
 Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
 
-### **Eksplorasi Sisaan**
+## **Eksplorasi Sisaan**
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1572,7 +1572,7 @@ qqnorm(sisaan_aapl.da)
 qqline(sisaan_aapl.da, col = "dodgerblue3", lwd = 2.5) 
 # Plot sisaan
 plot(c(1:length(sisaan_aapl.da)), sisaan_aapl.da, 
-     main = "Plot Sisaan Model ARIMA",
+     main = "Sisaan Model ARIMA",
      xlab = "Periode",
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
