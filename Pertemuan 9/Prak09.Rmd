@@ -1812,14 +1812,14 @@ homogen$Keterangan <- ifelse(homogen$p.value < 0.05,
                               "Sisaan Homogen")
 
 homogen$p.value <- ifelse(homogen$p.value == 0, "< 2.2e-16",
-                           round(homogen$p.value, 2) )
+                           round(homogen$p.value, 3) )
 
 rownames(homogen) <- unique(data$Name)
 datatable(homogen, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, didapat *p-value* sebesar $0.1129$ yang lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, hanya ada 2 yang lebih kecil dari dari taraf nyata $5\%$ yakni `AMZN` dan `GOOG`. Yang berarti **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**. Sisanya lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
 
 #### Nilai tengah sama dengan nol
 
