@@ -1228,7 +1228,7 @@ plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)",
 
 Berdasarkan plot data deret waktu yang sudah di *Differencing*, terlihat bahwa seluruh data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
 
-## Uji Ulang 
+## Uji Ulang
 
 Akan dilakukan uji ulang untuk mengecek kestasioneran data dalam rataan.
 
