@@ -1721,10 +1721,14 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan me
 
 ### Sisaan Menyebar Normal
 
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
 ```{r}
 #tak tolak H0 > sisaan menyebar normal
-ks.test(sisaan_aapl.da,"pnorm")  
-
 r.normal <- data.frame(
   p.value = c(ks.test(sisaan_aapl.da, "pnorm")[["p.value"]],
               ks.test(sisaan_amzn.da, "pnorm")[["p.value"]],
@@ -1734,21 +1738,18 @@ r.normal <- data.frame(
               ks.test(sisaan_nflx.da, "pnorm")[["p.value"]],
               ks.test(sisaan_nvda.da, "pnorm")[["p.value"]]
               )
-) %>%
-  mutate(across(where(is.numeric), ~round(., 2)))
+) 
 r.normal$Keterangan <- ifelse(r.normal$p.value < 0.05, 
                               "Sisaan Tidak Menyebar Normal", 
                               "Sisaan Menyebar Normal")
+
+r.normal$p.value <- ifelse(r.normal$p.value == 0, "< 2.2e-16",
+                           sprintf("%.2e", r.normal$p.value) )
+
 rownames(r.normal) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
 datatable(r.normal, filter = 'top', 
           options = list(pageLength = 7))
 ```
-
-Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
-
-> $H_0$ : Sisaan menyebar normal
->
-> $H_1$ : Sisaan tidak menyebar normal
 
 Berdasarkan uji KS tersebut, didapat *p-value* sebesar $7.04\times10^{-11}$ yang kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
 
