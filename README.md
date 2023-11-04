@@ -12,7 +12,24 @@ Data Deret Waktu, serta pemodelan data deret waktu ARIMA(p,d,q) melalui Metode B
 [`STA1231 - Analisis Regresi`](https://krs.ipb.ac.id/mk/167366)  
   
 ## Install Mendeley
-https://simak.ipb.ac.id/Foto/Panduan/Dokumen_44.pdf
+https://simak.ipb.ac.id/Foto/Panduan/Dokumen_44.pdf  
+
+## Metode Selain ARIMA
+* **ARIMAX:**
+  - https://rpubs.com/denannn/kel1par3datainflasi2  
+  - https://rpubs.com/cdorante/ec2004_w6
+* **SARIMA:**
+  - https://rpubs.com/Akbar_rizki/sarima
+  - https://rpubs.com/auliaann/905379
+* **ARCH/GARCH:**
+  - https://rpubs.com/spiffy/archgarchsahamamazon
+* **LSTM:**
+  - (LSTM)[https://www.r-bloggers.com/2018/04/time-series-deep-learning-forecasting-sunspots-with-keras-stateful-lstm-in-r/]
+> **Note :** `ARCH/GARCH`   
+> Untuk mengambil hasil forecast menggunakan ugarchforecast,  
+    -> gunakan: `hasil_forecast <- objek_hasil_forecast@forecast[["seriesFor"]]`  
+> Lanjutkan dengan melakukan differencing inv menggunakan syntax pertemuan sebelumnya  
+            
   
 ### Extras 
 Kalo mau download Semua file di repo pake ini:  
