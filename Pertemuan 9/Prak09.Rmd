@@ -1896,7 +1896,7 @@ plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4,
      lwd=2.5, col = "green4")
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Transformasi Balik
@@ -2016,7 +2016,9 @@ ggsave("09_banding_ramal.png", chart, path = export.chart,
 
 Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sedikit menaikonstan setiap periodenya. Sedangkan harga saham lainnya cenderung naik dengan drastis.
 
-## Perbandingan Data Aktual dengan Data Ramal
+## Perbandingan Data Aktual dengan Data Ramal {.tabset}
+
+### AAPL 
 
 ```{r}
 perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=h), ramal_aapl[-1]),
@@ -2024,6 +2026,42 @@ perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=h), ramal_aapl[-1]),
 colnames(perbandingan_aapl.da) <- c("Aktual","Ramal")
 datatable(perbandingan_aapl.da, filter = 'top', 
           options = list(pageLength = 5))
+```
+
+### AMZN 
+
+```{r}
+
+```
+
+### GOOG 
+
+```{r}
+
+```
+
+### META 
+
+```{r}
+
+```
+
+### MSFT
+
+```{r}
+
+```
+
+### NFLX 
+
+```{r}
+
+```
+
+### NVDA
+
+```{r}
+
 ```
 
 ```{r}
