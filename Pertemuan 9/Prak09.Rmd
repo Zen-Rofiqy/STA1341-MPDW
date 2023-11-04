@@ -1867,7 +1867,7 @@ ramalan_nflx.da <- forecast::forecast(model_nflx.da, h = nrow(test_nflx))
 ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = nrow(test_nvda)) 
 ```
 
-### Plot Ramalan
+## Plot Ramalan
 
 ```{r dpi=300, fig.height = 8, fig.width = 25, fig.align = "center"}
 data.ramalan_aapl.da <- ramalan_aapl.da$mean
@@ -1924,24 +1924,104 @@ ramal_nflx <- diffinv(ramal_nflx, differences=1) +
 ramal_nvda <- diffinv(ramal_nvda, differences=1) +
   train_nvda.ts[length(train_nvda.ts)]
 
-
-
-
-#has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
-ts.plot(train_aapl.ts, ramal_aapl,  xlab="Periode (Hari)", 
-        col = "lightskyblue4", lwd = 3,
-        ylab="Saham Harga (USD)",
-        main="Plot Ramalan Saham Apple Selama 115 Hari Kedepan")
+ramal <- data.frame(
+  Date = data2 %>% dplyr::select(Date)  ,
+  `Adj Close` = c(as.vector(train_aapl.ts), ramal_aapl[-1],
+                  as.vector(train_amzn.ts), ramal_amzn[-1],
+                  as.vector(train_goog.ts), ramal_goog[-1],
+                  as.vector(train_meta.ts), ramal_meta[-1],
+                  as.vector(train_msft.ts), ramal_msft[-1],
+                  as.vector(train_nflx.ts), ramal_nflx[-1],
+                  as.vector(train_nvda.ts), ramal_nvda[-1] ),
+  Name = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
+              each = length(train_aapl.ts) + h)
+)
+colnames(ramal) <- c("Date", "Adj Close", "Name")
 ```
 
-Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sedikit menaik setiap periodenya.
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=TRUE, message = FALSE}
+chart <- 
+ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
+  #Label Data Asli 
+  annotate( "rect", alpha=0.1, fill="seagreen",
+            xmin=as.Date(min(data3$Date)), 
+            xmax=as.Date(data3$Date[ceiling(nrow(train_aapl))]),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="seagreen",
+            x = as.Date(data3$Date[ceiling(nrow(train_aapl)/2)]), 
+            y = max(data3$`Adj Close`) * 0.95, 
+    label = "Data Asli", size=10) + 
+  
+  #Label Data Ramal
+  annotate( "rect", alpha=0.1, fill="violetred",
+            xmin=as.Date(data3$Date[ceiling(nrow(train_aapl))]), 
+            xmax=as.Date(max(data3$Date)),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="violetred",
+            x = as.Date(data3$Date[ceiling(0.9 * length(data3$Date)/7)]) , 
+            y = max(data3$`Adj Close`) * 0.95, 
+    label = "Data Ramal\n115 Hari", size=10) +
+  #Time Series
+  geom_line(aes(color=Name), linewidth=1.5) +
+  #Warna Saham
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Ramalan Saham MAANG",
+       subtitle = "Peramalan Saham MAANG Selama 115 Hari Kedepan\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data3[data3$Date == max(data3$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data3$Date)), 
+               as.Date(max(data3$Date)) + 60)
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.Date(data3$Date[ceiling(nrow(train_aapl))]) , 
+             linetype = "dotted", color = "black", linewidth = 2)
+chart
+#Export Chart
+ggsave("09_banding_ramal.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
 
-### Perbandingan
+Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sedikit menaikonstan setiap periodenya. Sedangkan harga saham lainnya cenderung naik dengan drastis.
+
+## Perbandingan Data Aktual dengan Data Ramal
 
 ```{r}
 perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=h), ramal_aapl[-1]),
                      nrow = h, ncol = 2)
-colnames(perbandingan_aapl.da) <- c("Aktual","Hasil Forecast")
+colnames(perbandingan_aapl.da) <- c("Aktual","Ramal")
 datatable(perbandingan_aapl.da, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -3611,92 +3691,8 @@ Dari Semua data ujinya memiliki pola yang cenderung tren naik.
 
 ```{r}
 #Pnggabungan data
-data3 <- data.frame(
-  Date = data2 %>% dplyr::select(Date)  ,
-  `Adj Close` = c(as.vector(train_aapl.ts), ramal_aapl[-1],
-                  as.vector(train_amzn.ts), ramal_amzn[-1],
-                  as.vector(train_goog.ts), ramal_goog[-1],
-                  as.vector(train_meta.ts), ramal_meta[-1],
-                  as.vector(train_msft.ts), ramal_msft[-1],
-                  as.vector(train_nflx.ts), ramal_nflx[-1],
-                  as.vector(train_nvda.ts), ramal_nvda[-1] ),
-  Name = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
-              each = length(train_aapl.ts) + h)
-)
-colnames(data3) <- c("Date", "Adj Close", "Name")
+
 ```
 
-```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=TRUE, message = FALSE}
-chart <- 
-ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
-  #Label Data Asli 
-  annotate( "rect", alpha=0.1, fill="seagreen",
-            xmin=as.Date(min(data3$Date)), 
-            xmax=as.Date(data3$Date[ceiling(nrow(train_aapl))]),
-            ymin=0, ymax=Inf ) + 
-  
-  annotate( "text", color="seagreen",
-            x = as.Date(data3$Date[ceiling(nrow(train_aapl)/2)]), 
-            y = max(data3$`Adj Close`) * 0.95, 
-    label = "Data Asli", size=10) + 
-  
-  #Label Data Ramal
-  annotate( "rect", alpha=0.1, fill="violetred",
-            xmin=as.Date(data3$Date[ceiling(nrow(train_aapl))]), 
-            xmax=as.Date(max(data3$Date)),
-            ymin=0, ymax=Inf ) + 
-  
-  annotate( "text", color="violetred",
-            x = as.Date(data3$Date[ceiling(0.9 * length(data3$Date)/7)]) , 
-            y = max(data3$`Adj Close`) * 0.95, 
-    label = "Data Ramal\n115 Hari", size=10) +
-  #Time Series
-  geom_line(aes(color=Name), linewidth=1.5) +
-  #Warna Saham
-  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
-                                MSFT="deepskyblue2", META="dodgerblue3", 
-                                AAPL="lightskyblue4",
-                                GOOG="gold3", AMZN="orange2") ) +
-  theme.ts + #THeme
-  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Ramalan Saham MAANG",
-       subtitle = "Peramalan Saham MAANG Selama 115 Hari Kedepan\n") +
-  # Label / legend
-  geom_text_repel(
-    data=data3[data3$Date == max(data3$Date),], #Posisi di ujung data
-    aes(color = Name, label = Name), #Warna garis & label saham
-    size = 8, #Ukuran text
-    nudge_x = 20, #Posisi Text (kanan 50)
-    hjust = 0, #Ujung
-    segment.size = 1,               #Ukuran garis
-    segment.alpha = .75,             #transparasi garis
-    segment.linetype = "dotted",    #Time garis
-    box.padding = .4, #Biar label saham nggak dempetan
-    segment.curvature = -0.1, #biar garis mulus
-    segment.ncp = 8, 
-    segment.angle = 60 
-  ) +
-  #Axis
-    coord_cartesian(clip = "off"
-  ) +
-    scale_x_date( #Sumbu x
-    date_breaks = "1 year",  # Menampilkan label setiap tahun
-    date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date(min(data3$Date)), 
-               as.Date(max(data3$Date)) + 60)
-  ) +
-    scale_y_continuous( #Sumbu y
-    labels = scales::dollar_format(prefix = "$") #tambahin dolar
-  ) +
-    annotate( #Buat nandain batas data
-    "text", x = as.Date("2023-7-28"), y = 50, 
-    label = "28 Juli", size=6
-  ) +
-  geom_vline( #Buat garis batas data
-    xintercept = as.Date(data3$Date[ceiling(nrow(train_aapl))]) , 
-             linetype = "dotted", color = "black", linewidth = 2)
-chart
-#Export Chart
-ggsave("09_banding_ramal.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 20)
+```{}
 ```
