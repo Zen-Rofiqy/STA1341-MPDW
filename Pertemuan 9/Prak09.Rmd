@@ -156,7 +156,7 @@ data2 <- data
 
 ### Cek Periode Data
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 install_load("lubridate")
 
 dates <- as.Date(data$Date)
@@ -179,7 +179,7 @@ if (length(missing_dates) == 0) {
 
 **Inputasi Data**
 
-```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+```{r fig.align=, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
 install_load('purrr')
 # Fungsi untuk mengisi data yang hilang
 fill_missing_data <- function(name) {
@@ -1829,8 +1829,25 @@ drift1 <- data.frame(
   )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
-
 rownames(drift1) <- unique(data$Name)
+
+drift1$Keterangan <-
+ c(drift1_aapl[which(drift1_aapl$Model == 
+                     drift1["Model"]["AAPL",]), "Keterangan"],
+   drift1_amzn[which(drift1_amzn$Model == 
+                     drift1["Model"]["AMZN",]), "Keterangan"],
+   drift1_goog[which(drift1_goog$Model == 
+                     drift1["Model"]["GOOG",]), "Keterangan"],
+   drift1_meta[which(drift1_meta$Model == 
+                     drift1["Model"]["META",]), "Keterangan"],
+   drift1_msft[which(drift1_msft$Model == 
+                     drift1["Model"]["MSFT",]), "Keterangan"],
+   drift1_nflx[which(drift1_nflx$Model == 
+                     drift1["Model"]["NFLX",]), "Keterangan"],
+   drift1_nvda[which(drift1_nvda$Model == 
+                     drift1["Model"]["NVDA",]), "Keterangan"]
+   )
+
 datatable(drift1, filter = 'top', 
           options = list(pageLength = 7))
 ```
@@ -1950,39 +1967,56 @@ model_nvda.drift2 <- Arima(train_nvda.diff, order=c(4,0,5), method="ML")
 drift2 <- data.frame(
   Model = 
     c( paste("ARIMA(", paste(as.character(
-          model_aapl.drift1[["call"]][["order"]][-1]), 
+          model_aapl.drift2[["call"]][["order"]][-1]), 
           collapse = ","), ")", sep = ""),
        paste("ARIMA(", paste(as.character(
-          model_amzn.drift1[["call"]][["order"]][-1]), 
+          model_amzn.drift2[["call"]][["order"]][-1]), 
           collapse = ","), ")", sep = ""),
        paste("ARIMA(", paste(as.character(
-          model_goog.drift1[["call"]][["order"]][-1]), 
+          model_goog.drift2[["call"]][["order"]][-1]), 
           collapse = ","), ")", sep = ""),
        paste("ARIMA(", paste(as.character(
-          model_meta.drift1[["call"]][["order"]][-1]), 
+          model_meta.drift2[["call"]][["order"]][-1]), 
           collapse = ","), ")", sep = ""),
        paste("ARIMA(", paste(as.character(
-          model_msft.drift1[["call"]][["order"]][-1]), 
+          model_msft.drift2[["call"]][["order"]][-1]), 
           collapse = ","), ")", sep = ""),
        paste("ARIMA(", paste(as.character(
-          model_nflx.drift1[["call"]][["order"]][-1]), 
+          model_nflx.drift2[["call"]][["order"]][-1]), 
           collapse = ","), ")", sep = ""),
        paste("ARIMA(", paste(as.character(
-          model_nvda.drift1[["call"]][["order"]][-1]), 
+          model_nvda.drift2[["call"]][["order"]][-1]), 
           collapse = ","), ")", sep = "")
   ),
-  AIC = c(model_aapl.drift1[["aicc"]],
-          model_amzn.drift1[["aicc"]],
-          model_goog.drift1[["aicc"]],
-          model_meta.drift1[["aicc"]],
-          model_msft.drift1[["aicc"]],
-          model_nflx.drift1[["aicc"]],
-          model_nvda.drift1[["aicc"]]
+  AIC = c(model_aapl.drift2[["aicc"]],
+          model_amzn.drift2[["aicc"]],
+          model_goog.drift2[["aicc"]],
+          model_meta.drift2[["aicc"]],
+          model_msft.drift2[["aicc"]],
+          model_nflx.drift2[["aicc"]],
+          model_nvda.drift2[["aicc"]]
   )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
-
 rownames(drift2) <- unique(data$Name)
+
+drift2$Keterangan <-
+ c(drift2_aapl[which(drift2_aapl$Model == 
+                     drift2["Model"]["AAPL",]), "Keterangan"],
+   drift2_amzn[which(drift2_amzn$Model == 
+                     drift2["Model"]["AMZN",]), "Keterangan"],
+   drift2_goog[which(drift2_goog$Model == 
+                     drift2["Model"]["GOOG",]), "Keterangan"],
+   drift2_meta[which(drift2_meta$Model == 
+                     drift2["Model"]["META",]), "Keterangan"],
+   drift2_msft[which(drift2_msft$Model == 
+                     drift2["Model"]["MSFT",]), "Keterangan"],
+   drift2_nflx[which(drift2_nflx$Model == 
+                     drift2["Model"]["NFLX",]), "Keterangan"],
+   drift2_nvda[which(drift2_nvda$Model == 
+                     drift2["Model"]["NVDA",]), "Keterangan"]
+   )
+
 datatable(drift2, filter = 'top', 
           options = list(pageLength = 7))
 ```
