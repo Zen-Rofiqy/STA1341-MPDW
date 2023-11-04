@@ -1696,7 +1696,11 @@ datatable(drift1_aapl, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Model Terbaik tidak ditemukan karena tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
+
+```{r}
+model_aapl.drift1 <- Arima(train_aapl.ts, order=c(3,1,3), method="ML")
+```
 
 ### AMZN 
 
@@ -1705,6 +1709,12 @@ drift1_amzn <-
   model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12)
 datatable(drift1_amzn, filter = 'top', 
           options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2295.54$ dimiliki oleh model `ARIMA(1,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(1,1,1)`.
+
+```{r}
+model_amzn.drift1 <- Arima(train_amzn.ts, order=c(1,1,1), method="ML")
 ```
 
 ### GOOG 
@@ -1716,6 +1726,12 @@ datatable(drift1_goog, filter = 'top',
           options = list(pageLength = 5))
 ```
 
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2002.22$.
+
+```{r}
+model_goog.drift1 <- Arima(train_goog.ts, order=c(3,1,3), method="ML")
+```
+
 ### META 
 
 ```{r message=FALSE, warning=FALSE}
@@ -1723,6 +1739,12 @@ drift1_meta <-
   model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12)
 datatable(drift1_meta, filter = 'top', 
           options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,5)` dengan nilai AIC sebesar $3002.21$.
+
+```{r}
+model_meta.drift1 <- Arima(train_meta.ts, order=c(3,1,5), method="ML")
 ```
 
 ### MSFT 
@@ -1734,6 +1756,12 @@ datatable(drift1_msft, filter = 'top',
           options = list(pageLength = 5))
 ```
 
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2668.42$ dimiliki oleh model `ARIMA(3,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,1,3)`.
+
+```{r}
+model_msft.drift1 <- Arima(train_msft.ts, order=c(3,1,3), method="ML")
+```
+
 ### NFLX 
 
 ```{r message=FALSE, warning=FALSE}
@@ -1743,6 +1771,12 @@ datatable(drift1_nflx, filter = 'top',
           options = list(pageLength = 5))
 ```
 
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3474.44$ dimiliki oleh model `ARIMA(3,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,1,3)`.
+
+```{r}
+model_nflx.drift1 <- Arima(train_nflx.ts, order=c(3,1,3), method="ML")
+```
+
 ### NVDA
 
 ```{r message=FALSE, warning=FALSE}
@@ -1750,6 +1784,18 @@ drift1_nvda <-
   model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12)
 datatable(drift1_nvda, filter = 'top', 
           options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3105.62$ dimiliki oleh model `ARIMA(2,1,2)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,2)`.
+
+```{r}
+model_nvda.drift1 <- Arima(train_nvda.ts, order=c(2,1,2), method="ML")
+```
+
+### Model Terbaik
+
+```{r}
+
 ```
 
 # **Analisis Sisaan**
