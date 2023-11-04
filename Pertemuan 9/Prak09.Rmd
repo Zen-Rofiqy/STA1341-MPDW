@@ -409,7 +409,7 @@ ggsave("01_Time Series MAANG_2022-2023.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 23)
 ```
 
-### AAPL
+### AAPL {style=".color:lightskyblue4;"}
 
 ```{r}
 aapl <- data2 %>%
@@ -1224,15 +1224,15 @@ Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kep
 
 Mengutip dari laman [r-coder.com](https://r-coder.com/box-cox-transformation-r/){.uri}, formula transformasi data disesuaikan dengan nilai *rounded value* ($\lambda$) optimumnya.
 
-| $\mathbf{\lambda}$ | **Transformation** |
-|:------------------:|:------------------:|
-|         -2         |      $1/x^2$       |
-|         -1         |       $1/x$        |
-|        -0.5        |    $1/\sqrt{x}$    |
-|         0          |    $\log{(x)}$     |
-|        0.5         |     $\sqrt{x}$     |
-|         1          |        $x$         |
-|         2          |       $x^2$        |
+| $\mathbf{\lambda}$ | **Transformasi** | **Transformasi Balik** |
+|:------------------:|:----------------:|:----------------------:|
+|         -2         |     $1/x^2$      |      $1/\sqrt{x}$      |
+|         -1         |      $1/x$       |         $1/x$          |
+|        -0.5        |   $1/\sqrt{x}$   |        $1/x^2$         |
+|         0          |   $\log{(x)}$    |         $e^x$          |
+|        0.5         |    $\sqrt{x}$    |         $x^2$          |
+|         1          |       $x$        |          $x$           |
+|         2          |      $x^2$       |       $\sqrt{x}$       |
 
 : Karena semua data saham yang tidak stasioner memiliki nilai *rounded value* ($\lambda$) optimum nya mendekati 0, maka transformasi yang digunakan adalah transformasi $\log{(x)}$ dengan transfromasi baliknya $e^x$ atau $\exp{(x)}$.
 
@@ -1265,7 +1265,7 @@ bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-5, 6, by=.01))
 title("NVDA", cex.main=3)
 ```
 
-Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap rangkaian data sekarang mencakup nilai satu dalam selangnya, yang menunjukkan bahwa data tersebut sekarang sudah stasioner dalam ragam.
+Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap rangkaian data sekarang mencakup nilai satu dalam selangnya, yang menunjukkan bahwa data tersebut sekarang sudah **stasioner dalam ragam**.
 
 ### Dalam Rataan: Differencing
 
