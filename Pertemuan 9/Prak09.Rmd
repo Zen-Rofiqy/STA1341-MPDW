@@ -1852,7 +1852,7 @@ datatable(nol, filter = 'top',
 
 Berdasarkan uji-t tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
-# **Peramalan** {.tabset}
+# **Peramalan**
 
 Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk $h$ hari ke depan. Dengan $h$ adalah banyaknya data test per perusahaan.
 
@@ -1880,15 +1880,53 @@ data.ramalan_nvda.da <- ramalan_nvda.da$mean
 
 #Plot
 par(mfrow=c(2,4))
-plot(ramalan_aapl.da, col="lightskyblue4", main="AAPL", cex.main=4, lwd=2)
+plot(ramalan_aapl.da, main="AAPL", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col="lightskyblue4")
+plot(ramalan_amzn.da, main="AMZN", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "orange2")
+plot(ramalan_goog.da, main="GOOG", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "gold3")
+plot(ramalan_meta.da, main="META", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "dodgerblue3")
+plot(ramalan_msft.da, main="MSFT", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "deepskyblue2")
+plot(ramalan_nflx.da, main="NFLX", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "firebrick3")
+plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "green4")
 ```
 
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa ramalan `ARIMA(0,1,1)` cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode. Selanjutnya, dapat dicari nilai akurasi antara hasil ramalan dengan data uji sebagai berikut.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
-pt_1 <- train_aapl.ts[length(train_aapl.ts)] #nilai akhir data latih
-hasil.forc.Diff <- data.ramalan_aapl.da
-ramal_aapl <- diffinv(hasil.forc.Diff, differences = 1) + pt_1
+#Transformasi Balik
+ramal_aapl <- data.ramalan_aapl.da
+ramal_amzn <- exp(data.ramalan_amzn.da)
+ramal_goog <- exp(data.ramalan_goog.da)
+ramal_meta <- exp(data.ramalan_meta.da)
+ramal_msft <- exp(data.ramalan_msft.da)
+ramal_nflx <- exp(data.ramalan_nflx.da)
+ramal_nvda <- exp(data.ramalan_nvda.da)
+
+#Diff inv
+ramal_aapl <- diffinv(ramal_aapl, differences=1) +
+  train_aapl.ts[length(train_aapl.ts)]             #nilai akhir data latih
+ramal_amzn <- diffinv(ramal_amzn, differences=1) +
+  train_amzn.ts[length(train_amzn.ts)]
+ramal_goog <- diffinv(ramal_goog, differences=1) +
+  train_goog.ts[length(train_goog.ts)]
+ramal_meta <- diffinv(ramal_meta, differences=1) +
+  train_meta.ts[length(train_meta.ts)]
+ramal_msft <- diffinv(ramal_msft, differences=1) +
+  train_msft.ts[length(train_msft.ts)]
+ramal_nflx <- diffinv(ramal_nflx, differences=1) +
+  train_nflx.ts[length(train_nflx.ts)]
+ramal_nvda <- diffinv(ramal_nvda, differences=1) +
+  train_nvda.ts[length(train_nvda.ts)]
+
+
+
+
 #has.1 sama hasilnta dengan: cumsum(c(pt_1,hasil.forc.Diff))
 ts.plot(train_aapl.ts, ramal_aapl,  xlab="Periode (Hari)", 
         col = "lightskyblue4", lwd = 3,
