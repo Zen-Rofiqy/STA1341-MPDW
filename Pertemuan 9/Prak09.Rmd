@@ -1548,7 +1548,7 @@ model_aapl.da <- Arima(train_aapl.diff, order=c(2,1,3), method="ML")
 
 ### AMZN
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 model.tentaif_amzn <- 
   model_tentatif(train_amzn.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_amzn, filter = 'top', 
@@ -1563,7 +1563,7 @@ model_amzn.da <- Arima(train_amzn.diff, order=c(0,1,1), method="ML")
 
 ### GOOG
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 model.tentaif_goog <- 
   model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_goog, filter = 'top', 
@@ -1578,7 +1578,7 @@ model_goog.da <- Arima(train_goog.diff, order=c(0,1,1), method="ML")
 
 ### META
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 model.tentaif_meta <- 
   model_tentatif(train_meta.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_meta, filter = 'top', 
@@ -1593,7 +1593,7 @@ model_meta.da <- Arima(train_meta.diff, order=c(0,1,1), method="ML")
 
 ### MSFT
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 model.tentaif_msft <- 
   model_tentatif(train_msft.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_msft, filter = 'top', 
@@ -1608,7 +1608,7 @@ model_msft.da <- Arima(train_msft.diff, order=c(0,1,1), method="ML")
 
 ### NFLX
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 model.tentaif_nflx <- 
   model_tentatif(train_nflx.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_nflx, filter = 'top', 
@@ -1623,7 +1623,7 @@ model_nflx.da <- Arima(train_nflx.diff, order=c(0,1,1), method="ML")
 
 ### NVDA
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 model.tentaif_nvda <- 
   model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_nvda, filter = 'top', 
@@ -1673,8 +1673,25 @@ tentatif <- data.frame(
   )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
-
 rownames(tentatif) <- unique(data$Name)
+
+tentatif$Keterangan <-
+ c(model.tentaif_aapl[which(model.tentaif_aapl$Model == 
+                     tentatif["Model"]["AAPL",]), "Keterangan"],
+   model.tentaif_amzn[which(model.tentaif_amzn$Model == 
+                     tentatif["Model"]["AMZN",]), "Keterangan"],
+   model.tentaif_goog[which(model.tentaif_goog$Model == 
+                     tentatif["Model"]["GOOG",]), "Keterangan"],
+   model.tentaif_meta[which(model.tentaif_meta$Model == 
+                     tentatif["Model"]["META",]), "Keterangan"],
+   model.tentaif_msft[which(model.tentaif_msft$Model == 
+                     tentatif["Model"]["MSFT",]), "Keterangan"],
+   model.tentaif_nflx[which(model.tentaif_nflx$Model == 
+                     tentatif["Model"]["NFLX",]), "Keterangan"],
+   model.tentaif_nvda[which(model.tentaif_nvda$Model == 
+                     tentatif["Model"]["NVDA",]), "Keterangan"]
+   )
+
 datatable(tentatif, filter = 'top', 
           options = list(pageLength = 7))
 ```
