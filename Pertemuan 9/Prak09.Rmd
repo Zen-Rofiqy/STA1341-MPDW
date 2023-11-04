@@ -1534,7 +1534,6 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
   return(models)
 }
 
-# Panggil Fungsi
 model.tentaif_aapl <- 
   model_tentatif(train_aapl.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_aapl, filter = 'top', 
@@ -1636,6 +1635,77 @@ Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1578.14$ dimiliki 
 ```{r}
 model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
 ```
+
+## Model Tentatif Terbaik
+
+```{r}
+tentatif <- data.frame(
+  Model = 
+    c( paste("ARIMA(", paste(as.character(
+          model_aapl.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_amzn.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_goog.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_meta.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_msft.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nflx.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nvda.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = "")
+  ),
+  AIC = c(model_nvda.da[["aicc"]],
+          model_nvda.da[["aicc"]],
+          model_nvda.da[["aicc"]],
+          model_nvda.da[["aicc"]],
+          model_nvda.da[["aicc"]],
+          model_nvda.da[["aicc"]],
+          model_nvda.da[["aicc"]]
+  )
+) 
+
+rownames(tentatif) <- unique(data$Name)
+datatable(tentatif, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+# Model ARIMA dengan Drift
+
+Tren menentukan bagaimana perubahan deret waktu dari waktu ke waktu. Dalam model ARIMA, ini dapat dimodelkan menggunakan persamaan dasar berikut [1]. "a" disebut "**intercept**" dan "b" disebut "**drift**". "Drift" adalah hanyalah kemiringan garis lurus. Selanjutnya akan dilakukan kombinasi model ARIMA dengan Intercept dan Drift.
+
+## Model Tanpa Intercept dan Drift {.tabset}
+
+Simpelnya ini merupakan model data train yang diberi diff. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan, sehingga kan membentuk model **ARIMA(p, 1, q)**.
+
+### AAPL 
+
+```{r}
+drift1_aapl <- 
+  model_tentatif(train_aapl, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+### AMZN 
+
+### GOOG 
+
+### META 
+
+### MSFT 
+
+### NFLX 
+
+### NVDA
 
 # **Analisis Sisaan**
 
