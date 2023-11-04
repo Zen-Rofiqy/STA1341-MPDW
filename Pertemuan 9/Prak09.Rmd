@@ -1466,7 +1466,7 @@ install_load('TSA')
 install_load('forecast')
 
 # Fungsi untuk menghitung model ARIMA dan menganalisis parameter
-model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
+model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
   best_model <- NULL
   best_aic <- Inf
   eacf_result <- eacf(data)
@@ -1485,7 +1485,8 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
             eacf_result$symbol[p + 1, q + 2] == "o" && 
             eacf_result$symbol[p + 2, q + 2] == "o") {
       
-          model <- Arima(data, order = c(p, d, q), method = "ML")
+          model <- Arima(data, order=c(p,d,q), method="ML", 
+                         include.drift=drift)
           aic <- AIC(model)
           
           # Mendapatkan nilai coef dari model
@@ -2054,7 +2055,7 @@ Simpelnya ini merupakan model **data train** yang diberi **differencing** dan **
 
 ```{r message=FALSE, warning=FALSE}
 drift3_aapl <- 
-  model_tentatif(train_aapl.ts, p_max=6, d=1, q_max=12, drift=TRUE)
+  model_tentatif(train_aapl.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift3_aapl, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -2069,7 +2070,7 @@ model_aapl.drift3 <- Arima(train_aapl.ts, order=c(2,1,2), method="ML")
 
 ```{r message=FALSE, warning=FALSE}
 drift3_amzn <- 
-  model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12)
+  model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift3_amzn, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -2084,7 +2085,7 @@ model_amzn.drift3 <- Arima(train_amzn.ts, order=c(2,1,2), method="ML")
 
 ```{r message=FALSE, warning=FALSE}
 drift3_goog <- 
-  model_tentatif(train_goog.ts, p_max = 6, d = 1, q_max = 12)
+  model_tentatif(train_goog.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift3_goog, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -2099,7 +2100,7 @@ model_goog.drift3 <- Arima(train_goog.ts, order=c(2,1,2), method="ML")
 
 ```{r message=FALSE, warning=FALSE}
 drift3_meta <- 
-  model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12)
+  model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift3_meta, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -2114,7 +2115,7 @@ model3meta.drift3 <- Arima(train_meta.ts, order=c(2,1,2), method="ML")
 
 ```{r message=FALSE, warning=FALSE}
 drift3_msft <- 
-  model_tentatif(train_msft.ts, p_max = 6, d = 1, q_max = 12)
+  model_tentatif(train_msft.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift3_msft, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -2129,7 +2130,7 @@ model_msft.drift3 <- Arima(train_msft.ts, order=c(2,1,2), method="ML")
 
 ```{r message=FALSE, warning=FALSE}
 drift3_nflx <- 
-  model_tentatif(train_nflx.ts, p_max = 6, d = 1, q_max = 12)
+  model_tentatif(train_nflx.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift3_nflx, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -2144,7 +2145,7 @@ model_nflx.drift3 <- Arima(train_nflx.ts, order=c(2,1,2), method="ML")
 
 ```{r message=FALSE, warning=FALSE}
 drift3_nvda <- 
-  model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12)
+  model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift3_nvda, filter = 'top', 
           options = list(pageLength = 5))
 ```
