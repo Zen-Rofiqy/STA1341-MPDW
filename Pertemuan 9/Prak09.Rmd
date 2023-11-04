@@ -2021,8 +2021,9 @@ Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sediki
 ### AAPL 
 
 ```{r}
-perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=h), ramal_aapl[-1]),
-                     nrow = h, ncol = 2)
+perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=nrow(test_aapl)), 
+                                      ramal_aapl[-1]),
+                     nrow = nrow(test_aapl), ncol = 2)
 colnames(perbandingan_aapl.da) <- c("Aktual","Ramal")
 datatable(perbandingan_aapl.da, filter = 'top', 
           options = list(pageLength = 5))
@@ -2031,38 +2032,70 @@ datatable(perbandingan_aapl.da, filter = 'top',
 ### AMZN 
 
 ```{r}
-
+perbandingan_amzn.da <- matrix(data=c(head(test_amzn.ts, n=nrow(test_amzn)), 
+                                      ramal_amzn[-1]),
+                     nrow = nrow(test_amzn), ncol = 2)
+colnames(perbandingan_amzn.da) <- c("Aktual","Ramal")
+datatable(perbandingan_amzn.da, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
 ### GOOG 
 
 ```{r}
-
+perbandingan_goog.da <- matrix(data=c(head(test_goog.ts, n=nrow(test_goog)), 
+                                      ramal_goog[-1]),
+                     nrow = nrow(test_goog), ncol = 2)
+colnames(perbandingan_goog.da) <- c("Aktual","Ramal")
+datatable(perbandingan_goog.da, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
 ### META 
 
 ```{r}
-
+perbandingan_meta.da <- matrix(data=c(head(test_meta.ts, n=nrow(test_meta)), 
+                                      ramal_meta[-1]),
+                     nrow = nrow(test_meta), ncol = 2)
+colnames(perbandingan_meta.da) <- c("Aktual","Ramal")
+datatable(perbandingan_meta.da, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
 ### MSFT
 
 ```{r}
-
+perbandingan_msft.da <- matrix(data=c(head(test_msft.ts, n=nrow(test_msft)), 
+                                      ramal_msft[-1]),
+                     nrow = nrow(test_msft), ncol = 2)
+colnames(perbandingan_msft.da) <- c("Aktual","Ramal")
+datatable(perbandingan_msft.da, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
 ### NFLX 
 
-```{r}
-
+```{r}Ramal}
+perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=nrow(test_nflx)), 
+                                      ramal_nflx[-1]),
+                     nrow = nrow(test_nflx), ncol = 2)
+colnames(perbandingan_nflx.da) <- c("Aktual","Ramal")
+datatable(perbandingan_nflx.da, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
 ### NVDA
 
 ```{r}
-
+perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=nrow(test_nvda)), 
+                                      ramal_nvda[-1]),
+                               nrow = nrow(test_nvda), ncol = 2)
+colnames(perbandingan_nvda.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_nvda.da, filter = 'top', 
+          options = list(pageLength = 5))
 ```
+
+## Akurasi
 
 ```{r}
 akurasi.aapl <- accuracy(ts(ramal_aapl[-1]), head(test_aapl.ts, n=h)) %>%
