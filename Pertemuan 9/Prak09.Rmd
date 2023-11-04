@@ -1947,7 +1947,7 @@ model_nvda.drift2 <- Arima(train_nvda.ts, order=c(2,1,2), method="ML")
 ### Model Terbaik
 
 ```{r}
-drift1 <- data.frame(
+drift3 <- data.frame(
   Model = 
     c( paste("ARIMA(", paste(as.character(
           model_aapl.drift1[["call"]][["order"]][-1]), 
@@ -1982,8 +1982,8 @@ drift1 <- data.frame(
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
-rownames(drift1) <- unique(data$Name)
-datatable(drift1, filter = 'top', 
+rownames(drift3) <- unique(data$Name)
+datatable(drift3, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
@@ -1994,28 +1994,28 @@ Simpelnya ini merupakan model data train yang diberi diff. Yakni memodelkan data
 ### AAPL
 
 ```{r message=FALSE, warning=FALSE}
-drift2_aapl <- 
+drift3_aapl <- 
   model_tentatif(train_aapl.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift2_aapl, filter = 'top', 
+datatable(drift3_aapl, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
 
 ```{r}
-model_aapl.drift2 <- Arima(train_aapl.ts, order=c(2,1,2), method="ML")
+model_aapl.drift3 <- Arima(train_aapl.ts, order=c(2,1,2), method="ML")
 ```
 
 ### AMZN
 
 ```{r message=FALSE, warning=FALSE}
-drift2_amzn <- 
+drift3_amzn <- 
   model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift2_amzn, filter = 'top', 
+datatable(drift3_amzn, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifi3an dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
 
 ```{r}
 model_amzn.drift2 <- Arima(train_amzn.ts, order=c(2,1,2), method="ML")
@@ -2024,82 +2024,82 @@ model_amzn.drift2 <- Arima(train_amzn.ts, order=c(2,1,2), method="ML")
 ### GOOG
 
 ```{r message=FALSE, warning=FALSE}
-drift2_goog <- 
+drift3_goog <- 
   model_tentatif(train_goog.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift2_goog, filter = 'top', 
+datatable(drift3_goog, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
 
 ```{r}
-model_goog.drift2 <- Arima(train_goog.ts, order=c(2,1,2), method="ML")
+model_goog.drift3 <- Arima(train_goog.ts, order=c(2,1,2), method="ML")
 ```
 
 ### META
 
 ```{r message=FALSE, warning=FALSE}
-drift2_meta <- 
+drift3_meta <- 
   model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift2_meta, filter = 'top', 
+datatable(drift3_meta, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
 
 ```{r}
-model_meta.drift2 <- Arima(train_meta.ts, order=c(2,1,2), method="ML")
+model3meta.drift3 <- Arima(train_meta.ts, order=c(2,1,2), method="ML")
 ```
 
 ### MSFT
 
 ```{r message=FALSE, warning=FALSE}
-drift2_msft <- 
+drift3_msft <- 
   model_tentatif(train_msft.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift2_msft, filter = 'top', 
+datatable(drift3_msft, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
 
 ```{r}
-model_msft.drift2 <- Arima(train_msft.ts, order=c(2,1,2), method="ML")
+model_msft.drift3 <- Arima(train_msft.ts, order=c(2,1,2), method="ML")
 ```
 
 ### NFLX
 
 ```{r message=FALSE, warning=FALSE}
-drift2_nflx <- 
+drift3_nflx <- 
   model_tentatif(train_nflx.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift2_nflx, filter = 'top', 
+datatable(drift3_nflx, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
 
 ```{r}
-model_nflx.drift2 <- Arima(train_nflx.ts, order=c(2,1,2), method="ML")
+model_nflx.drift3 <- Arima(train_nflx.ts, order=c(2,1,2), method="ML")
 ```
 
 ### NVDA
 
 ```{r message=FALSE, warning=FALSE}
-drift2_nvda <- 
+drift3_nvda <- 
   model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift2_nvda, filter = 'top', 
+datatable(drift3_nvda, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
 Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3105.62$ dimiliki oleh model `ARIMA(2,1,2)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,2)`.
 
 ```{r}
-model_nvda.drift2 <- Arima(train_nvda.ts, order=c(2,1,2), method="ML")
+model_nvda.drift3 <- Arima(train_nvda.ts, order=c(2,1,2), method="ML")
 ```
 
 ### Model Terbaik
 
 ```{r}
-drift1 <- data.frame(
+drift3 <- data.frame(
   Model = 
     c( paste("ARIMA(", paste(as.character(
           model_aapl.drift1[["call"]][["order"]][-1]), 
@@ -2134,8 +2134,8 @@ drift1 <- data.frame(
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
-rownames(drift1) <- unique(data$Name)
-datatable(drift1, filter = 'top', 
+rownames(drift3) <- unique(data$Name)
+datatable(drift3, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
