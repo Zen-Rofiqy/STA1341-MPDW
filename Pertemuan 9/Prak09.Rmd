@@ -1103,7 +1103,7 @@ ggsave("09_banding_train-test.png", chart, path = export.chart,
 
 ### Plot ACF
 
-```{r fig.align=, fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 install_load('tsibble','tseries')
 par(mfrow=c(2,4))
 acf(train_aapl.ts, main=""); mtext("AAPL", side=3, line=1, cex=2, font=2)
@@ -1146,7 +1146,7 @@ Berdasarkan uji ADF tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$
 
 ### Plot Box-Cox
 
-```{r fig.align=, fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 install_load('MASS')
 index <- seq(1:nrow(train_aapl))
 par(mfrow=c(2,4))
@@ -1236,7 +1236,7 @@ Mengutip dari laman [r-coder.com](https://r-coder.com/box-cox-transformation-r/)
 
 #### Transformasi
 
-```{r fig.align=, fig.height=7.5, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=7.5, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
 #Transformasi
 train_amzn.ts.new <- log(train_amzn.ts)
 train_goog.ts.new <- log(train_goog.ts)
@@ -1312,7 +1312,7 @@ Akan dilakukan uji ulang untuk mengecek kestasioneran data dalam rataan.
 
 ### Plot ACF
 
-```{r fig.align=, fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 par(mfrow=c(2,4))
 acf(train_aapl.diff, ylim=c(-.1,.1) , main="")
 mtext("AAPL", side=3, line=1, cex=2, font=2)
@@ -1375,7 +1375,7 @@ Identifikasi model dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel 
 
 ## Plot ACF & PACF
 
-```{r fig.align=, fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 par(mfrow=c(2,4))
 pacf(train_aapl.diff, ylim=c(-.1,.1) , main="")
 mtext("AAPL", side=3, line=1, cex=2, font=2)
