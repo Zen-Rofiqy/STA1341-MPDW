@@ -1461,8 +1461,6 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 
 Pemilihan model ARIMA terbaik dilakukan ketika memiliki nilai **AIC** yang terkecil, **Semua Parameter Signifikan**, dan **Tidak ada Parameter NA**.
 
-### AAPL
-
 ```{r message=FALSE, warning=FALSE}
 install_load('TSA')
 install_load('forecast')
@@ -1537,7 +1535,11 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05) {
 
   return(models)
 }
+```
 
+### AAPL
+
+```{r message=FALSE, warning=FALSE}
 model.tentaif_aapl <- 
   model_tentatif(train_aapl.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_aapl, filter = 'top', 
@@ -1708,7 +1710,7 @@ Tren menentukan bagaimana perubahan deret waktu dari waktu ke waktu. Dalam model
 
 ## 1. Model Tanpa Intercept dan Drift {.tabset}
 
-Simpelnya ini merupakan model **data train** yang diberi diff. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q)**.
+Simpelnya ini merupakan model **data train** yang diberi differencing. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q)**.
 
 ### AAPL
 
@@ -1877,7 +1879,7 @@ datatable(drift1, filter = 'top',
 
 ## 2. Model Dengan Intercept Tanpa Drift {.tabset}
 
-Simpelnya ini merupakan model **data diff** tanpa diberi diff. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q)**.
+Simpelnya ini merupakan model **data differencing** tanpa diberi differencing. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q)**.
 
 ### AAPL
 
@@ -2046,13 +2048,13 @@ datatable(drift2, filter = 'top',
 
 ## 3. Model Tanpa Intercept Dengan Drift {.tabset}
 
-Simpelnya ini merupakan model data train yang diberi diff. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan, sehingga kan membentuk model **ARIMA(p, 1, q)**.
+Simpelnya ini merupakan model **data train** yang diberi **differencing** dan **drift**. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q) + include.drift**.
 
 ### AAPL
 
 ```{r message=FALSE, warning=FALSE}
 drift3_aapl <- 
-  model_tentatif(train_aapl.ts, p_max = 6, d = 1, q_max = 12)
+  model_tentatif(train_aapl.ts, p_max=6, d=1, q_max=12, drift=TRUE)
 datatable(drift3_aapl, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -2190,15 +2192,32 @@ drift3 <- data.frame(
   )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
+rownames(drift2) <- unique(data$Name)
 
-rownames(drift3) <- unique(data$Name)
+drift2$Keterangan <-
+ c(drift2_aapl[which(drift2_aapl$Model == 
+                     drift2["Model"]["AAPL",]), "Keterangan"],
+   drift2_amzn[which(drift2_amzn$Model == 
+                     drift2["Model"]["AMZN",]), "Keterangan"],
+   drift2_goog[which(drift2_goog$Model == 
+                     drift2["Model"]["GOOG",]), "Keterangan"],
+   drift2_meta[which(drift2_meta$Model == 
+                     drift2["Model"]["META",]), "Keterangan"],
+   drift2_msft[which(drift2_msft$Model == 
+                     drift2["Model"]["MSFT",]), "Keterangan"],
+   drift2_nflx[which(drift2_nflx$Model == 
+                     drift2["Model"]["NFLX",]), "Keterangan"],
+   drift2_nvda[which(drift2_nvda$Model == 
+                     drift2["Model"]["NVDA",]), "Keterangan"]
+   )
+
 datatable(drift3, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
 ## 4. Model Dengan Intercept dan Drift {.tabset}
 
-Simpelnya ini merupakan model data train yang diberi diff. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan, sehingga kan membentuk model **ARIMA(p, 1, q)**.
+Simpelnya ini merupakan model **data differencing** tanpa diberi differencing namun diberi drift. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q) + include.drift**.
 
 ### AAPL
 
@@ -2343,7 +2362,25 @@ drift4 <- data.frame(
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
-rownames(drift4) <- unique(data$Name)
+rownames(drift2) <- unique(data$Name)
+
+drift2$Keterangan <-
+ c(drift2_aapl[which(drift2_aapl$Model == 
+                     drift2["Model"]["AAPL",]), "Keterangan"],
+   drift2_amzn[which(drift2_amzn$Model == 
+                     drift2["Model"]["AMZN",]), "Keterangan"],
+   drift2_goog[which(drift2_goog$Model == 
+                     drift2["Model"]["GOOG",]), "Keterangan"],
+   drift2_meta[which(drift2_meta$Model == 
+                     drift2["Model"]["META",]), "Keterangan"],
+   drift2_msft[which(drift2_msft$Model == 
+                     drift2["Model"]["MSFT",]), "Keterangan"],
+   drift2_nflx[which(drift2_nflx$Model == 
+                     drift2["Model"]["NFLX",]), "Keterangan"],
+   drift2_nvda[which(drift2_nvda$Model == 
+                     drift2["Model"]["NVDA",]), "Keterangan"]
+   )
+
 datatable(drift4, filter = 'top', 
           options = list(pageLength = 7))
 ```
