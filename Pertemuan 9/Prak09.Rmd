@@ -2158,7 +2158,14 @@ datatable(perbandingan_msft.da, filter = 'top',
 
 ### NFLX
 
-`{r}Ramal} perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=nrow(test_nflx)),                                        ramal_nflx[-1]),                      nrow = nrow(test_nflx), ncol = 2) colnames(perbandingan_nflx.da) <- c("Aktual","Ramal") datatable(perbandingan_nflx.da, filter = 'top',            options = list(pageLength = 5))`
+```{r}
+perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=nrow(test_nflx)), 
+                                      ramal_nflx[-1]),
+                     nrow = nrow(test_nflx), ncol = 2)
+colnames(perbandingan_nflx.da) <- c("Aktual","Ramal")
+datatable(perbandingan_nflx.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
 
 ### NVDA
 
