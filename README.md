@@ -24,7 +24,7 @@ https://simak.ipb.ac.id/Foto/Panduan/Dokumen_44.pdf
 * **ARCH/GARCH:**
   - https://rpubs.com/spiffy/archgarchsahamamazon
 * **LSTM:**
-  - (LSTM)[https://www.r-bloggers.com/2018/04/time-series-deep-learning-forecasting-sunspots-with-keras-stateful-lstm-in-r/]
+  - [LSTM](https://www.r-bloggers.com/2018/04/time-series-deep-learning-forecasting-sunspots-with-keras-stateful-lstm-in-r/)
 > **Note :** `ARCH/GARCH`   
 > Untuk mengambil hasil forecast menggunakan ugarchforecast,  
     -> gunakan: `hasil_forecast <- objek_hasil_forecast@forecast[["seriesFor"]]`  
