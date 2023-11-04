@@ -79,10 +79,6 @@ Kami akan menggunakan peubah `Adj Close (Adjusted Close)`, Karena sesuai dengan 
 
 Tujuan dari praktikum ini adalah untuk menganalisis pola perkiraan pergerakan harga tujuh saham teknologi terkemuka dengan harapan dapat memberikan rekomendasi kepada pembaca mengenai saham mana yang sebaiknya dipertimbangkan untuk dibeli atau diinvestasikan secara signifikan di antara tujuh perusahaan teknologi besar tersebut.
 
-## Referensi
-
--   [Referensi Warna](https://bookdown.org/hneth/ds4psy/ds4psy_files/figure-html/apx-color-sample-1.png){.uri}
-
 ## Data Preparation {.tabset}
 
 ### Import Data
@@ -242,6 +238,8 @@ datatable(data, filter = 'top',
 ```
 
 # Eksplorasi Data
+
+Referensi : [Warna](https://bookdown.org/hneth/ds4psy/ds4psy_files/figure-html/apx-color-sample-1.png){.uri}
 
 ## Plot Time Series {.tabset}
 
@@ -1451,11 +1449,17 @@ Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag
 
 ## Tabel EACF {.tabset}
 
-Identifikasi model menggunakan plot EACF dilakukan dengan melihat titik sudut kiri segitiga pada pola segitiga nol atas (pola mariks segitiga bawah). Sebagai contoh :
+Referensi : [[University of South Carolina] Chapter 6: Model Specification for Time Series](https://people.stat.sc.edu/hitchcock/stat520ch6slides.pdf){.uri}
+
+> Mengutip dari referensi diatas, Identifikasi model menggunakan Tabel EACF (Extended Autocorrelation Function) untuk proses ARMA(p, q) seharusnya secara teoritis memiliki **pola segitiga nol**, dengan nol di sudut kiri atas muncul pada baris ke-p dan kolom ke-q (dengan label baris dan kolom dimulai dari 0).
+
+Sebagai contoh :
 
 ![](images/Screenshot%202023-10-15%20234003-01.png)
 
 Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+Pemilihan model ARIMA terbaik dilakukan ketika memiliki nilai **AIC** yang terkecil, **Semua Parameter Signifikan**, dan **Tidak ada Parameter NA**.
 
 ### AAPL
 
