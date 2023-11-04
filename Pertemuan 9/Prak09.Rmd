@@ -2383,28 +2383,30 @@ drift4 <- data.frame(
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
-rownames(drift2) <- unique(data$Name)
+rownames(drift4) <- unique(data$Name)
 
-drift2$Keterangan <-
- c(drift2_aapl[which(drift2_aapl$Model == 
-                     drift2["Model"]["AAPL",]), "Keterangan"],
-   drift2_amzn[which(drift2_amzn$Model == 
-                     drift2["Model"]["AMZN",]), "Keterangan"],
-   drift2_goog[which(drift2_goog$Model == 
-                     drift2["Model"]["GOOG",]), "Keterangan"],
-   drift2_meta[which(drift2_meta$Model == 
-                     drift2["Model"]["META",]), "Keterangan"],
-   drift2_msft[which(drift2_msft$Model == 
-                     drift2["Model"]["MSFT",]), "Keterangan"],
-   drift2_nflx[which(drift2_nflx$Model == 
-                     drift2["Model"]["NFLX",]), "Keterangan"],
-   drift2_nvda[which(drift2_nvda$Model == 
-                     drift2["Model"]["NVDA",]), "Keterangan"]
+drift4$Keterangan <-
+ c(drift4_aapl[which(drift4_aapl$Model == 
+                     drift4["Model"]["AAPL",]), "Keterangan"],
+   drift4_amzn[which(drift4_amzn$Model == 
+                     drift4["Model"]["AMZN",]), "Keterangan"],
+   drift4_goog[which(drift4_goog$Model == 
+                     drift4["Model"]["GOOG",]), "Keterangan"],
+   drift4_meta[which(drift4_meta$Model == 
+                     drift4["Model"]["META",]), "Keterangan"],
+   drift4_msft[which(drift4_msft$Model == 
+                     drift4["Model"]["MSFT",]), "Keterangan"],
+   drift4_nflx[which(drift4_nflx$Model == 
+                     drift4["Model"]["NFLX",]), "Keterangan"],
+   drift4_nvda[which(drift4_nvda$Model == 
+                     drift4["Model"]["NVDA",]), "Keterangan"]
    )
 
 datatable(drift4, filter = 'top', 
           options = list(pageLength = 7))
 ```
+
+Walaupun berlabel model terbaik, namun hanya terdapat satu model yang semua parameternya signifikan. Yakni Model `ARIMA(3,0,3)` dari `AAPL`. Mungkin ini bisa disebabkan karne`AAPL` tidak dilakukan transfomrasi, sedangkan yang lainnya dilakukan transformasi.
 
 # **Analisis Sisaan**
 
