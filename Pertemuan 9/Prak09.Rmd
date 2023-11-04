@@ -1435,8 +1435,8 @@ name <- unique(data$Name)
 acf.pacf.tab <- data.frame()
 for(i in 1:length(name)){
   dex <- data_frames[[i]] %>% acf.pacf() %>% 
-  rename(!!paste0(col_names[i], ".a") := acf, 
-         !!paste0(col_names[i], ".p") := pacf)
+  rename(!!paste0(name[i], ".a") := acf, 
+         !!paste0(name[i], ".p") := pacf)
   
     acf.pacf.tab <- merge(acf.pacf.tab, dex, by=0, all=TRUE)[-1]
 }
@@ -2271,7 +2271,7 @@ model_amzn.drift4 <- Arima(train_amzn.diff, order=c(3,0,4), method="ML",
 drift4_goog <- 
   model_tentatif(train_goog.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
 datatable(drift4_goog, filter = 'top', 
-          options = list(pageLength = 5))()
+          options = list(pageLength = 5))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Walaupun jika mengabaikan kategorinya, pemilihan modle terbaiknya agak cukup sulit. Hanya ada **tiga** model yang parameternya tidak memiliki **NA** di dalamnya. Merika adalah `ARIMA(1,0,12)`, `ARIMA(4,0,11)`, dan `ARIMA(2,0,12)`. Itupun mereka banyak parameternya yang signifikan. Diputuskanlah model terbaiknya adalah `ARIMA(2,0,12)` dengan nilai AIC yang lebih kecil daripada ketiganya yakni sebesar $-2297.46$.
@@ -2788,7 +2788,7 @@ ramal <- data.frame(
                   as.vector(train_nflx.ts), ramal_nflx[-1],
                   as.vector(train_nvda.ts), ramal_nvda[-1] ),
   Name = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
-              each = length(train_aapl.ts) + h)
+              each = nrow(train_aapl) + nrow(test_aapl) )
 )
 colnames(ramal) <- c("Date", "Adj Close", "Name")
 ```
