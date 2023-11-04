@@ -2018,7 +2018,7 @@ Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sediki
 
 ## Perbandingan Data Aktual dengan Data Ramal {.tabset}
 
-### AAPL 
+### AAPL
 
 ```{r}
 perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=nrow(test_aapl)), 
@@ -2029,7 +2029,7 @@ datatable(perbandingan_aapl.da, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-### AMZN 
+### AMZN
 
 ```{r}
 perbandingan_amzn.da <- matrix(data=c(head(test_amzn.ts, n=nrow(test_amzn)), 
@@ -2040,7 +2040,7 @@ datatable(perbandingan_amzn.da, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-### GOOG 
+### GOOG
 
 ```{r}
 perbandingan_goog.da <- matrix(data=c(head(test_goog.ts, n=nrow(test_goog)), 
@@ -2051,7 +2051,7 @@ datatable(perbandingan_goog.da, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-### META 
+### META
 
 ```{r}
 perbandingan_meta.da <- matrix(data=c(head(test_meta.ts, n=nrow(test_meta)), 
@@ -2073,16 +2073,9 @@ datatable(perbandingan_msft.da, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-### NFLX 
+### NFLX
 
-```{r}Ramal}
-perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=nrow(test_nflx)), 
-                                      ramal_nflx[-1]),
-                     nrow = nrow(test_nflx), ncol = 2)
-colnames(perbandingan_nflx.da) <- c("Aktual","Ramal")
-datatable(perbandingan_nflx.da, filter = 'top', 
-          options = list(pageLength = 5))
-```
+`{r}Ramal} perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=nrow(test_nflx)),                                        ramal_nflx[-1]),                      nrow = nrow(test_nflx), ncol = 2) colnames(perbandingan_nflx.da) <- c("Aktual","Ramal") datatable(perbandingan_nflx.da, filter = 'top',            options = list(pageLength = 5))`
 
 ### NVDA
 
