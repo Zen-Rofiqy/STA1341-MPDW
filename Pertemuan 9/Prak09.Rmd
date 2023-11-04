@@ -1696,6 +1696,8 @@ datatable(tentatif, filter = 'top',
           options = list(pageLength = 7))
 ```
 
+Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model terbaik yang paling sering digunakan. Hanya `AAPL` saja yang modelnya berbeda dari yang lainnya, yakni **ARIMA(2,1,3)**. Perlu diingat bahwa `AAPL` Tidak dilakukan transformasi. Sehingga jika kita mengabaikan nilai **AIC** nya, maka nilai **AIC** terkecil adalah $-2421.46$ (`MSFT`) dan yang terbesar adalah $-1759.06$ (`NFLX`).
+
 # Model ARIMA dengan Drift
 
 Tren menentukan bagaimana perubahan deret waktu dari waktu ke waktu. Dalam model ARIMA, ini dapat dimodelkan menggunakan persamaan dasar berikut [1]. "a" disebut "**intercept**" dan "b" disebut "**drift**". "Drift" adalah hanyalah kemiringan garis lurus. Selanjutnya akan dilakukan kombinasi model ARIMA dengan Intercept dan Drift.
