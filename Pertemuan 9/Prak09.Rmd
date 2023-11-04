@@ -1663,15 +1663,16 @@ tentatif <- data.frame(
           model_nvda.da[["call"]][["order"]][-1]), 
           collapse = ","), ")", sep = "")
   ),
-  AIC = c(model_nvda.da[["aicc"]],
-          model_nvda.da[["aicc"]],
-          model_nvda.da[["aicc"]],
-          model_nvda.da[["aicc"]],
-          model_nvda.da[["aicc"]],
-          model_nvda.da[["aicc"]],
+  AIC = c(model_aapl.da[["aicc"]],
+          model_amzn.da[["aicc"]],
+          model_goog.da[["aicc"]],
+          model_meta.da[["aicc"]],
+          model_msft.da[["aicc"]],
+          model_nflx.da[["aicc"]],
           model_nvda.da[["aicc"]]
   )
-) 
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
 
 rownames(tentatif) <- unique(data$Name)
 datatable(tentatif, filter = 'top', 
@@ -1688,24 +1689,68 @@ Simpelnya ini merupakan model data train yang diberi diff. Yakni memodelkan data
 
 ### AAPL 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 drift1_aapl <- 
-  model_tentatif(train_aapl, p_max = 6, d = 1, q_max = 12)
+  model_tentatif(train_aapl.ts, p_max = 6, d = 1, q_max = 12)
 datatable(drift1_aapl, filter = 'top', 
           options = list(pageLength = 5))
 ```
 
+Model Terbaik tidak ditemukan karena tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya.
+
 ### AMZN 
+
+```{r message=FALSE, warning=FALSE}
+drift1_amzn <- 
+  model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
 
 ### GOOG 
 
+```{r message=FALSE, warning=FALSE}
+drift1_goog <- 
+  model_tentatif(train_goog.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
 ### META 
+
+```{r message=FALSE, warning=FALSE}
+drift1_meta <- 
+  model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
 
 ### MSFT 
 
+```{r message=FALSE, warning=FALSE}
+drift1_msft <- 
+  model_tentatif(train_msft.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
 ### NFLX 
 
+```{r message=FALSE, warning=FALSE}
+drift1_nflx <- 
+  model_tentatif(train_nflx.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
 ### NVDA
+
+```{r message=FALSE, warning=FALSE}
+drift1_nvda <- 
+  model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
 
 # **Analisis Sisaan**
 
