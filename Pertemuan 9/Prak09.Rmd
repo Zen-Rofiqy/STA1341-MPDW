@@ -1122,15 +1122,20 @@ acf(train_nvda.ts, main=""); mtext("NVDA", side=3, line=1, cex=2, font=2)
 
 Berdasarkan plot ACF, terlihat bahwa plot ACF seluruh data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data **tidak stasioner dalam rataan** dan tidak membentuk gelombang sinus.
 
-```{r}
-# Membuka file PNG untuk menyimpan plot
-png(expo,
-    height = 9*300, width = 16*300, res=300)
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/ACF_1.png", sep=""),
+    height = 7.5*300, width = 20*300, res=300)
 
-# Plot time series dengan warna dan pengaturan lainnya
-ts.plot(amzn.ts, xlab = "Time Period", ylab = "Harga Saham",
-        main = "Time Series Amazon", col = 'orange', lwd = 2)
-points(amzn.ts, col = 'orange', lwd = 1.5)
+# Plot 
+par(mfrow=c(2,4))
+acf(train_aapl.ts, main=""); mtext("AAPL", side=3, line=1, cex=2, font=2)
+acf(train_amzn.ts, main=""); mtext("AMZN", side=3, line=1, cex=2, font=2)
+acf(train_goog.ts, main=""); mtext("GOOG", side=3, line=1, cex=2, font=2)
+acf(train_meta.ts, main=""); mtext("META", side=3, line=1, cex=2, font=2)
+acf(train_msft.ts, main=""); mtext("MSFT", side=3, line=1, cex=2, font=2)
+acf(train_nflx.ts, main=""); mtext("NFLX", side=3, line=1, cex=2, font=2)
+acf(train_nvda.ts, main=""); mtext("NVDA", side=3, line=1, cex=2, font=2)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
