@@ -12,7 +12,7 @@
 Agar _memudahkan_ untuk dibaca..  
 Daripada liatin rmd nya, mending liat `rpubs` nya.. XD    
 Yuk mampir ke :  
-https://rpubs.com/ZenR_Prog/MPDW-Prak08-22-23  
+https://rpubs.com/ZenR_Prog/MPDW-Prak09-ARIMA
   
 ## Tentang Data
 https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data
