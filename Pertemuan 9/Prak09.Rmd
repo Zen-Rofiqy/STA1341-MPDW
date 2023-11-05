@@ -1124,7 +1124,7 @@ Berdasarkan plot ACF, terlihat bahwa plot ACF seluruh data train menurun secara 
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/ACF_1.png", sep=""),
+png(paste(export.chart, "/99_Stas_ACF.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
@@ -1213,6 +1213,55 @@ sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
 Gambar di atas menunjukkan bahwa hanya `AAPL` yang memuat *rounded value* ($\lambda$) di dalam selangnya. Sementara selainnya tidak memuatnya.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_BoxCox.png", sep=""),
+    height = 7.5*300, width = 20*300, res=300)
+
+# Plot 
+index <- seq(1:nrow(train_aapl))
+par(mfrow=c(2,4))
+
+bc =boxcox(train_aapl.ts~index, lambda=seq(-2, 4, by=.01))
+title("AAPL", cex.main = 4)
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_amzn.ts~index, lambda=seq(-2, 4, by=.01))
+title("AMZN", cex.main = 4)
+lambda_amzn <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_goog.ts~index, lambda=seq(-2, 4, by=.01))
+title("GOOG", cex.main = 4)
+lambda_goog <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_meta.ts~index, lambda=seq(-2, 4, by=.01))
+title("META", cex.main = 4)
+lambda_meta <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_msft.ts~index, lambda=seq(-2, 4, by=.01))
+title("MSFT", cex.main = 4)
+lambda_msft <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_nflx.ts~index, lambda=seq(-2, 4, by=.01))
+title("NFLX", cex.main = 4)
+lambda_nflx <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+index <- seq(1:nrow(train_nvda)) #Beda titik potong
+bc =boxcox(train_nvda.ts~index, lambda=seq(-2, 4, by=.01))
+title("NVDA", cex.main = 4)
+lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
 
 #### Lambda dan Selang Kepercayaan
 
