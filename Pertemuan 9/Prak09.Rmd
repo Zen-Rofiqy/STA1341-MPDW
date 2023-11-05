@@ -1528,9 +1528,9 @@ datatable(adf1, filter = 'top',
 
 Berdasarkan uji ADF tersebut, semua data saham mendapatkan *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
 
-# Identifikasi Model
+# Model Tentatif
 
-Identifikasi model dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel EACF. Mengutip dari postingan pada laman [medium.com](https://medium.com/@ooemma83/how-to-interpret-acf-and-pacf-plots-for-identifying-ar-ma-arma-or-arima-models-498717e815b6) **Panduan dasar** untuk menginterpretasikan plot ACF dan PACF adalah sebagai berikut :
+Identifikasi model tentatif dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel EACF. Mengutip dari postingan pada laman [medium.com](https://medium.com/@ooemma83/how-to-interpret-acf-and-pacf-plots-for-identifying-ar-ma-arma-or-arima-models-498717e815b6) **Panduan dasar** untuk menginterpretasikan plot ACF dan PACF adalah sebagai berikut :
 
 1.  Cari pola *tail off* pada ACF atau PACF.
 2.  Jika *tail off* terjadi pada ACF → **model AR** → *cut off* pada PACF akan memberikan nilai p untuk AR(p).
