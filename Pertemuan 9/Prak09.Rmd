@@ -175,7 +175,7 @@ if (length(missing_dates) == 0) {
 
 **Inputasi Data**
 
-```{r dpi=300, fig.height = 9, fig.width = 16, fig.align = "center"}
+```{r fig.align=, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
 install_load('purrr')
 # Fungsi untuk mengisi data yang hilang
 fill_missing_data <- function(name) {
@@ -209,7 +209,12 @@ final_data <- final_data %>%
 install_load('imputeTS')
 
 data <- na_interpolation(final_data$`Adj Close`)
-ggplot_na_imputations(final_data$`Adj Close`, data)
+
+chart <- ggplot_na_imputations(final_data$`Adj Close`, data)
+chart
+#Export Chart
+ggsave("00_Imputasi Data.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
 
 data <- final_data %>% select(Name, Date) %>% 
   mutate(`Adj Close` = data)
@@ -1709,7 +1714,7 @@ Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model terbaik 
 
 Tren menentukan bagaimana perubahan deret waktu dari waktu ke waktu. Dalam model ARIMA, ini dapat dimodelkan menggunakan persamaan dasar berikut [1]. "a" disebut "**intercept**" dan "b" disebut "**drift**". "Drift" adalah hanyalah kemiringan garis lurus. Selanjutnya akan dilakukan kombinasi model ARIMA dengan Intercept dan Drift.
 
-## 1. Model Tanpa Intercept dan Drift {.tabset}
+## 1. Model Tanpa Intercept dan Tanpa Drift {.tabset}
 
 Simpelnya ini merupakan model **data train** yang diberi differencing. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q)**.
 
@@ -2229,7 +2234,7 @@ datatable(drift3, filter = 'top',
 
 Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya signifikan.
 
-## 4. Model Dengan Intercept dan Drift {.tabset}
+## 4. Model dengan Intercept dan dengan Drift {.tabset}
 
 Simpelnya ini merupakan model **data differencing** tanpa diberi differencing namun diberi drift. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q) + include.drift**.
 
@@ -2795,27 +2800,27 @@ colnames(ramal) <- c("Date", "Adj Close", "Name")
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=TRUE, message = FALSE}
 chart <- 
-ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
+ggplot(ramal, aes(x = Date, y = `Adj Close`, color = Name)) +
   #Label Data Asli 
   annotate( "rect", alpha=0.1, fill="seagreen",
-            xmin=as.Date(min(data3$Date)), 
-            xmax=as.Date(data3$Date[ceiling(nrow(train_aapl))]),
+            xmin=as.Date(min(ramal$Date)), 
+            xmax=as.Date(ramal$Date[ceiling(nrow(train_aapl))]),
             ymin=0, ymax=Inf ) + 
   
   annotate( "text", color="seagreen",
-            x = as.Date(data3$Date[ceiling(nrow(train_aapl)/2)]), 
-            y = max(data3$`Adj Close`) * 0.95, 
+            x = as.Date(ramal$Date[ceiling(nrow(train_aapl)/2)]), 
+            y = max(ramal$`Adj Close`) * 0.95, 
     label = "Data Asli", size=10) + 
   
   #Label Data Ramal
   annotate( "rect", alpha=0.1, fill="violetred",
-            xmin=as.Date(data3$Date[ceiling(nrow(train_aapl))]), 
-            xmax=as.Date(max(data3$Date)),
+            xmin=as.Date(ramal$Date[ceiling(nrow(train_aapl))]), 
+            xmax=as.Date(max(ramal$Date)),
             ymin=0, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
-            x = as.Date(data3$Date[ceiling(0.9 * length(data3$Date)/7)]) , 
-            y = max(data3$`Adj Close`) * 0.95, 
+            x = as.Date(ramal$Date[ceiling(0.9 * length(ramal$Date)/7)]) , 
+            y = max(ramal$`Adj Close`) * 0.95, 
     label = "Data Ramal\n115 Hari", size=10) +
   #Time Series
   geom_line(aes(color=Name), linewidth=1.5) +
@@ -2830,7 +2835,7 @@ ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
        subtitle = "Peramalan Saham MAANG Selama 115 Hari Kedepan\n") +
   # Label / legend
   geom_text_repel(
-    data=data3[data3$Date == max(data3$Date),], #Posisi di ujung data
+    data=ramal[ramal$Date == max(ramal$Date),], #Posisi di ujung data
     aes(color = Name, label = Name), #Warna garis & label saham
     size = 8, #Ukuran text
     nudge_x = 20, #Posisi Text (kanan 50)
@@ -2849,8 +2854,8 @@ ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
     scale_x_date( #Sumbu x
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date(min(data3$Date)), 
-               as.Date(max(data3$Date)) + 60)
+    limits = c(as.Date(min(ramal$Date)), 
+               as.Date(max(ramal$Date)) + 60)
   ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
@@ -2860,7 +2865,7 @@ ggplot(data3, aes(x = Date, y = `Adj Close`, color = Name)) +
     label = "28 Juli", size=6
   ) +
   geom_vline( #Buat garis batas data
-    xintercept = as.Date(data3$Date[ceiling(nrow(train_aapl))]) , 
+    xintercept = as.Date(ramal$Date[ceiling(nrow(train_aapl))]) , 
              linetype = "dotted", color = "black", linewidth = 2)
 chart
 #Export Chart
