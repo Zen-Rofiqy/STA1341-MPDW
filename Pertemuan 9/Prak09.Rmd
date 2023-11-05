@@ -1341,7 +1341,7 @@ Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Stas_BoxCox_Trans.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 7.5*300, width = 15*300, res=300)
 
 # Plot 
 par(mfrow=c(2,3))
@@ -1408,7 +1408,7 @@ Berdasarkan plot data deret waktu yang sudah di *Differencing*, terlihat bahwa s
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Stas_Diff.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 8*300, width = 25*300, res=300)
 
 # Plot 
 par(mfrow=c(2,4))
@@ -1470,6 +1470,38 @@ mtext("NVDA", side=3, line=1, cex=2, font=2)
 
 Berdasarkan ketujuh plot ACF tersebut, dapat dilihat bahwa lag nya sudah tidak *tails off slowly* (trennya telah berakhir dan korelasi antara pengamatan pada lag-lag yang lebih jauh telah berkurang secara signifikan), sehingga data dinyatakan stasioner dalam rataan. Ini menunjukkan bahwa masalah ketidakstasioneran dalam data telah berhasil diatasi.
 
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+    height = 7.5*300, width = 20*300, res=300)
+
+# Plot 
+par(mfrow=c(2,4))
+acf(train_aapl.diff, ylim=c(-.1,.1) , main="")
+mtext("AAPL", side=3, line=1, cex=2, font=2)
+
+acf(train_amzn.diff, ylim=c(-.1,.1) , main="")
+mtext("AMZN", side=3, line=1, cex=2, font=2)
+
+acf(train_goog.diff, ylim=c(-.1,.1) , main="")
+mtext("GOOG", side=3, line=1, cex=2, font=2)
+
+acf(train_meta.diff, ylim=c(-.1,.1) , main="")
+mtext("META", side=3, line=1, cex=2, font=2)
+
+acf(train_msft.diff, ylim=c(-.1,.1) , main="")
+mtext("MSFT", side=3, line=1, cex=2, font=2)
+
+acf(train_nflx.diff, ylim=c(-.1,.1) , main="")
+mtext("NFLX", side=3, line=1, cex=2, font=2)
+
+acf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+mtext("NVDA", side=3, line=1, cex=2, font=2)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
 ### Uji ADF
 
 ```{r message=FALSE, warning=FALSE}
@@ -1496,7 +1528,7 @@ datatable(adf1, filter = 'top',
 
 Berdasarkan uji ADF tersebut, semua data saham mendapatkan *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
 
-# **Identifikasi Model** {.tabset}
+# Identifikasi Model
 
 Identifikasi model dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel EACF. Mengutip dari postingan pada laman [medium.com](https://medium.com/@ooemma83/how-to-interpret-acf-and-pacf-plots-for-identifying-ar-ma-arma-or-arima-models-498717e815b6) **Panduan dasar** untuk menginterpretasikan plot ACF dan PACF adalah sebagai berikut :
 
