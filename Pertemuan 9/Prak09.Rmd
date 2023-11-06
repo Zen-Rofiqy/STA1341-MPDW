@@ -1563,6 +1563,38 @@ pacf(train_nvda.diff, ylim=c(-.1,.1) , main="")
 mtext("NVDA", side=3, line=1, cex=2, font=2)
 ```
 
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_PACF.png", sep=""),
+    height = 7.5*300, width = 20*300, res=300)
+
+# Plot 
+par(mfrow=c(2,4))
+pacf(train_aapl.diff, ylim=c(-.1,.1) , main="")
+mtext("AAPL", side=3, line=1, cex=2, font=2)
+
+pacf(train_amzn.diff, ylim=c(-.1,.1) , main="")
+mtext("AMZN", side=3, line=1, cex=2, font=2)
+
+pacf(train_goog.diff, ylim=c(-.1,.1) , main="")
+mtext("GOOG", side=3, line=1, cex=2, font=2)
+
+pacf(train_meta.diff, ylim=c(-.1,.1) , main="")
+mtext("META", side=3, line=1, cex=2, font=2)
+
+pacf(train_msft.diff, ylim=c(-.1,.1) , main="")
+mtext("MSFT", side=3, line=1, cex=2, font=2)
+
+pacf(train_nflx.diff, ylim=c(-.1,.1) , main="")
+mtext("NFLX", side=3, line=1, cex=2, font=2)
+
+pacf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+mtext("NVDA", side=3, line=1, cex=2, font=2)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
 Referensi : [Significance level of ACF and PACF in R](https://stackoverflow.com/questions/29996910/significance-level-of-acf-and-pacf-in-r){.uri}
 
 ```{r}
