@@ -2635,7 +2635,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 7*300, width = 12*300, res=300)
 
 # Plot 
 par(mfrow=c(2,2)) 
@@ -2681,7 +2681,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 7*300, width = 12*300, res=300)
 
 # Plot 
 
@@ -2715,7 +2715,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 7*300, width = 12*300, res=300)
 
 # Plot 
 
@@ -2749,7 +2749,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 7*300, width = 12*300, res=300)
 
 # Plot 
 
@@ -2783,7 +2783,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 7*300, width = 12*300, res=300)
 
 # Plot 
 
@@ -2817,7 +2817,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 7*300, width = 12*300, res=300)
 
 # Plot 
 
@@ -2851,7 +2851,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan me
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+    height = 7*300, width = 12*300, res=300)
 
 # Plot 
 
