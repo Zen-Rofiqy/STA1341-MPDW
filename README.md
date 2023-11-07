@@ -16,14 +16,18 @@ https://simak.ipb.ac.id/Foto/Panduan/Dokumen_44.pdf
 
 ## Metode Selain ARIMA
 * **ARIMAX:**
+  > Untuk meningkatkan **akurasi** model ARIMA
   - https://rpubs.com/denannn/kel1par3datainflasi2  
   - https://rpubs.com/cdorante/ec2004_w6
 * **SARIMA:**
+  > Untuk Model **Musiman**/Seasonal 
   - https://rpubs.com/Akbar_rizki/sarima
   - https://rpubs.com/auliaann/905379
 * **ARCH/GARCH:**
+  > Untuk Sisaan yang **Tidak Homogen**
   - https://rpubs.com/spiffy/archgarchsahamamazon
 * **LSTM:**
+  > Untuk Pola Data **Siklik**
   - [LSTM](https://www.r-bloggers.com/2018/04/time-series-deep-learning-forecasting-sunspots-with-keras-stateful-lstm-in-r/)
 > **Note :** `ARCH/GARCH`   
 > Untuk mengambil hasil forecast menggunakan ugarchforecast,  
