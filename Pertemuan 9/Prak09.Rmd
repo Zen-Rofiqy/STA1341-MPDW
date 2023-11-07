@@ -2634,11 +2634,23 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
-
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_aapl.da) 
+qqline(sisaan_aapl.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_aapl.da)), sisaan_aapl.da, 
+     main = "Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_aapl.da) 
+pacf(sisaan_aapl.da) 
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -2668,7 +2680,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
@@ -2702,7 +2714,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
@@ -2736,7 +2748,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
@@ -2770,7 +2782,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
@@ -2804,7 +2816,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
@@ -2838,7 +2850,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan me
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
