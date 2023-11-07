@@ -16,6 +16,8 @@ https://simak.ipb.ac.id/Foto/Panduan/Dokumen_44.pdf
 
 ## Metode Selain ARIMA
 * **ARIMAX:**
+  > Jika ada variabel eksternal yang dapat mempengaruhi.
+  > Bisa berupa variabel dummy, indikator waktu, variabel lain yang berkaitan dengan fenomena nya.
   > Untuk meningkatkan **akurasi** model ARIMA
   - https://rpubs.com/denannn/kel1par3datainflasi2  
   - https://rpubs.com/cdorante/ec2004_w6
