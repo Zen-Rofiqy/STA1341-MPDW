@@ -3118,30 +3118,35 @@ plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4,
 Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
-#Transformasi Balik
-ramal_aapl <- data.ramalan_aapl.da
-ramal_amzn <- exp(data.ramalan_amzn.da)
-ramal_goog <- exp(data.ramalan_goog.da)
-ramal_meta <- exp(data.ramalan_meta.da)
-ramal_msft <- exp(data.ramalan_msft.da)
-ramal_nflx <- exp(data.ramalan_nflx.da)
-ramal_nvda <- exp(data.ramalan_nvda.da)
-
 #Diff inv
-ramal_aapl <- diffinv(ramal_aapl, differences=1) +
+ramal_aapl <- diffinv(data.ramalan_aapl.da, differences=1) +
   train_aapl.ts[length(train_aapl.ts)]             #nilai akhir data latih
-ramal_amzn <- diffinv(ramal_amzn, differences=1) +
-  train_amzn.ts[length(train_amzn.ts)]
-ramal_goog <- diffinv(ramal_goog, differences=1) +
-  train_goog.ts[length(train_goog.ts)]
-ramal_meta <- diffinv(ramal_meta, differences=1) +
-  train_meta.ts[length(train_meta.ts)]
-ramal_msft <- diffinv(ramal_msft, differences=1) +
-  train_msft.ts[length(train_msft.ts)]
-ramal_nflx <- diffinv(ramal_nflx, differences=1) +
-  train_nflx.ts[length(train_nflx.ts)]
-ramal_nvda <- diffinv(ramal_nvda, differences=1) +
-  train_nvda.ts[length(train_nvda.ts)]
+
+ramal_amzn <- diffinv(data.ramalan_amzn.da, differences=1) +
+  train_amzn.ts.new[length(train_amzn.ts)]
+
+ramal_goog <- diffinv(data.ramalan_goog.da, differences=1) +
+  train_goog.ts.new[length(train_goog.ts)]
+
+ramal_meta <- diffinv(data.ramalan_meta.da, differences=1) +
+  train_meta.ts.new[length(train_meta.ts)]
+
+ramal_msft <- diffinv(data.ramalan_msft.da, differences=1) +
+  train_msft.ts.new[length(train_msft.ts)]
+
+ramal_nflx <- diffinv(data.ramalan_nflx.da, differences=1) +
+  train_nflx.ts.new[length(train_nflx.ts)]
+
+ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
+  train_nvda.ts.new[length(train_nvda.ts)]
+
+#Transformasi Balik
+ramal_amzn <- exp(ramal_amzn)
+ramal_goog <- exp(ramal_goog)
+ramal_meta <- exp(ramal_meta)
+ramal_msft <- exp(ramal_msft)
+ramal_nflx <- exp(ramal_nflx)
+ramal_nvda <- exp(ramal_nvda)
 
 ramal <- data.frame(
   Date = data2 %>% dplyr::select(Date)  ,
