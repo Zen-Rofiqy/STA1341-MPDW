@@ -1,0 +1,3440 @@
+---
+title: "Time Series MAANG dengan Metode ARIMA & ARCH/GARCH"
+author: "Angga Fathan Rofiqy"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: hide
+    toc_depth: 3
+    number_sections: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    fig_caption: true
+pkgdown:
+  as_is: true
+---
+
+Kode di `Hide` dalam *default*, untuk menampilkan kode, klik `Code` .
+
+```{r, warning=FALSE, message = FALSE}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+```
+
+```{r}
+path <- function(){
+  gsub  ( "\\\\",  "/",  readClipboard ()  )
+}
+#Copy path, Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+```{r}
+#Export chart
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 9/Chart"
+```
+
+# Pendahuluan
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*2Yt3-zcGKc6MYuXCxgCL0A.jpeg)
+
+Dataset yang saya gunakan merupakan koleksi data harga saham historis periode Juli 2018 hingga Juli 2023 dari tujuh raksasa teknologi paling berpengaruh di dunia: Microsoft, Apple, Amazon, Nvidia, Google, Netflix, dan Meta (sebelumnya dikenal sebagai Facebook). Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.
+
+Dataset ini memilki data :
+
+1.  **Open:** yakni Harga saham pada awal periode perdagangan tertentu. Ini adalah harga saham pertama pada hari perdagangan tersebut.
+2.  **High:** Harga tertinggi yang saham capai selama periode perdagangan tersebut. Ini mencerminkan harga tertinggi yang pembeli bersedia bayar selama hari tersebut.
+3.  **Low:** Harga terendah yang saham capai selama periode perdagangan tersebut. Ini mencerminkan harga terendah yang penjual bersedia terima selama hari tersebut.
+4.  **Close:** Harga saham pada akhir periode perdagangan tertentu. Ini adalah harga saham terakhir pada hari perdagangan tersebut.
+5.  **Adj Close (Adjusted Close):** Harga penutup yang telah disesuaikan untuk memperhitungkan perubahan seperti pembagian saham atau dividen. Ini adalah harga penutup yang paling relevan untuk analisis jangka panjang, karena mencerminkan harga saham yang sebenarnya setelah penyesuaian.
+6.  **Volume:** Volume perdagangan saham selama periode tertentu. Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan tersebut.
+
+Kami akan menggunakan peubah `Adj Close (Adjusted Close)`, Karena sesuai dengan penjelasan diatas, peubah `Adj Close` adalah yang paling sesuai untuk dianalisis dibandingkan peubah lainnya.
+
+## Tujuan
+
+Tujuan dari praktikum ini adalah untuk menganalisis pola perkiraan pergerakan harga tujuh saham teknologi terkemuka dengan harapan dapat memberikan rekomendasi kepada pembaca mengenai saham mana yang sebaiknya dipertimbangkan untuk dibeli atau diinvestasikan secara signifikan di antara tujuh perusahaan teknologi besar tersebut.
+
+## Data Preparation {.tabset}
+
+### Import Data
+
+```{r, warning=FALSE, message = FALSE}
+install_load('rio')
+raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Data/MAANG%20Stock%20Prices.csv")
+```
+
+### Data Checking
+
+Cek Tipe data.
+
+```{r}
+str(raw.data)
+```
+
+Semua data Karakter, harus diubah.
+
+Cek Data kosong.
+
+```{r}
+sum(is.na(raw.data))
+```
+
+Tidak ada data kosong.
+
+### Penyesuaian Tipe Data
+
+Semua tipe data masih berupa character. Harus diubah menjadi tipe data yang sesuai.
+
+```{r, warning=FALSE, message = FALSE}
+install_load('dplyr')
+data <- raw.data %>%  
+  mutate(
+    Date = as.Date(raw.data[, 2], format = "%m/%d/%y"), #Mengubah menjadi Date 
+    across(3:ncol(raw.data), as.numeric)                #Mengubah menjadi Numerik
+  )
+str(data)
+```
+
+### Rechecking Data 
+
+Cek kembali data kosong.
+
+```{r}
+cat('Banyaknya Data Kosong', sum(is.na(data)))
+```
+
+Melihat baris, kolom mana data yang kosong.
+
+```{r message=FALSE, warning=FALSE}
+# Mencari indeks baris dan kolom yang mengandung NA
+na.idx <- which(is.na(data), arr.ind = TRUE)
+
+# Menampilkan data raw dengan baris dan kolom yang mengandung NA
+install_load('DT')
+datatable(raw.data[                        # Subsetting
+                unique(na.idx[, 1]),   # Vektor indeks baris yang mengandung NA
+                unique(na.idx[, 2])  ] # Vektor indeks kolom yang mengandung NA
+          )  
+```
+
+Ternyata pada baris tersebut ada data karakter text yang merupakan label dari tiap kolomnya. Sehingga ketika diubah ke numerik akan menjadi `NA`. Maka saya akan menghapus baris tersebut.
+
+```{r}
+data <- data %>%
+  filter(!row_number() %in% unique(na.idx[, 1]))
+data2 <- data
+```
+
+### Cek Periode Data
+
+```{r message=FALSE, warning=FALSE}
+install_load("lubridate")
+
+dates <- as.Date(data$Date)
+
+# Buat rentang waktu mulai dari tanggal pertama hingga tanggal terakhir dalam data
+full_date_range <- seq(min(dates), max(dates), by = "days")
+
+# Bandingkan rentang waktu dengan tanggal yang ada dalam data
+missing_dates <- setdiff(full_date_range, dates) 
+
+# Jika 'missing_dates' kosong, maka semua tanggal sudah ada dalam data
+if (length(missing_dates) == 0) {
+  cat("Semua tanggal ada dalam data.\n")
+} else {
+  cat("Tanggal yang tidak ada dalam data sebanyak", length(missing_dates),
+      "\nAtau sebanyak", length(missing_dates) * 7, 
+      "Data Hilang dari ke-7 perusahaan yang ada")
+}
+```
+
+**Inputasi Data**
+
+```{r fig.align="center", fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
+install_load('purrr')
+# Fungsi untuk mengisi data yang hilang
+fill_missing_data <- function(name) {
+  data_filtered <- data2 %>%
+    filter(Name == name)
+  
+  full_date_range <- seq(min(data2$Date), max(data2$Date), by = "days")
+  data_frame_template <- data.frame(Date = full_date_range)
+  
+  # Menambahkan kolom "Name" sesuai dengan perusahaan yang diproses
+  data_frame_template$Name <- name
+  
+  data_filled <- merge(data_frame_template, data_filtered, 
+                       by = c("Date", "Name"), all.x = TRUE)
+  return(data_filled)
+}
+
+# Menggunakan purrr::map untuk memproses setiap nama perusahaan
+filled_data_list <- map(unique(data2$Name), fill_missing_data)
+
+# Gabungkan data-data yang telah diisi menjadi satu data frame
+final_data <- data.frame()
+final_data <- do.call(rbind, filled_data_list)
+
+# Urutkan data berdasarkan "Name" terlebih dahulu, kemudian "Date"
+final_data <- final_data %>%
+  dplyr::select(1, 2, 7) %>%
+  arrange(Name, Date)
+
+#Input Data Hilang
+install_load('imputeTS')
+
+data <- na_interpolation(final_data$`Adj Close`)
+
+install_load('ggplot2')
+chart <- ggplot_na_imputations(final_data$`Adj Close`, data)
+chart
+#Export Chart
+ggsave("00_Imputasi Data.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+
+data <- final_data %>% select(Name, Date) %>% 
+  mutate(`Adj Close` = data)
+```
+
+Data sudah di imputasi.
+
+**Cek ukuran data**
+
+```{r}
+cat("Ukuran data awal adalah", nrow(data2),
+    "\nBanyaknya peride data yang hilang", length(missing_dates),
+    "(PerSaham.", length(missing_dates) * 7, "Jika semua)",
+    "\nUkuran data yang baru seharusnya", 
+    nrow(data2) + length(missing_dates) * 7,
+    "\nIni sudah sesuai dengan Ukuran data input (", nrow(data), ")")
+```
+
+Data sudah benar, siap untuk dianalisis.
+
+### Data Cleaned
+
+```{r}
+datatable(data, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+# Eksplorasi Data
+
+Referensi : [Warna](https://bookdown.org/hneth/ds4psy/ds4psy_files/figure-html/apx-color-sample-1.png){.uri}
+
+## Plot Time Series {.tabset}
+
+```{r, warning=FALSE, message = FALSE}
+install_load('ggplot2','extrafont')
+# font_import(); loadfonts() #Run ini sekali aja
+theme.ts <- list(
+  theme(legend.position = "none",
+        axis.text.x = element_text(hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 20, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        )
+theme.ts1 <- list(
+  theme(legend.position = "none",
+        axis.text.x = element_text(hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 50, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        )
+```
+
+### MAANG
+
+Melihat keseluruhan *Time Series* data saham.
+
+```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+install_load('viridis','ggrepel')
+#Plot
+chart <-
+ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
+  #Color
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
+                                "META" = .25, "AAPL" = .25, "GOOG" = .25, 
+                                "AMZN" = 1)) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Time Series MAANG",
+       subtitle = "Seperti apa sih pola deret waktu saham MAANG?\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data[data$Date == max(data$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 80, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date("2018-07-30"), as.Date("2023-12-28"))
+    #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date("2023-07-28")), 
+             linetype = "dotted", color = "red")
+chart
+
+#Export Chart
+ggsave("01_Time Series MAANG.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+```
+
+Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Amazon**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
+
+```{r}
+data2 <- data %>%
+  filter(Date >= as.Date("2022-01-01")) 
+```
+
+```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+install_load('viridis','ggrepel')
+#Plot
+chart <-
+ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
+  #Color
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
+                                "META" = .25, "AAPL" = .25, "GOOG" = .25, 
+                                "AMZN" = 1)) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Time Series MAANG",
+       subtitle = "Seperti apa sih pola deret waktu saham MAANG pada 2022-2023?\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data2$Date)), as.Date("2023-09-28"))
+    #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date("2023-07-28")), 
+             linetype = "dotted", color = "red")
+chart
+
+#Export Chart
+ggsave("01_Time Series MAANG_2022-2023.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+```
+
+### AAPL {style=".color:lightskyblue4;"}
+
+```{r}
+aapl <- data2 %>%
+  filter(Name == "AAPL")  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(aapl) <- NULL
+str(aapl)
+```
+
+```{r}
+datatable(aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+aapl.ts <- ts(aapl[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(aapl.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(aapl$`Adj Close`)
+min_date <- aapl$Date[which.min(aapl$`Adj Close`)]
+percentage <- (which.min(aapl$`Adj Close`) / nrow(aapl)) * 100
+
+chart <-
+ggplot(aapl, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("lightskyblue4")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Apple",
+       subtitle = "Seperti apa sih pola deret waktu saham Apple?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("03_Time Series Apple.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $64.47\%$ dari data menunjukkan kecenderungan [musiman yang menurun secara multipel]{.underline}. Kemudian, pada tanggal `2023-01-05`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_aapl <- aapl[1: round(nrow(aapl) *80/100),]
+test_aapl <- aapl[round(nrow(aapl) *80/100 +1): nrow(aapl),]
+train_aapl.ts <- ts(train_aapl[,3])
+test_aapl.ts <- ts(train_aapl[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_aapl, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_aapl, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Apple",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("lightskyblue4", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("03_TS_AAPL_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun musiman multiplikatif. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan]{.underline}.
+
+### AMZN
+
+```{r}
+amzn <- data2 %>%
+  filter(Name == "AMZN")  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(amzn) <- NULL
+str(amzn)
+```
+
+```{r}
+datatable(amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+amzn.ts <- ts(amzn[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(amzn.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(amzn$`Adj Close`)
+min_date <- amzn$Date[which.min(amzn$`Adj Close`)]
+percentage <- (which.min(amzn$`Adj Close`) / nrow(amzn)) * 100
+
+chart <-
+ggplot(amzn, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("orange2")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Amazon",
+       subtitle = "Seperti apa sih pola deret waktu saham Amazon?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Potong\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("02_Time Series Amazon.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dari grafik deret waktu yang ditampilkan, terlihat bahwa sekitar $63.2\%$ dari data menunjukkan kecenderungan [musiman yang menurun secara aditif]{.underline}. Selanjutnya, pada tanggal `2022-12-28`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_amzn <- amzn[1: round(nrow(amzn) *80/100),]
+test_amzn <- amzn[round(nrow(amzn) *80/100 +1): nrow(amzn),]
+train_amzn.ts <- ts(train_amzn[,3])
+test_amzn.ts <- ts(test_amzn[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_amzn, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_amzn, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Amazon",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("orange", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("02_TS_Amazon_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dari plot deret waktu data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun musiman secara aditif. Ini menunjukkan ketidakstabilan dalam nilai tengah dan variabilitas data latih, yang [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan absennya nilai tengah yang stabil. Hal ini juga mengindikasikan bahwa data uji [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan.]{.underline}
+
+### GOOG
+
+```{r}
+goog <- data2 %>%
+  filter(Name == "GOOG")  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(goog) <- NULL
+str(goog)
+```
+
+```{r}
+datatable(goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+goog.ts <- ts(goog[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(goog.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(goog$`Adj Close`)
+min_date <- goog$Date[which.min(goog$`Adj Close`)]
+percentage <- (which.min(goog$`Adj Close`) / nrow(goog)) * 100
+
+chart <-
+ggplot(goog, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("gold3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Google",
+       subtitle = "Seperti apa sih pola deret waktu saham Google?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("04_Time Series Google.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Melalui visualisasi grafik deret waktu yang disuguhkan, tampaknya sekitar $53.81\%$ data menggambarkan [tren menurun]{.underline}. Lalu, pada tanggal `2021-11-03`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_goog <- goog[1: round(nrow(goog) *80/100),]
+test_goog <- goog[round(nrow(goog) *80/100 +1): nrow(goog),]
+train_goog.ts <- ts(train_goog[,3])
+test_goog.ts <- ts(test_goog[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_goog, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_goog, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Google",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("gold3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("04_TS_GOOG_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Melalui plot deret waktu dari data latih ($80\%$ dari data asli), terlihat bahwa data menggambarkan tren menurun yang cukup jelas. Hal ini menunjukkan bahwa data latih [tidak]{.underline} menunjukkan sifat [stasioneritas dalam rataan]{.underline}. Sementara itu, dalam plot data uji ($20\%$ dari data asli), tampaknya terdapat tren naik yang signifikan, dan tidak ada nilai tengah yang tetap. Ini juga mengindikasikan bahwa data uji [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan]{.underline}.
+
+### META
+
+```{r}
+meta <- data2 %>%
+  filter(Name == "META")  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(meta) <- NULL
+str(meta)
+```
+
+```{r}
+datatable(meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+meta.ts <- ts(meta[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(meta.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(meta$`Adj Close`)
+min_date <- meta$Date[which.min(meta$`Adj Close`)]
+percentage <- (which.min(meta$`Adj Close`) / nrow(meta)) * 100
+
+chart <-
+ggplot(meta, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("dodgerblue3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham META",
+       subtitle = "Seperti apa sih pola deret waktu saham META?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("05_Time Series META.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Melalui grafik deret waktu yang disajikan, terlihat bahwa sekitar $53.81\%$ dari data menunjukkan kecenderungan [penurunan tren]{.underline}. Lalu, pada tanggal `2022-11-03`, terjadi perubahan pola menjadi [tren naik]{.underline}. Pola perubahan ini, beserta tanggal dan persentasenya, serupa dengan yang terlihat dalam pergerakan saham Google.
+
+**Pembagian Data Training Dan Test2**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_meta <- meta[1: round(nrow(meta) *80/100),]
+test_meta <- meta[round(nrow(meta) *80/100 +1): nrow(meta),]
+train_meta.ts <- ts(train_meta[,3])
+test_meta.ts <- ts(test_meta[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_meta, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_meta, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham META",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("dodgerblue3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("05_TS_META_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan grafik deret waktu data latih ($80\%$ dari data asli), tampak bahwa data menunjukkan kombinasi tren turun dan tren naik. Hal ini menunjukkan bahwa data latih [tidak]{.underline} memenuhi syarat [stasioneritas dalam rataan maupun ragam]{.underline}. Sementara itu, pada plot data uji ($20\%$ dari data asli), terlihat tren naik yang signifikan dan ketiadaan nilai tengah yang konsisten. Ini juga menandakan bahwa data uji [tidak]{.underline} memenuhi syarat [stasioneritas dalam rataan]{.underline}.
+
+### MSFT
+
+```{r}
+msft <- data2 %>%
+  filter(Name == "MSFT")  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(msft) <- NULL
+str(msft)
+```
+
+```{r}
+datatable(msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+msft.ts <- ts(msft[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(msft.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(msft$`Adj Close`)
+min_date <- msft$Date[which.min(msft$`Adj Close`)]
+percentage <- (which.min(msft$`Adj Close`) / nrow(msft)) * 100
+
+chart <-
+ggplot(msft, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("deepskyblue2")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Microsoft",
+       subtitle = "Seperti apa sih pola deret waktu saham Microsoft?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("06_Time Series Microsoft.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dalam gambaran grafik deret waktu yang diberikan, sekitar \$53.81%\$ data menunjukkan adanya [tren penurunan]{.underline} yang tampak. Lalu, pada tanggal `2022-11-03`, terjadi perubahan pola menjadi tren [kenaikan]{.underline}. Karakteristik tanggal dan persentase perubahan pola ini serupa dengan yang dapat ditemukan pada pergerakan saham Google dan META.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_msft <- msft[1: round(nrow(msft) *80/100),]
+test_msft <- msft[round(nrow(msft) *80/100 +1): nrow(msft),]
+train_msft.ts <- ts(train_msft[,3])
+test_msft.ts <- ts(test_msft[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_msft, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_msft, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Microsoft",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("deepskyblue2", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("06_TS_MSFT_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dari visualisasi grafik deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan adanya tren turun dan tren naik. Hal ini menunjukkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Sementara itu, dalam plot data uji ($20\%$ dari data asli), tampaknya terdapat tren kenaikan yang signifikan dan ketiadaan nilai tengah yang stabil. Hal ini juga menandakan bahwa data uji [tidak]{.underline} memenuhi persyaratan [stasioneritas dalam rataan.]{.underline}
+
+### NFLX
+
+```{r}
+nflx <- data2 %>%
+  filter(Name == "NFLX")  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(nflx) <- NULL
+str(nflx)
+```
+
+```{r}
+datatable(nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+nflx.ts <- ts(nflx[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(nflx.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(nflx$`Adj Close`)
+min_date <- nflx$Date[which.min(nflx$`Adj Close`)]
+percentage <- (which.min(nflx$`Adj Close`) / nrow(nflx)) * 100
+
+chart <-
+ggplot(nflx, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("firebrick3")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Seperti apa sih pola deret waktu saham Netflix?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("07_Time Series Netflix.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berbeda dari yang lain, berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $22.84\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-05-11`, terjadi perubahan pola menjadi [tren naik]{.underline}.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_nflx <- nflx[1: round(nrow(nflx) *80/100),]
+test_nflx <- nflx[round(nrow(nflx) *80/100  +1): nrow(nflx),]
+train_nflx.ts <- ts(train_nflx[,3])
+test_nflx.ts <- ts(test_nflx[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("firebrick3", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("07_TS_NFLX_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun yang drastis dan tren naik yang cukup mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan]{.underline}.
+
+### NVDA
+
+```{r}
+nvda <- data2 %>%
+  filter(Name == "NVDA")  # Filter data saham Amazon tahun 2022 ke atas
+
+rownames(nvda) <- NULL
+str(nvda)
+```
+
+```{r}
+datatable(nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Mengubah `Ajd Close` Menjadi *Time series.*
+
+```{r}
+nvda.ts <- ts(nvda[,3])
+```
+
+Ringkasan Data `Ajd CLose.`
+
+```{r}
+summary(nvda.ts)
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+min_value <- min(nvda$`Adj Close`)
+min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
+percentage <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
+
+chart <-
+ggplot(nvda, aes(x=Date, y=`Adj Close`)) + 
+  geom_line(aes(color=Name), linewidth=2) +
+  scale_color_manual(values = c("green4")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham NVIDIA",
+       subtitle = "Seperti apa sih pola deret waktu saham NVIDIA?\n") +
+  theme(legend.position = "none") +
+  theme.ts1 + 
+  geom_vline(xintercept = as.numeric(min_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
+                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+                         "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+chart
+#Export Chart
+ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $50.25\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-10-14`, terjadi perubahan pola menjadi [tren naik]{.underline} dan menaik tajam pada Juli 2023.
+
+**Pembagian Data Training Dan Test.**
+
+```{r}
+#membagi 80% data latih (training) dan 20% data uji (testing)
+train_nvda <- nvda[1:488,]
+test_nvda <- nvda[489: nrow(nvda),]
+train_nvda.ts <- ts(train_nvda[,3])
+test_nvda.ts <- ts(test_nvda[,3])
+```
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham NVIDIA",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  scale_colour_manual(name="Keterangan:", 
+                      breaks = c("Data Latih", "Data Uji"),
+                      values = c("green4", "grey30")) + theme.ts1
+chart
+#Export Chart
+ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan.]{.underline}
+
+## Data Train vs Test
+
+```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
+chart <-
+ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+  #Label Data Latih 
+  annotate( "rect", alpha=0.1, fill="seagreen",
+            xmin=as.Date(min(data2$Date)), 
+            xmax=data2$Date[ceiling(0.8 * length(data2$Date)/7)],
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="seagreen",
+            x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
+            y = max(data2$`Adj Close`) * 0.95, 
+    label = "Data Latih\n80%", size=10) + 
+  
+  #Label Data Uji
+  annotate( "rect", alpha=0.1, fill="violetred",
+            xmin=data2$Date[ceiling(0.8 * length(data2$Date)/7)], 
+            xmax=as.Date(max(data2$Date)),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="violetred",
+            x = as.Date(data2$Date[ceiling(0.9 * length(data2$Date)/7)]) , 
+            y = max(data2$`Adj Close`) * 0.95, 
+    label = "Data Uji\n20%", size=10) +
+  
+  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
+  #Color
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  
+    scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = 1, "MSFT" = 1, 
+                                "META" = 1, "AAPL" = 1, "GOOG" = 1, 
+                                "AMZN" = 1)) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Time Series MAANG",
+       subtitle = "Pembagian Data Latih dan data Uji\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data2$Date)), as.Date("2023-09-28"))
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = data2$Date[ceiling(0.8 * length(data2$Date)/7)] , 
+             linetype = "dotted", color = "black", linewidth = 2) 
+            
+chart
+#Export Chart
+ggsave("09_banding_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 23)
+```
+
+# Stasioneritas
+
+## Uji Stasioneritas
+
+### Plot ACF
+
+```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+install_load('tsibble','tseries')
+par(mfrow=c(2,4))
+acf(train_aapl.ts, main=""); mtext("AAPL", side=3, line=1, cex=2, font=2)
+acf(train_amzn.ts, main=""); mtext("AMZN", side=3, line=1, cex=2, font=2)
+acf(train_goog.ts, main=""); mtext("GOOG", side=3, line=1, cex=2, font=2)
+acf(train_meta.ts, main=""); mtext("META", side=3, line=1, cex=2, font=2)
+acf(train_msft.ts, main=""); mtext("MSFT", side=3, line=1, cex=2, font=2)
+acf(train_nflx.ts, main=""); mtext("NFLX", side=3, line=1, cex=2, font=2)
+acf(train_nvda.ts, main=""); mtext("NVDA", side=3, line=1, cex=2, font=2)
+```
+
+Berdasarkan plot ACF, terlihat bahwa plot ACF seluruh data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data **tidak stasioner dalam rataan** dan tidak membentuk gelombang sinus.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_ACF.png", sep=""),
+    height = 7.5*300, width = 20*300, res=300)
+
+# Plot 
+par(mfrow=c(2,4))
+acf(train_aapl.ts, main=""); mtext("AAPL", side=3, line=1, cex=2, font=2)
+acf(train_amzn.ts, main=""); mtext("AMZN", side=3, line=1, cex=2, font=2)
+acf(train_goog.ts, main=""); mtext("GOOG", side=3, line=1, cex=2, font=2)
+acf(train_meta.ts, main=""); mtext("META", side=3, line=1, cex=2, font=2)
+acf(train_msft.ts, main=""); mtext("MSFT", side=3, line=1, cex=2, font=2)
+acf(train_nflx.ts, main=""); mtext("NFLX", side=3, line=1, cex=2, font=2)
+acf(train_nvda.ts, main=""); mtext("NVDA", side=3, line=1, cex=2, font=2)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### Uji ADF
+
+```{r}
+adf <- data.frame(
+  p.value = c(tseries::adf.test(train_aapl.ts)[["p.value"]],
+               tseries::adf.test(train_amzn.ts)[["p.value"]],
+               tseries::adf.test(train_goog.ts)[["p.value"]],
+               tseries::adf.test(train_meta.ts)[["p.value"]],
+               tseries::adf.test(train_msft.ts)[["p.value"]],
+               tseries::adf.test(train_nflx.ts)[["p.value"]],
+               tseries::adf.test(train_nvda.ts)[["p.value"]]
+              )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+adf$Keterangan <- ifelse(adf$p.value < 0.05, "Rataan Stasioner", 
+                         "Rataan Tidak Stasioner")
+rownames(adf) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+datatable(adf, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+
+### Plot Box-Cox
+
+```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+install_load('MASS')
+index <- seq(1:nrow(train_aapl))
+par(mfrow=c(2,4))
+
+bc =boxcox(train_aapl.ts~index, lambda=seq(-2, 4, by=.01))
+title("AAPL", cex.main = 4)
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_amzn.ts~index, lambda=seq(-2, 4, by=.01))
+title("AMZN", cex.main = 4)
+lambda_amzn <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_goog.ts~index, lambda=seq(-2, 4, by=.01))
+title("GOOG", cex.main = 4)
+lambda_goog <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_meta.ts~index, lambda=seq(-2, 4, by=.01))
+title("META", cex.main = 4)
+lambda_meta <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_msft.ts~index, lambda=seq(-2, 4, by=.01))
+title("MSFT", cex.main = 4)
+lambda_msft <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_nflx.ts~index, lambda=seq(-2, 4, by=.01))
+title("NFLX", cex.main = 4)
+lambda_nflx <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+index <- seq(1:nrow(train_nvda)) #Beda titik potong
+bc =boxcox(train_nvda.ts~index, lambda=seq(-2, 4, by=.01))
+title("NVDA", cex.main = 4)
+lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+```
+
+Gambar di atas menunjukkan bahwa hanya `AAPL` yang memuat *rounded value* ($\lambda$) di dalam selangnya. Sementara selainnya tidak memuatnya.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_BoxCox.png", sep=""),
+    height = 7.5*300, width = 20*300, res=300)
+
+# Plot 
+index <- seq(1:nrow(train_aapl))
+par(mfrow=c(2,4))
+
+bc =boxcox(train_aapl.ts~index, lambda=seq(-2, 4, by=.01))
+title("AAPL", cex.main = 4)
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_amzn.ts~index, lambda=seq(-2, 4, by=.01))
+title("AMZN", cex.main = 4)
+lambda_amzn <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_goog.ts~index, lambda=seq(-2, 4, by=.01))
+title("GOOG", cex.main = 4)
+lambda_goog <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_meta.ts~index, lambda=seq(-2, 4, by=.01))
+title("META", cex.main = 4)
+lambda_meta <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_msft.ts~index, lambda=seq(-2, 4, by=.01))
+title("MSFT", cex.main = 4)
+lambda_msft <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+bc =boxcox(train_nflx.ts~index, lambda=seq(-2, 4, by=.01))
+title("NFLX", cex.main = 4)
+lambda_nflx <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+index <- seq(1:nrow(train_nvda)) #Beda titik potong
+bc =boxcox(train_nvda.ts~index, lambda=seq(-2, 4, by=.01))
+title("NVDA", cex.main = 4)
+lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+#### Lambda dan Selang Kepercayaan
+
+```{r}
+lsk <- data.frame(
+  Lambda = c(lambda_aapl, lambda_amzn, lambda_goog, lambda_meta, 
+             lambda_msft, lambda_nflx, lambda_nvda ),
+  Batas.Bawah = c(min(sk_aapl), min(sk_amzn), min(sk_goog), min(sk_meta),
+                  min(sk_msft), min(sk_nflx), min(sk_nvda)  ),
+  Batas.Atas = c(max(sk_aapl), max(sk_amzn), max(sk_goog), max(sk_meta),
+                 max(sk_msft), max(sk_nflx), max(sk_nvda)  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+lsk$Keterangan <- apply(lsk, 1, function(row) {
+  ifelse(row["Batas.Bawah"] <= 1 && row["Batas.Atas"] >= 1,
+         "Ragam Stasioner",  "Ragam Tidak Stasioner")
+})
+
+rownames(lsk) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+
+datatable(lsk, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kepercayaan diatas yang menyatakan bahwa selain `AAPL`{style="caret-color: white;"} tidak ada yang memuat nilai satu di dalam selangnya. Ini mengindikasikan bahwa hanya `AAPL`{style="caret-color: white;"} yang memiliki **stasioneritas dalam ragam**, Sementara yang lain memerlukan transformasi data karena **tidak** memiliki sifat **stasioner dalam ragam**.
+
+## **Penanganan Ketidakstasioneran Data**
+
+### Dalam Ragam: Transformasi
+
+Mengutip dari laman [r-coder.com](https://r-coder.com/box-cox-transformation-r/){.uri}, formula transformasi data disesuaikan dengan nilai *rounded value* ($\lambda$) optimumnya.
+
+| $\mathbf{\lambda}$ | **Transformasi** | **Transformasi Balik** |
+|:------------------:|:----------------:|:----------------------:|
+|         -2         |     $1/x^2$      |      $1/\sqrt{x}$      |
+|         -1         |      $1/x$       |         $1/x$          |
+|        -0.5        |   $1/\sqrt{x}$   |        $1/x^2$         |
+|         0          |   $\log{(x)}$    |         $e^x$          |
+|        0.5         |    $\sqrt{x}$    |         $x^2$          |
+|         1          |       $x$        |          $x$           |
+|         2          |      $x^2$       |       $\sqrt{x}$       |
+
+: Karena semua data saham yang tidak stasioner memiliki nilai *rounded value* ($\lambda$) optimum nya mendekati 0, maka transformasi yang digunakan adalah transformasi $\log{(x)}$ dengan transfromasi baliknya $e^x$ atau $\exp{(x)}$.
+
+#### Transformasi
+
+```{r fig.align="center", fig.height=7.5, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
+#Transformasi
+train_amzn.ts.new <- log(train_amzn.ts)
+train_goog.ts.new <- log(train_goog.ts)
+train_meta.ts.new <- log(train_meta.ts)
+train_msft.ts.new <- log(train_msft.ts)
+train_nflx.ts.new <- log(train_nflx.ts)
+train_nvda.ts.new <- log(train_nvda.ts)
+
+#Plot BoxCox
+par(mfrow=c(2,3))
+index <- seq(1:nrow(train_aapl))
+bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("AMZN", cex.main=3)
+bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("GOOG", cex.main=3)
+bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("META", cex.main=3)
+bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("MSFT", cex.main=3)
+bc <-boxcox(train_nflx.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("NFLX", cex.main=3)
+index <- seq(1:nrow(train_nvda))
+bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("NVDA", cex.main=3)
+```
+
+Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap rangkaian data sekarang mencakup nilai satu dalam selangnya, yang menunjukkan bahwa data tersebut sekarang sudah **stasioner dalam ragam**.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_BoxCox_Trans.png", sep=""),
+    height = 7.5*300, width = 15*300, res=300)
+
+# Plot 
+par(mfrow=c(2,3))
+index <- seq(1:nrow(train_aapl))
+bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("AMZN", cex.main=3)
+bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("GOOG", cex.main=3)
+bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("META", cex.main=3)
+bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("MSFT", cex.main=3)
+bc <-boxcox(train_nflx.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("NFLX", cex.main=3)
+index <- seq(1:nrow(train_nvda))
+bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-5, 6, by=.01))
+title("NVDA", cex.main=3)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### Dalam Rataan: Differencing
+
+*Differencing* (diferensiasi) adalah suatu proses statistik yang digunakan untuk mengatasi ketidakstasioneran dalam data rata-rata atau tren data. Tujuannya adalah untuk membuat data menjadi lebih stasioner dengan mengurangi atau menghilangkan tren atau pola waktu yang mungkin ada dalam data tersebut.
+
+```{r dpi=300, fig.height = 8, fig.width = 25, fig.align = "center"}
+#Diff
+train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
+train_amzn.diff <- diff(train_amzn.ts.new, differences = 1) 
+train_goog.diff <- diff(train_goog.ts.new, differences = 1) 
+train_meta.diff <- diff(train_meta.ts.new, differences = 1) 
+train_msft.diff <- diff(train_msft.ts.new, differences = 1) 
+train_nflx.diff <- diff(train_nflx.ts.new, differences = 1) 
+train_nvda.diff <- diff(train_nvda.ts.new, differences = 1) 
+
+#Plot
+par(mfrow=c(2,4))
+plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "lightskyblue4", lwd = 2,
+        main="AAPL", cex.main = 4)
+plot.ts(train_amzn.diff, lty=1, xlab="Periode (Hari)", 
+        col = "orange2", lwd = 2,
+        main="AMZN", cex.main = 4)
+plot.ts(train_goog.diff, lty=1, xlab="Differencing  (Hari)", 
+        col = "gold3", lwd = 2,
+        main="GOOG", cex.main = 4)
+plot.ts(train_meta.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "dodgerblue3", lwd = 2,
+        main="META", cex.main = 4)
+plot.ts(train_msft.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "deepskyblue2", lwd = 2,
+        main="MSFT", cex.main = 4)
+plot.ts(train_nflx.diff, lty=1, xlab="Periode (Hari)", 
+        col = "firebrick3", lwd = 2,
+        main="NFLX", cex.main = 4)
+plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "green4", lwd = 2,
+        main="NVDA", cex.main = 4)
+```
+
+Berdasarkan plot data deret waktu yang sudah di *Differencing*, terlihat bahwa seluruh data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_Diff.png", sep=""),
+    height = 8*300, width = 25*300, res=300)
+
+# Plot 
+par(mfrow=c(2,4))
+plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "lightskyblue4", lwd = 2,
+        main="AAPL", cex.main = 4)
+plot.ts(train_amzn.diff, lty=1, xlab="Periode (Hari)", 
+        col = "orange2", lwd = 2,
+        main="AMZN", cex.main = 4)
+plot.ts(train_goog.diff, lty=1, xlab="Differencing  (Hari)", 
+        col = "gold3", lwd = 2,
+        main="GOOG", cex.main = 4)
+plot.ts(train_meta.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "dodgerblue3", lwd = 2,
+        main="META", cex.main = 4)
+plot.ts(train_msft.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "deepskyblue2", lwd = 2,
+        main="MSFT", cex.main = 4)
+plot.ts(train_nflx.diff, lty=1, xlab="Periode (Hari)", 
+        col = "firebrick3", lwd = 2,
+        main="NFLX", cex.main = 4)
+plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
+        col = "green4", lwd = 2,
+        main="NVDA", cex.main = 4)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+## Uji Ulang
+
+Akan dilakukan uji ulang untuk mengecek kestasioneran data dalam rataan.
+
+### Plot ACF
+
+```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+par(mfrow=c(2,4))
+acf(train_aapl.diff, ylim=c(-.1,.1) , main="")
+mtext("AAPL", side=3, line=1, cex=2, font=2)
+
+acf(train_amzn.diff, ylim=c(-.1,.1) , main="")
+mtext("AMZN", side=3, line=1, cex=2, font=2)
+
+acf(train_goog.diff, ylim=c(-.1,.1) , main="")
+mtext("GOOG", side=3, line=1, cex=2, font=2)
+
+acf(train_meta.diff, ylim=c(-.1,.1) , main="")
+mtext("META", side=3, line=1, cex=2, font=2)
+
+acf(train_msft.diff, ylim=c(-.1,.1) , main="")
+mtext("MSFT", side=3, line=1, cex=2, font=2)
+
+acf(train_nflx.diff, ylim=c(-.1,.1) , main="")
+mtext("NFLX", side=3, line=1, cex=2, font=2)
+
+acf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+mtext("NVDA", side=3, line=1, cex=2, font=2)
+```
+
+Berdasarkan ketujuh plot ACF tersebut, dapat dilihat bahwa lag nya sudah tidak *tails off slowly* (trennya telah berakhir dan korelasi antara pengamatan pada lag-lag yang lebih jauh telah berkurang secara signifikan), sehingga data dinyatakan stasioner dalam rataan. Ini menunjukkan bahwa masalah ketidakstasioneran dalam data telah berhasil diatasi.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
+    height = 7.5*300, width = 20*300, res=300)
+
+# Plot 
+par(mfrow=c(2,4))
+acf(train_aapl.diff, ylim=c(-.1,.1) , main="")
+mtext("AAPL", side=3, line=1, cex=2, font=2)
+
+acf(train_amzn.diff, ylim=c(-.1,.1) , main="")
+mtext("AMZN", side=3, line=1, cex=2, font=2)
+
+acf(train_goog.diff, ylim=c(-.1,.1) , main="")
+mtext("GOOG", side=3, line=1, cex=2, font=2)
+
+acf(train_meta.diff, ylim=c(-.1,.1) , main="")
+mtext("META", side=3, line=1, cex=2, font=2)
+
+acf(train_msft.diff, ylim=c(-.1,.1) , main="")
+mtext("MSFT", side=3, line=1, cex=2, font=2)
+
+acf(train_nflx.diff, ylim=c(-.1,.1) , main="")
+mtext("NFLX", side=3, line=1, cex=2, font=2)
+
+acf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+mtext("NVDA", side=3, line=1, cex=2, font=2)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### Uji ADF
+
+```{r message=FALSE, warning=FALSE}
+adf1 <- data.frame(
+  p.value = c(tseries::adf.test(train_aapl.diff)[["p.value"]],
+              tseries::adf.test(train_amzn.diff)[["p.value"]],
+              tseries::adf.test(train_goog.diff)[["p.value"]],
+              tseries::adf.test(train_meta.diff)[["p.value"]],
+              tseries::adf.test(train_msft.diff)[["p.value"]],
+              tseries::adf.test(train_nflx.diff)[["p.value"]],
+              tseries::adf.test(train_nvda.diff)[["p.value"]]
+              )
+)
+adf1$Keterangan <- ifelse(adf1$p.value < 0.05, "Rataan Stasioner", 
+                         "Rataan Tidak Stasioner")
+rownames(adf1) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+datatable(adf1, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+> $H_0$ : Data tidak stasioner dalam rataan
+>
+> $H_1$ : Data stasioner dalam rataan
+
+Berdasarkan uji ADF tersebut, semua data saham mendapatkan *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+
+# Model Tentatif
+
+Identifikasi model tentatif dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel EACF. Mengutip dari postingan pada laman [medium.com](https://medium.com/@ooemma83/how-to-interpret-acf-and-pacf-plots-for-identifying-ar-ma-arma-or-arima-models-498717e815b6) **Panduan dasar** untuk menginterpretasikan plot ACF dan PACF adalah sebagai berikut :
+
+1.  Cari pola *tail off* pada ACF atau PACF.
+2.  Jika *tail off* terjadi pada ACF → **model AR** → *cut off* pada PACF akan memberikan nilai p untuk AR(p).
+3.  Jika *tail off* terjadi pada PACF → **model MA** → *cut off* pada ACF akan memberikan nilai q untuk MA(q).
+4.  Jika terjadi *tail off* pada kedua ACF dan PACF → **model ARMA**.
+
+## Plot ACF & PACF
+
+```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+par(mfrow=c(2,4))
+pacf(train_aapl.diff, ylim=c(-.1,.1) , main="")
+mtext("AAPL", side=3, line=1, cex=2, font=2)
+
+pacf(train_amzn.diff, ylim=c(-.1,.1) , main="")
+mtext("AMZN", side=3, line=1, cex=2, font=2)
+
+pacf(train_goog.diff, ylim=c(-.1,.1) , main="")
+mtext("GOOG", side=3, line=1, cex=2, font=2)
+
+pacf(train_meta.diff, ylim=c(-.1,.1) , main="")
+mtext("META", side=3, line=1, cex=2, font=2)
+
+pacf(train_msft.diff, ylim=c(-.1,.1) , main="")
+mtext("MSFT", side=3, line=1, cex=2, font=2)
+
+pacf(train_nflx.diff, ylim=c(-.1,.1) , main="")
+mtext("NFLX", side=3, line=1, cex=2, font=2)
+
+pacf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+mtext("NVDA", side=3, line=1, cex=2, font=2)
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Stas_PACF.png", sep=""),
+    height = 7.5*300, width = 20*300, res=300)
+
+# Plot 
+par(mfrow=c(2,4))
+pacf(train_aapl.diff, ylim=c(-.1,.1) , main="")
+mtext("AAPL", side=3, line=1, cex=2, font=2)
+
+pacf(train_amzn.diff, ylim=c(-.1,.1) , main="")
+mtext("AMZN", side=3, line=1, cex=2, font=2)
+
+pacf(train_goog.diff, ylim=c(-.1,.1) , main="")
+mtext("GOOG", side=3, line=1, cex=2, font=2)
+
+pacf(train_meta.diff, ylim=c(-.1,.1) , main="")
+mtext("META", side=3, line=1, cex=2, font=2)
+
+pacf(train_msft.diff, ylim=c(-.1,.1) , main="")
+mtext("MSFT", side=3, line=1, cex=2, font=2)
+
+pacf(train_nflx.diff, ylim=c(-.1,.1) , main="")
+mtext("NFLX", side=3, line=1, cex=2, font=2)
+
+pacf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+mtext("NVDA", side=3, line=1, cex=2, font=2)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+Referensi : [Significance level of ACF and PACF in R](https://stackoverflow.com/questions/29996910/significance-level-of-acf-and-pacf-in-r){.uri}
+
+```{r}
+acf.pacf <- function(dt){ #Fungsi Deteksi Cut off plot ACF & PACF
+  N <- acf(dt, plot = F)[["n.used"]] + 1 #Banyaknya Data
+  #Garis Signifikan
+  sl <- c(-1,1)*(exp(2*1.96/sqrt(N-3))-1)/(exp(2*1.96/sqrt(N-3))+1)
+  acf <- data.frame( lag = acf(dt, plot=F)[["lag"]], 
+                     acf = acf(dt, plot=F)[["acf"]] ) 
+  
+    cut.off1 <- acf %>%
+        filter(acf <= min(sl) | acf >= max(sl)) %>%
+        dplyr::select(lag); colnames(cut.off1) <- "acf"
+  
+  pacf <- data.frame(lag = pacf(dt, plot=F)[["lag"]], 
+                     acf = pacf(dt, plot=F)[["acf"]] ) 
+  
+    cut.off2 <- pacf %>%
+        filter(acf <= min(sl) | acf >= max(sl)) %>%
+        dplyr::select(lag); colnames(cut.off2) <- "pacf"
+    
+  cut.off <- merge(cut.off1, cut.off2, by = 0, all = TRUE)[-1]
+  return(cut.off)
+}
+
+data_frames <- list(
+  train_aapl.diff, train_amzn.diff, train_goog.diff,
+  train_meta.diff, train_msft.diff, train_nflx.diff,
+  train_nvda.diff
+)
+
+name <- unique(data$Name)
+
+acf.pacf.tab <- data.frame()
+for(i in 1:length(name)){
+  dex <- data_frames[[i]] %>% acf.pacf() %>% 
+  rename(!!paste0(name[i], ".a") := acf, 
+         !!paste0(name[i], ".p") := pacf)
+  
+    acf.pacf.tab <- merge(acf.pacf.tab, dex, by=0, all=TRUE)[-1]
+}
+
+datatable(acf.pacf.tab, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
+
+## Tabel EACF {.tabset}
+
+Referensi : [[University of South Carolina] Chapter 6: Model Specification for Time Series](https://people.stat.sc.edu/hitchcock/stat520ch6slides.pdf){.uri}
+
+> Mengutip dari referensi diatas, Identifikasi model menggunakan Tabel EACF (Extended Autocorrelation Function) untuk proses ARMA(p, q) seharusnya secara teoritis memiliki **pola segitiga nol**, dengan nol di sudut kiri atas muncul pada baris ke-p dan kolom ke-q (dengan label baris dan kolom dimulai dari 0).
+
+Sebagai contoh :
+
+![](images/Screenshot%202023-10-15%20234003-01.png)
+
+Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+
+Pemilihan model ARIMA terbaik dilakukan ketika memiliki nilai **AIC** yang terkecil, **Semua Parameter Signifikan**, dan **Tidak ada Parameter NA**.
+
+```{r message=FALSE, warning=FALSE}
+install_load('TSA')
+install_load('forecast')
+
+# Fungsi untuk menghitung model ARIMA dan menganalisis parameter
+model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
+  best_model <- NULL
+  best_aic <- Inf
+  eacf_result <- eacf(data)
+  models <- data.frame(Model = character(0), 
+                       AIC = numeric(0), 
+                       Signif = character(0), 
+                       Keterangan = character(0))
+  
+  for (p in 0:p_max) {
+    for (q in 1:q_max) {
+      #Pola Matriks segitiga bawah
+      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
+          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
+          !is.na(eacf_result$symbol[p + 2, q + 2])) {
+        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
+            eacf_result$symbol[p + 1, q + 2] == "o" && 
+            eacf_result$symbol[p + 2, q + 2] == "o") {
+      
+          model <- Arima(data, order=c(p,d,q), method="ML", 
+                         include.drift=drift)
+          aic <- AIC(model)
+          
+          # Mendapatkan nilai coef dari model
+          coeftest_result <- lmtest::coeftest(model)
+          
+          # jika lebih kecil dari alpha, maka signifikan
+          significant_params <- 
+            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] < alpha]  
+          
+          # jika lebih besar dari alpha, maka tidak signifikan
+          non_significant_params <- 
+            rownames(coeftest_result)[coeftest_result[, "Pr(>|z|)"] > alpha]  
+          
+          # Keterangan signifikansi
+          if (length(significant_params) == 0) {
+            keterangan <- "Semua parameter tidak signifikan"
+          } else if (length(significant_params) == nrow(coeftest_result)) {
+            keterangan <- "Semua parameter signifikan"
+          } else {
+            keterangan <- paste("Parameter yang tidak signifikan adalah", 
+                                paste(non_significant_params, collapse = ", "))
+          }
+          
+          models <- rbind(models, 
+                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q, ")", 
+                                             sep = ""), 
+                               AIC = aic, 
+                               Signif = paste(significant_params, 
+                                              collapse = ", "), 
+                               Keterangan = keterangan))
+          
+          #Identifikasi Best Model
+            if (keterangan == "Semua parameter signifikan" && 
+                !any(is.na(significant_params))) {
+              if (aic < best_aic) {
+                best_model <- model
+                best_aic <- aic
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  cat("\nModel ARIMA dengan AIC terkecil:\n")
+  print(best_model)
+
+  return(models)
+}
+```
+
+### AAPL
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_aapl <- 
+  model_tentatif(train_aapl.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2139.54$ dimiliki oleh model `ARIMA(2,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,3)` .
+
+```{r}
+model_aapl.da <- Arima(train_aapl.diff, order=c(2,1,3), method="ML")
+```
+
+### AMZN
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_amzn <- 
+  model_tentatif(train_amzn.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2101.57$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_amzn.da <- Arima(train_amzn.diff, order=c(0,1,1), method="ML")
+```
+
+### GOOG
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_goog <- 
+  model_tentatif(train_goog.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2301.96$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_goog.da <- Arima(train_goog.diff, order=c(0,1,1), method="ML")
+```
+
+### META
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_meta <- 
+  model_tentatif(train_meta.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1815.84$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
+
+```{r}
+model_meta.da <- Arima(train_meta.diff, order=c(0,1,1), method="ML")
+```
+
+### MSFT
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_msft <- 
+  model_tentatif(train_msft.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2421.48$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_msft.da <- Arima(train_msft.diff, order=c(0,1,1), method="ML")
+```
+
+### NFLX
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_nflx <- 
+  model_tentatif(train_nflx.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1759.09$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_nflx.da <- Arima(train_nflx.diff, order=c(0,1,1), method="ML")
+```
+
+### NVDA
+
+```{r message=FALSE, warning=FALSE}
+model.tentaif_nvda <- 
+  model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
+datatable(model.tentaif_nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1578.14$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
+```
+
+## Model Tentatif Terbaik
+
+```{r}
+tentatif <- data.frame(
+  Model = 
+    c( paste("ARIMA(", paste(as.character(
+          model_aapl.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_amzn.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_goog.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_meta.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_msft.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nflx.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nvda.da[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = "")
+  ),
+  AIC = c(model_aapl.da[["aicc"]],
+          model_amzn.da[["aicc"]],
+          model_goog.da[["aicc"]],
+          model_meta.da[["aicc"]],
+          model_msft.da[["aicc"]],
+          model_nflx.da[["aicc"]],
+          model_nvda.da[["aicc"]]
+  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+rownames(tentatif) <- unique(data$Name)
+
+tentatif$Keterangan <-
+ c(model.tentaif_aapl[which(model.tentaif_aapl$Model == 
+                     tentatif["Model"]["AAPL",]), "Keterangan"],
+   model.tentaif_amzn[which(model.tentaif_amzn$Model == 
+                     tentatif["Model"]["AMZN",]), "Keterangan"],
+   model.tentaif_goog[which(model.tentaif_goog$Model == 
+                     tentatif["Model"]["GOOG",]), "Keterangan"],
+   model.tentaif_meta[which(model.tentaif_meta$Model == 
+                     tentatif["Model"]["META",]), "Keterangan"],
+   model.tentaif_msft[which(model.tentaif_msft$Model == 
+                     tentatif["Model"]["MSFT",]), "Keterangan"],
+   model.tentaif_nflx[which(model.tentaif_nflx$Model == 
+                     tentatif["Model"]["NFLX",]), "Keterangan"],
+   model.tentaif_nvda[which(model.tentaif_nvda$Model == 
+                     tentatif["Model"]["NVDA",]), "Keterangan"]
+   )
+
+datatable(tentatif, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model terbaik yang paling sering digunakan. Hanya `AAPL` saja yang modelnya berbeda dari yang lainnya, yakni **ARIMA(2,1,3)**. Perlu diingat bahwa `AAPL` Tidak dilakukan transformasi. Sehingga jika kita mengabaikan nilai **AIC** nya, maka nilai **AIC** terkecil adalah $-2421.46$ (`MSFT`) dan yang terbesar adalah $-1759.06$ (`NFLX`).
+
+# Model ARIMA dengan Drift
+
+Tren menentukan bagaimana perubahan deret waktu dari waktu ke waktu. Dalam model ARIMA, ini dapat dimodelkan menggunakan persamaan dasar berikut [1]. "a" disebut "**intercept**" dan "b" disebut "**drift**". "Drift" adalah hanyalah kemiringan garis lurus. Selanjutnya akan dilakukan kombinasi model ARIMA dengan Intercept dan Drift.
+
+## 1. Model Tanpa Intercept dan Tanpa Drift {.tabset}
+
+Simpelnya ini merupakan model **data train** yang diberi differencing. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q)**.
+
+### AAPL
+
+```{r message=FALSE, warning=FALSE}
+drift1_aapl <- 
+  model_tentatif(train_aapl.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2137.64$.
+
+```{r}
+model_aapl.drift1 <- Arima(train_aapl.ts, order=c(3,1,3), method="ML")
+```
+
+### AMZN
+
+```{r message=FALSE, warning=FALSE}
+drift1_amzn <- 
+  model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2295.54$ dimiliki oleh model `ARIMA(1,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(1,1,1)`.
+
+```{r}
+model_amzn.drift1 <- Arima(train_amzn.ts, order=c(1,1,1), method="ML")
+```
+
+### GOOG
+
+```{r message=FALSE, warning=FALSE}
+drift1_goog <- 
+  model_tentatif(train_goog.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2002.22$.
+
+```{r}
+model_goog.drift1 <- Arima(train_goog.ts, order=c(3,1,3), method="ML")
+```
+
+### META
+
+```{r message=FALSE, warning=FALSE}
+drift1_meta <- 
+  model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,5)` dengan nilai AIC sebesar $3002.21$.
+
+```{r}
+model_meta.drift1 <- Arima(train_meta.ts, order=c(3,1,5), method="ML")
+```
+
+### MSFT
+
+```{r message=FALSE, warning=FALSE}
+drift1_msft <- 
+  model_tentatif(train_msft.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2668.42$ dimiliki oleh model `ARIMA(3,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,1,3)`.
+
+```{r}
+model_msft.drift1 <- Arima(train_msft.ts, order=c(3,1,3), method="ML")
+```
+
+### NFLX
+
+```{r message=FALSE, warning=FALSE}
+drift1_nflx <- 
+  model_tentatif(train_nflx.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3474.44$ dimiliki oleh model `ARIMA(3,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,1,3)`.
+
+```{r}
+model_nflx.drift1 <- Arima(train_nflx.ts, order=c(3,1,3), method="ML")
+```
+
+### NVDA
+
+```{r message=FALSE, warning=FALSE}
+drift1_nvda <- 
+  model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12)
+datatable(drift1_nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3105.62$ dimiliki oleh model `ARIMA(2,1,2)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,2)`.
+
+```{r}
+model_nvda.drift1 <- Arima(train_nvda.ts, order=c(2,1,2), method="ML")
+```
+
+### Model Terbaik
+
+```{r}
+drift1 <- data.frame(
+  Model = 
+    c( paste("ARIMA(", paste(as.character(
+          model_aapl.drift1[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_amzn.drift1[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_goog.drift1[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_meta.drift1[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_msft.drift1[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nflx.drift1[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nvda.drift1[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = "")
+  ),
+  AIC = c(model_aapl.drift1[["aicc"]],
+          model_amzn.drift1[["aicc"]],
+          model_goog.drift1[["aicc"]],
+          model_meta.drift1[["aicc"]],
+          model_msft.drift1[["aicc"]],
+          model_nflx.drift1[["aicc"]],
+          model_nvda.drift1[["aicc"]]
+  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+rownames(drift1) <- unique(data$Name)
+
+drift1$Keterangan <-
+ c(drift1_aapl[which(drift1_aapl$Model == 
+                     drift1["Model"]["AAPL",]), "Keterangan"],
+   drift1_amzn[which(drift1_amzn$Model == 
+                     drift1["Model"]["AMZN",]), "Keterangan"],
+   drift1_goog[which(drift1_goog$Model == 
+                     drift1["Model"]["GOOG",]), "Keterangan"],
+   drift1_meta[which(drift1_meta$Model == 
+                     drift1["Model"]["META",]), "Keterangan"],
+   drift1_msft[which(drift1_msft$Model == 
+                     drift1["Model"]["MSFT",]), "Keterangan"],
+   drift1_nflx[which(drift1_nflx$Model == 
+                     drift1["Model"]["NFLX",]), "Keterangan"],
+   drift1_nvda[which(drift1_nvda$Model == 
+                     drift1["Model"]["NVDA",]), "Keterangan"]
+   )
+
+datatable(drift1, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Walaupun berlabel model terbaik, namun terdapat dua model yang tidak semua parameternya signifikan. Yakni Model `ARIMA(3,1,3)` dari `GOOG` dan `ARIMA(3,1,3)` dari `META`.
+
+## 2. Model Dengan Intercept Tanpa Drift {.tabset}
+
+Simpelnya ini merupakan model **data differencing** tanpa diberi differencing. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q)**.
+
+### AAPL
+
+```{r message=FALSE, warning=FALSE}
+drift2_aapl <- 
+  model_tentatif(train_aapl.diff, p_max =6, d = 0, q_max = 12)
+datatable(drift2_aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,0,3)` dengan nilai AIC sebesar $2138.82$.
+
+```{r}
+model_aapl.drift2 <- Arima(train_aapl.diff, order=c(3,0,3), method="ML")
+```
+
+### AMZN
+
+```{r message=FALSE, warning=FALSE}
+drift2_amzn <- 
+  model_tentatif(train_amzn.diff, p_max = 6, d = 0, q_max = 12)
+datatable(drift2_amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,0,4)` dengan nilai AIC sebesar $-2111.55$.
+
+```{r}
+model_amzn.drift2 <- Arima(train_amzn.diff, order=c(3,0,4), method="ML")
+```
+
+### GOOG
+
+```{r message=FALSE, warning=FALSE}
+drift2_goog <- 
+  model_tentatif(train_goog.diff, p_max = 6, d = 0, q_max = 12)
+datatable(drift2_goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(1,0,3)` dengan nilai AIC sebesar $-2311.74$.
+
+```{r}
+model_goog.drift2 <- Arima(train_goog.diff, order=c(1,0,3), method="ML")
+```
+
+### META
+
+```{r message=FALSE, warning=FALSE}
+drift2_meta <- 
+  model_tentatif(train_meta.diff, p_max = 6, d = 0, q_max = 12)
+datatable(drift2_meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,0,4)` dengan nilai AIC sebesar $-1816.39$.
+
+```{r}
+model_meta.drift2 <- Arima(train_meta.diff, order=c(3,0,4), method="ML")
+```
+
+### MSFT
+
+```{r message=FALSE, warning=FALSE}
+drift2_msft <- 
+  model_tentatif(train_msft.diff, p_max = 6, d = 0, q_max = 12)
+datatable(drift2_msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(2,0,7)` dengan nilai AIC sebesar $-2433.07$.
+
+```{r}
+model_msft.drift2 <- Arima(train_msft.diff, order=c(2,0,7), method="ML")
+```
+
+### NFLX
+
+```{r message=FALSE, warning=FALSE}
+drift2_nflx <- 
+  model_tentatif(train_nflx.diff, p_max = 6, d = 0, q_max = 12)
+datatable(drift2_nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(2,0,4)` dengan nilai AIC sebesar $-1764.81$.
+
+```{r}
+model_nflx.drift2 <- Arima(train_nflx.diff, order=c(2,0,4), method="ML")
+```
+
+### NVDA
+
+```{r message=FALSE, warning=FALSE}
+drift2_nvda <- 
+  model_tentatif(train_nvda.diff, p_max = 6, d = 0, q_max = 12)
+datatable(drift2_nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(4,0,5)` dengan nilai AIC sebesar $-2046.65$.
+
+```{r}
+model_nvda.drift2 <- Arima(train_nvda.diff, order=c(4,0,5), method="ML")
+```
+
+### Model Terbaik
+
+```{r}
+drift2 <- data.frame(
+  Model = 
+    c( paste("ARIMA(", paste(as.character(
+          model_aapl.drift2[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_amzn.drift2[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_goog.drift2[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_meta.drift2[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_msft.drift2[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nflx.drift2[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nvda.drift2[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = "")
+  ),
+  AIC = c(model_aapl.drift2[["aicc"]],
+          model_amzn.drift2[["aicc"]],
+          model_goog.drift2[["aicc"]],
+          model_meta.drift2[["aicc"]],
+          model_msft.drift2[["aicc"]],
+          model_nflx.drift2[["aicc"]],
+          model_nvda.drift2[["aicc"]]
+  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+rownames(drift2) <- unique(data$Name)
+
+drift2$Keterangan <-
+ c(drift2_aapl[which(drift2_aapl$Model == 
+                     drift2["Model"]["AAPL",]), "Keterangan"],
+   drift2_amzn[which(drift2_amzn$Model == 
+                     drift2["Model"]["AMZN",]), "Keterangan"],
+   drift2_goog[which(drift2_goog$Model == 
+                     drift2["Model"]["GOOG",]), "Keterangan"],
+   drift2_meta[which(drift2_meta$Model == 
+                     drift2["Model"]["META",]), "Keterangan"],
+   drift2_msft[which(drift2_msft$Model == 
+                     drift2["Model"]["MSFT",]), "Keterangan"],
+   drift2_nflx[which(drift2_nflx$Model == 
+                     drift2["Model"]["NFLX",]), "Keterangan"],
+   drift2_nvda[which(drift2_nvda$Model == 
+                     drift2["Model"]["NVDA",]), "Keterangan"]
+   )
+
+datatable(drift2, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya signifikan.
+
+## 3. Model Tanpa Intercept Dengan Drift {.tabset}
+
+Simpelnya ini merupakan model **data train** yang diberi **differencing** dan **drift**. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q) + include.drift**.
+
+### AAPL
+
+```{r message=FALSE, warning=FALSE}
+drift3_aapl <- 
+  model_tentatif(train_aapl.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
+datatable(drift3_aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2138.82$.
+
+```{r}
+model_aapl.drift3 <- Arima(train_aapl.ts, order=c(3,1,3), method="ML",
+                           include.drift=TRUE)
+```
+
+### AMZN
+
+```{r message=FALSE, warning=FALSE}
+drift3_amzn <- 
+  model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
+datatable(drift3_amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifi3an dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(1,1,1)` dengan nilai AIC sebesar $2296.55$.
+
+```{r}
+model_amzn.drift3 <- Arima(train_amzn.ts, order=c(1,1,1), method="ML",
+                           include.drift=TRUE)
+```
+
+### GOOG
+
+```{r message=FALSE, warning=FALSE}
+drift3_goog <- 
+  model_tentatif(train_goog.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
+datatable(drift3_goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(1,1,3)` dengan nilai AIC sebesar $2003.64$.
+
+```{r}
+model_goog.drift3 <- Arima(train_goog.ts, order=c(1,1,3), method="ML",
+                           include.drift=TRUE)
+```
+
+### META
+
+```{r message=FALSE, warning=FALSE}
+drift3_meta <- 
+  model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
+datatable(drift3_meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,5)` dengan nilai AIC sebesar $3003.73$.
+
+```{r}
+model_meta.drift3 <- Arima(train_meta.ts, order=c(3,1,5), method="ML",
+                           include.drift=TRUE)
+```
+
+### MSFT
+
+```{r message=FALSE, warning=FALSE}
+drift3_msft <- 
+  model_tentatif(train_msft.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
+datatable(drift3_msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(2,1,4)` dengan nilai AIC sebesar $2668.12$.
+
+```{r}
+model_msft.drift3 <- Arima(train_msft.ts, order=c(2,1,4), method="ML",
+                           include.drift=TRUE)
+```
+
+### NFLX
+
+```{r message=FALSE, warning=FALSE}
+drift3_nflx <- 
+  model_tentatif(train_nflx.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
+datatable(drift3_nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(2,1,5)` dengan nilai AIC sebesar $3469.87$.
+
+```{r}
+model_nflx.drift3 <- Arima(train_nflx.ts, order=c(2,1,5), method="ML",
+                           include.drift=TRUE)
+```
+
+### NVDA
+
+```{r message=FALSE, warning=FALSE}
+drift3_nvda <- 
+  model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
+datatable(drift3_nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3101.32$ dimiliki oleh model `ARIMA(3,1,2)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,1,2)`.
+
+```{r}
+model_nvda.drift3 <- Arima(train_nvda.ts, order=c(3,1,2), method="ML",
+                           include.drift=TRUE)
+```
+
+### Model Terbaik
+
+```{r}
+drift3 <- data.frame(
+  Model = 
+    c( paste("ARIMA(", paste(as.character(
+          model_aapl.drift3[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_amzn.drift3[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_goog.drift3[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_meta.drift3[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_msft.drift3[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nflx.drift3[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nvda.drift3[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = "")
+  ),
+  AIC = c(model_aapl.drift3[["aicc"]],
+          model_amzn.drift3[["aicc"]],
+          model_goog.drift3[["aicc"]],
+          model_meta.drift3[["aicc"]],
+          model_msft.drift3[["aicc"]],
+          model_nflx.drift3[["aicc"]],
+          model_nvda.drift3[["aicc"]]
+  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+rownames(drift3) <- unique(data$Name)
+
+drift3$Keterangan <-
+ c(drift3_aapl[which(drift3_aapl$Model == 
+                     drift3["Model"]["AAPL",]), "Keterangan"],
+   drift3_amzn[which(drift3_amzn$Model == 
+                     drift3["Model"]["AMZN",]), "Keterangan"],
+   drift3_goog[which(drift3_goog$Model == 
+                     drift3["Model"]["GOOG",]), "Keterangan"],
+   drift3_meta[which(drift3_meta$Model == 
+                     drift3["Model"]["META",]), "Keterangan"],
+   drift3_msft[which(drift3_msft$Model == 
+                     drift3["Model"]["MSFT",]), "Keterangan"],
+   drift3_nflx[which(drift3_nflx$Model == 
+                     drift3["Model"]["NFLX",]), "Keterangan"],
+   drift3_nvda[which(drift3_nvda$Model == 
+                     drift3["Model"]["NVDA",]), "Keterangan"]
+   )
+
+datatable(drift3, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya signifikan.
+
+## 4. Model dengan Intercept dan dengan Drift {.tabset}
+
+Simpelnya ini merupakan model **data differencing** tanpa diberi differencing namun diberi drift. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q) + include.drift**.
+
+### AAPL
+
+```{r message=FALSE, warning=FALSE}
+drift4_aapl <- 
+  model_tentatif(train_aapl.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
+datatable(drift4_aapl, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2137.15$ dimiliki oleh model `ARIMA(3,0,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(3,0,3)`.
+
+```{r}
+model_aapl.drift4 <- Arima(train_aapl.diff, order=c(3,0,3), method="ML",
+                           include.drift=TRUE)
+```
+
+### AMZN
+
+```{r message=FALSE, warning=FALSE}
+drift4_amzn <- 
+  model_tentatif(train_amzn.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
+datatable(drift4_amzn, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,0,4)` dengan nilai AIC sebesar $-2110.08$.
+
+```{r}
+model_amzn.drift4 <- Arima(train_amzn.diff, order=c(3,0,4), method="ML",
+                           include.drift=TRUE)
+```
+
+### GOOG
+
+```{r message=FALSE, warning=FALSE}
+drift4_goog <- 
+  model_tentatif(train_goog.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
+datatable(drift4_goog, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Walaupun jika mengabaikan kategorinya, pemilihan modle terbaiknya agak cukup sulit. Hanya ada **tiga** model yang parameternya tidak memiliki **NA** di dalamnya. Merika adalah `ARIMA(1,0,12)`, `ARIMA(4,0,11)`, dan `ARIMA(2,0,12)`. Itupun mereka banyak parameternya yang signifikan. Diputuskanlah model terbaiknya adalah `ARIMA(2,0,12)` dengan nilai AIC yang lebih kecil daripada ketiganya yakni sebesar $-2297.46$.
+
+```{r}
+model_goog.drift4 <- Arima(train_goog.diff, order=c(2,0,12), method="ML",
+                           include.drift=TRUE)
+```
+
+### META
+
+```{r message=FALSE, warning=FALSE}
+drift4_meta <- 
+  model_tentatif(train_meta.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
+datatable(drift4_meta, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(0,0,13)` dengan nilai AIC sebesar $-1826.41$.
+
+```{r}
+model_meta.drift4 <- Arima(train_meta.diff, order=c(0,0,1), method="ML",
+                           include.drift=TRUE)
+```
+
+### MSFT
+
+```{r message=FALSE, warning=FALSE}
+drift4_msft <- 
+  model_tentatif(train_msft.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
+datatable(drift4_msft, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(2,0,8)` dengan nilai AIC sebesar $-2433.85$.
+
+```{r}
+model_msft.drift4 <- Arima(train_msft.diff, order=c(2,0,8), method="ML",
+                           include.drift=TRUE)
+```
+
+### NFLX
+
+```{r message=FALSE, warning=FALSE}
+drift4_nflx <- 
+  model_tentatif(train_nflx.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
+datatable(drift4_nflx, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(0,0,1)` dengan nilai AIC sebesar $-1768.7$.
+
+```{r}
+model_nflx.drift4 <- Arima(train_nflx.diff, order=c(0,0,1), method="ML",
+                           include.drift=TRUE)
+```
+
+### NVDA
+
+```{r message=FALSE, warning=FALSE}
+drift4_nvda <- 
+  model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12, drift=TRUE)
+datatable(drift4_nvda, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(5,1,5)` dengan nilai AIC sebesar $-2038.37$.
+
+```{r}
+model_nvda.drift4 <- Arima(train_nvda.diff, order=c(5,1,5), method="ML",
+                           include.drift=TRUE)
+```
+
+### Model Terbaik
+
+```{r}
+drift4 <- data.frame(
+  Model = 
+    c( paste("ARIMA(", paste(as.character(
+          model_aapl.drift4[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_amzn.drift4[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_goog.drift4[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_meta.drift4[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_msft.drift4[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nflx.drift4[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = ""),
+       paste("ARIMA(", paste(as.character(
+          model_nvda.drift4[["call"]][["order"]][-1]), 
+          collapse = ","), ")", sep = "")
+  ),
+  AIC = c(model_aapl.drift4[["aicc"]],
+          model_amzn.drift4[["aicc"]],
+          model_goog.drift4[["aicc"]],
+          model_meta.drift4[["aicc"]],
+          model_msft.drift4[["aicc"]],
+          model_nflx.drift4[["aicc"]],
+          model_nvda.drift4[["aicc"]]
+  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+rownames(drift4) <- unique(data$Name)
+
+drift4$Keterangan <-
+ c(drift4_aapl[which(drift4_aapl$Model == 
+                     drift4["Model"]["AAPL",]), "Keterangan"],
+   drift4_amzn[which(drift4_amzn$Model == 
+                     drift4["Model"]["AMZN",]), "Keterangan"],
+   drift4_goog[which(drift4_goog$Model == 
+                     drift4["Model"]["GOOG",]), "Keterangan"],
+   drift4_meta[which(drift4_meta$Model == 
+                     drift4["Model"]["META",]), "Keterangan"],
+   drift4_msft[which(drift4_msft$Model == 
+                     drift4["Model"]["MSFT",]), "Keterangan"],
+   drift4_nflx[which(drift4_nflx$Model == 
+                     drift4["Model"]["NFLX",]), "Keterangan"],
+   drift4_nvda[which(drift4_nvda$Model == 
+                     drift4["Model"]["NVDA",]), "Keterangan"]
+   )
+
+datatable(drift4, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Walaupun berlabel model terbaik, namun hanya terdapat satu model yang semua parameternya signifikan. Yakni Model `ARIMA(3,0,3)` dari `AAPL`. Mungkin ini bisa disebabkan karne`AAPL` tidak dilakukan transfomrasi, sedangkan yang lainnya dilakukan transformasi.
+
+# **Analisis Sisaan**
+
+Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
+
+## **Eksplorasi Sisaan** {.tabset}
+
+### AAPL
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_aapl.da <- model_aapl.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_aapl.da) 
+qqline(sisaan_aapl.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_aapl.da)), sisaan_aapl.da, 
+     main = "Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_aapl.da, ylim=c(-.1,.1)) 
+pacf(sisaan_aapl.da, ylim=c(-.1,.1)) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar** **normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(2,1,3)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Sisaan_AAPL.png", sep=""),
+    height = 7*300, width = 12*300, res=300)
+
+# Plot 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_aapl.da) 
+qqline(sisaan_aapl.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_aapl.da)), sisaan_aapl.da, 
+     main = "Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_aapl.da, ylim=c(-.1,.1)) 
+pacf(sisaan_aapl.da, ylim=c(-.1,.1)) 
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### AMZN
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_amzn.da <- model_amzn.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_amzn.da) 
+qqline(sisaan_amzn.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_amzn.da)), sisaan_amzn.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_amzn.da, ylim=c(-.1,.1)) 
+pacf(sisaan_amzn.da, ylim=c(-.1,.1)) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik-titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Sisaan_AMZN.png", sep=""),
+    height = 7*300, width = 12*300, res=300)
+
+# Plot 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_amzn.da) 
+qqline(sisaan_amzn.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_amzn.da)), sisaan_amzn.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_amzn.da, ylim=c(-.1,.1)) 
+pacf(sisaan_amzn.da, ylim=c(-.1,.1)) 
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### GOOG
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_goog.da <- model_goog.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_goog.da) 
+qqline(sisaan_goog.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_goog.da)), sisaan_goog.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_goog.da, ylim=c(-.1,.1)) 
+pacf(sisaan_goog.da, ylim=c(-.1,.1)) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Sisaan_GOOG.png", sep=""),
+    height = 7*300, width = 12*300, res=300)
+
+# Plot 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_goog.da) 
+qqline(sisaan_goog.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_goog.da)), sisaan_goog.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_goog.da, ylim=c(-.1,.1)) 
+pacf(sisaan_goog.da, ylim=c(-.1,.1)) 
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### META
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_meta.da <- model_meta.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_meta.da) 
+qqline(sisaan_meta.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_meta.da)), sisaan_meta.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_meta.da, ylim=c(-.1,.1)) 
+pacf(sisaan_meta.da, ylim=c(-.1,.1)) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Sisaan_META.png", sep=""),
+    height = 7*300, width = 12*300, res=300)
+
+# Plot 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_meta.da) 
+qqline(sisaan_meta.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_meta.da)), sisaan_meta.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_meta.da, ylim=c(-.1,.1)) 
+pacf(sisaan_meta.da, ylim=c(-.1,.1)) 
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### MSFT
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_msft.da <- model_msft.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_msft.da) 
+qqline(sisaan_msft.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_msft.da)), sisaan_msft.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_msft.da, ylim=c(-.1,.1)) 
+pacf(sisaan_msft.da, ylim=c(-.1,.1)) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **menyebar tidak normal** ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Sisaan_MSFT.png", sep=""),
+    height = 7*300, width = 12*300, res=300)
+
+# Plot 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_msft.da) 
+qqline(sisaan_msft.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_msft.da)), sisaan_msft.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_msft.da, ylim=c(-.1,.1)) 
+pacf(sisaan_msft.da, ylim=c(-.1,.1)) 
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### NFLX
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_nflx.da <- model_nflx.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_nflx.da) 
+qqline(sisaan_nflx.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_nflx.da)), sisaan_nflx.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_nflx.da, ylim=c(-.1,.1)) 
+pacf(sisaan_nflx.da, ylim=c(-.1,.1)) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Sisaan_NFLX.png", sep=""),
+    height = 7*300, width = 12*300, res=300)
+
+# Plot 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_nflx.da) 
+qqline(sisaan_nflx.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_nflx.da)), sisaan_nflx.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_nflx.da, ylim=c(-.1,.1)) 
+pacf(sisaan_nflx.da, ylim=c(-.1,.1)) 
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### NVDA
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Eksplorasi 
+sisaan_nvda.da <- model_nvda.da$residuals 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_nvda.da) 
+qqline(sisaan_nvda.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_nvda.da)), sisaan_nvda.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+pacf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+```
+
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **tidak normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/99_Sisaan_NVDA.png", sep=""),
+    height = 7*300, width = 12*300, res=300)
+
+# Plot 
+par(mfrow=c(2,2)) 
+# QQ-Plot
+qqnorm(sisaan_nvda.da) 
+qqline(sisaan_nvda.da, col = "dodgerblue3", lwd = 2.5) 
+# Plot sisaan
+plot(c(1:length(sisaan_nvda.da)), sisaan_nvda.da, 
+     main = "Plot Sisaan Model ARIMA",
+     xlab = "Periode",
+     ylab = "Nilai Sisaan")
+abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
+#Plot ACF dan PACF
+acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+pacf(sisaan_nvda.da, ylim=c(-.1,.1))
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+## **Uji Formal** {.tabset}
+
+### Sisaan Menyebar Normal
+
+Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
+
+> $H_0$ : Sisaan menyebar normal
+>
+> $H_1$ : Sisaan tidak menyebar normal
+
+```{r}
+#tak tolak H0 > sisaan menyebar normal
+normal <- data.frame(
+  p.value = c(ks.test(sisaan_aapl.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_amzn.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_goog.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_meta.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_msft.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_nflx.da, "pnorm")[["p.value"]],
+              ks.test(sisaan_nvda.da, "pnorm")[["p.value"]]
+              )
+) 
+normal$Keterangan <- ifelse(normal$p.value < 0.05, 
+                              "Sisaan Tidak Menyebar Normal", 
+                              "Sisaan Menyebar Normal")
+
+normal$p.value <- ifelse(normal$p.value == 0, "< 2.2e-16",
+                           sprintf("%.2e", normal$p.value) )
+
+rownames(normal) <- unique(data$Name)
+datatable(normal, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Berdasarkan uji KS tersebut, didapat *p-value* sebesar $7.04\times10^{-11}$ pada `AAPL` sedangkan lainnya sangat kecil yakni kurang dari $2.2\times10^{-16}$. Semua *p-value* nya kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
+
+### Sisaan saling bebas
+
+Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Ljung-Box. Hipotesis yang digunakan adalah sebagai berikut.
+
+> $H_0$ : Sisaan saling bebas
+>
+> $H_1$ : Sisaan tidak tidak saling bebas
+
+```{r}
+#tak tolak H0 > sisaan saling bebas
+bebas <- data.frame(
+  p.value = c(Box.test(sisaan_aapl.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_amzn.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_goog.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_meta.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_msft.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_nflx.da, type = "Ljung")[["p.value"]],
+              Box.test(sisaan_nvda.da, type = "Ljung")[["p.value"]]
+              )
+) 
+bebas$Keterangan <- ifelse(bebas$p.value < 0.05, 
+                              "Sisaan Tidak Saling Bebas", 
+                              "Sisaan Saling Bebas")
+
+bebas$p.value <- ifelse(bebas$p.value == 0, "< 2.2e-16",
+                           round(bebas$p.value, 2) )
+
+rownames(bebas) <- unique(data$Name)
+datatable(bebas, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Berdasarkan uji Ljung-Box tersebut, semua *p-value* nya lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Yang berarti tidak ada autokorelasi. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+
+### Sisaan homogen
+
+Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
+
+> $H_0$ : Ragam sisaan homogen
+>
+> $H_1$ : Ragam sisaan tidak homogen
+
+```{r}
+#tak tolak H0 > sisaan homogen
+homogen <- data.frame(
+  p.value = c(Box.test((sisaan_aapl.da)^2, type = "Ljung")[["p.value"]],
+              Box.test((sisaan_amzn.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_goog.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_meta.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_msft.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_nflx.da)^2, type = "Ljung")[["p.value"]], 
+              Box.test((sisaan_nvda.da)^2, type = "Ljung")[["p.value"]]
+              )
+) 
+homogen$Keterangan <- ifelse(homogen$p.value < 0.05, 
+                              "Sisaan Tidak Homogen", 
+                              "Sisaan Homogen")
+
+homogen$p.value <- ifelse(homogen$p.value == 0, "< 2.2e-16",
+                           round(homogen$p.value, 3) )
+
+rownames(homogen) <- unique(data$Name)
+datatable(homogen, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, hanya ada 2 yang lebih kecil dari dari taraf nyata $5\%$ yakni `AMZN` dan `GOOG`. Yang berarti **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**. Sisanya lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**.
+
+### Nilai tengah sama dengan nol
+
+Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. Hipotesis yang diujikan sebagai berikut.
+
+> $H_0$ : nilai tengah sisaan sama dengan 0
+>
+> $H_1$ : nilai tengah sisaan tidak sama dengan 0
+
+```{r}
+#tak tolak h0 > nilai tengah sisaan sama dengan 0 
+nol <- data.frame(
+  p.value = c(t.test(sisaan_aapl.da, mu=0, conf.level=.95)[["p.value"]],
+              t.test(sisaan_amzn.da, mu=0, conf.level=.95)[["p.value"]], 
+              t.test(sisaan_goog.da, mu=0, conf.level=.95)[["p.value"]], 
+              t.test(sisaan_meta.da, mu=0, conf.level=.95)[["p.value"]], 
+              t.test(sisaan_msft.da, mu=0, conf.level=.95)[["p.value"]], 
+              t.test(sisaan_nflx.da, mu=0, conf.level=.95)[["p.value"]], 
+              t.test(sisaan_nvda.da, mu=0, conf.level=.95)[["p.value"]]
+              )
+) 
+nol$Keterangan <- ifelse(nol$p.value < 0.05, 
+                              "Nilai Tengah \u2260 0", 
+                              "Nilai Tengah = 0")
+
+nol$p.value <- ifelse(nol$p.value == 0, "< 2.2e-16",
+                           round(nol$p.value, 3) )
+
+rownames(nol) <- unique(data$Name)
+datatable(nol, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Berdasarkan uji-t tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+# **Peramalan**
+
+Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk $h$ hari ke depan. Dengan $h$ adalah banyaknya data test per perusahaan.
+
+```{r}
+#---FORECAST---#
+ramalan_aapl.da <- forecast::forecast(model_aapl.da, h = nrow(test_aapl)) 
+ramalan_amzn.da <- forecast::forecast(model_amzn.da, h = nrow(test_amzn)) 
+ramalan_goog.da <- forecast::forecast(model_goog.da, h = nrow(test_goog)) 
+ramalan_meta.da <- forecast::forecast(model_meta.da, h = nrow(test_meta)) 
+ramalan_msft.da <- forecast::forecast(model_msft.da, h = nrow(test_msft)) 
+ramalan_nflx.da <- forecast::forecast(model_nflx.da, h = nrow(test_nflx)) 
+ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = nrow(test_nvda)) 
+```
+
+## Plot Ramalan
+
+```{r dpi=300, fig.height = 8, fig.width = 25, fig.align = "center"}
+data.ramalan_aapl.da <- ramalan_aapl.da$mean
+data.ramalan_amzn.da <- ramalan_amzn.da$mean
+data.ramalan_goog.da <- ramalan_goog.da$mean
+data.ramalan_meta.da <- ramalan_meta.da$mean
+data.ramalan_msft.da <- ramalan_msft.da$mean
+data.ramalan_nflx.da <- ramalan_nflx.da$mean
+data.ramalan_nvda.da <- ramalan_nvda.da$mean
+
+#Plot
+par(mfrow=c(2,4))
+plot(ramalan_aapl.da, main="AAPL", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col="lightskyblue4")
+plot(ramalan_amzn.da, main="AMZN", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "orange2")
+plot(ramalan_goog.da, main="GOOG", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "gold3")
+plot(ramalan_meta.da, main="META", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "dodgerblue3")
+plot(ramalan_msft.da, main="MSFT", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "deepskyblue2")
+plot(ramalan_nflx.da, main="NFLX", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "firebrick3")
+plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "green4")
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+#Transformasi Balik
+ramal_aapl <- data.ramalan_aapl.da
+ramal_amzn <- exp(data.ramalan_amzn.da)
+ramal_goog <- exp(data.ramalan_goog.da)
+ramal_meta <- exp(data.ramalan_meta.da)
+ramal_msft <- exp(data.ramalan_msft.da)
+ramal_nflx <- exp(data.ramalan_nflx.da)
+ramal_nvda <- exp(data.ramalan_nvda.da)
+
+#Diff inv
+ramal_aapl <- diffinv(ramal_aapl, differences=1) +
+  train_aapl.ts[length(train_aapl.ts)]             #nilai akhir data latih
+ramal_amzn <- diffinv(ramal_amzn, differences=1) +
+  train_amzn.ts[length(train_amzn.ts)]
+ramal_goog <- diffinv(ramal_goog, differences=1) +
+  train_goog.ts[length(train_goog.ts)]
+ramal_meta <- diffinv(ramal_meta, differences=1) +
+  train_meta.ts[length(train_meta.ts)]
+ramal_msft <- diffinv(ramal_msft, differences=1) +
+  train_msft.ts[length(train_msft.ts)]
+ramal_nflx <- diffinv(ramal_nflx, differences=1) +
+  train_nflx.ts[length(train_nflx.ts)]
+ramal_nvda <- diffinv(ramal_nvda, differences=1) +
+  train_nvda.ts[length(train_nvda.ts)]
+
+ramal <- data.frame(
+  Date = data2 %>% dplyr::select(Date)  ,
+  `Adj Close` = c(as.vector(train_aapl.ts), ramal_aapl[-1],
+                  as.vector(train_amzn.ts), ramal_amzn[-1],
+                  as.vector(train_goog.ts), ramal_goog[-1],
+                  as.vector(train_meta.ts), ramal_meta[-1],
+                  as.vector(train_msft.ts), ramal_msft[-1],
+                  as.vector(train_nflx.ts), ramal_nflx[-1],
+                  as.vector(train_nvda.ts), ramal_nvda[-1] ),
+  Name = rep(c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA"), 
+              each = nrow(train_aapl) + nrow(test_aapl) )
+)
+colnames(ramal) <- c("Date", "Adj Close", "Name")
+```
+
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=TRUE, message = FALSE}
+chart <- 
+ggplot(ramal, aes(x = Date, y = `Adj Close`, color = Name)) +
+  #Label Data Asli 
+  annotate( "rect", alpha=0.1, fill="seagreen",
+            xmin=as.Date(min(ramal$Date)), 
+            xmax=as.Date(ramal$Date[ceiling(nrow(train_aapl))]),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="seagreen",
+            x = as.Date(ramal$Date[ceiling(nrow(train_aapl)/2)]), 
+            y = max(ramal$`Adj Close`) * 0.95, 
+    label = "Data Asli", size=10) + 
+  
+  #Label Data Ramal
+  annotate( "rect", alpha=0.1, fill="violetred",
+            xmin=as.Date(ramal$Date[ceiling(nrow(train_aapl))]), 
+            xmax=as.Date(max(ramal$Date)),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="violetred",
+            x = as.Date(ramal$Date[ceiling(0.9 * length(ramal$Date)/7)]) , 
+            y = max(ramal$`Adj Close`) * 0.95, 
+    label = "Data Ramal\n115 Hari", size=10) +
+  #Time Series
+  geom_line(aes(color=Name), linewidth=1.5) +
+  #Warna Saham
+  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
+                                MSFT="deepskyblue2", META="dodgerblue3", 
+                                AAPL="lightskyblue4",
+                                GOOG="gold3", AMZN="orange2") ) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Ramalan Saham MAANG",
+       subtitle = "Peramalan Saham MAANG Selama 115 Hari Kedepan\n") +
+  # Label / legend
+  geom_text_repel(
+    data=ramal[ramal$Date == max(ramal$Date),], #Posisi di ujung data
+    aes(color = Name, label = Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(ramal$Date)), 
+               as.Date(max(ramal$Date)) + 60)
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date("2023-7-28"), y = 50, 
+    label = "28 Juli", size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.Date(ramal$Date[ceiling(nrow(train_aapl))]) , 
+             linetype = "dotted", color = "black", linewidth = 2)
+chart
+#Export Chart
+ggsave("09_banding_ramal.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
+
+Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sedikit menaikonstan setiap periodenya. Sedangkan harga saham lainnya cenderung naik dengan drastis.
+
+## Perbandingan Data Aktual dengan Data Ramal {.tabset}
+
+### AAPL
+
+```{r}
+perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=nrow(test_aapl)), 
+                                      ramal_aapl[-1]),
+                     nrow = nrow(test_aapl), ncol = 2)
+colnames(perbandingan_aapl.da) <- c("Aktual","Ramal")
+datatable(perbandingan_aapl.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+### AMZN
+
+```{r}
+perbandingan_amzn.da <- matrix(data=c(head(test_amzn.ts, n=nrow(test_amzn)), 
+                                      ramal_amzn[-1]),
+                     nrow = nrow(test_amzn), ncol = 2)
+colnames(perbandingan_amzn.da) <- c("Aktual","Ramal")
+datatable(perbandingan_amzn.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+### GOOG
+
+```{r}
+perbandingan_goog.da <- matrix(data=c(head(test_goog.ts, n=nrow(test_goog)), 
+                                      ramal_goog[-1]),
+                     nrow = nrow(test_goog), ncol = 2)
+colnames(perbandingan_goog.da) <- c("Aktual","Ramal")
+datatable(perbandingan_goog.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+### META
+
+```{r}
+perbandingan_meta.da <- matrix(data=c(head(test_meta.ts, n=nrow(test_meta)), 
+                                      ramal_meta[-1]),
+                     nrow = nrow(test_meta), ncol = 2)
+colnames(perbandingan_meta.da) <- c("Aktual","Ramal")
+datatable(perbandingan_meta.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+### MSFT
+
+```{r}
+perbandingan_msft.da <- matrix(data=c(head(test_msft.ts, n=nrow(test_msft)), 
+                                      ramal_msft[-1]),
+                     nrow = nrow(test_msft), ncol = 2)
+colnames(perbandingan_msft.da) <- c("Aktual","Ramal")
+datatable(perbandingan_msft.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+### NFLX
+
+```{r}
+perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=nrow(test_nflx)), 
+                                      ramal_nflx[-1]),
+                     nrow = nrow(test_nflx), ncol = 2)
+colnames(perbandingan_nflx.da) <- c("Aktual","Ramal")
+datatable(perbandingan_nflx.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+### NVDA
+
+```{r}
+perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=nrow(test_nvda)), 
+                                      ramal_nvda[-1]),
+                               nrow = nrow(test_nvda), ncol = 2)
+colnames(perbandingan_nvda.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_nvda.da, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+## Akurasi
+
+```{r}
+akurasi.aapl <- accuracy(ts(ramal_aapl[-1]), 
+                         head(test_aapl.ts, n=nrow(test_aapl) )) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_aapl.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.aapl) <- "AAPL"
+
+akurasi.amzn <- accuracy(ts(ramal_amzn[-1]), 
+                         head(test_amzn.ts, n=nrow(test_amzn) )) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_amzn.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.amzn) <- "AMZN"
+
+akurasi.goog <- accuracy(ts(ramal_goog[-1]), 
+                         head(test_goog.ts, n=nrow(test_goog) )) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_goog.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.goog) <- "GOOG"
+
+akurasi.meta <- accuracy(ts(ramal_meta[-1]), 
+                         head(test_meta.ts, n=nrow(test_meta) )) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_meta.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.meta) <- "META"
+
+akurasi.msft <- accuracy(ts(ramal_msft[-1]), 
+                         head(test_msft.ts, n=nrow(test_msft) )) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_msft.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.msft) <- "MSFT"
+
+akurasi.nflx <- accuracy(ts(ramal_nflx[-1]), 
+                         head(test_nflx.ts, n=nrow(test_nflx) )) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_nflx.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.nflx) <- "NFLX"
+
+akurasi.nvda <- accuracy(ts(ramal_nvda[-1]), 
+                         head(test_nvda.ts, n=nrow(test_nvda) )) %>%
+  as.data.frame() %>%
+  cbind(Model = ramalan_nvda.da[["method"]]) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.nvda) <- "NVDA"
+```
+
+```{r}
+akurasi <- rbind(akurasi.aapl, akurasi.amzn, akurasi.goog, akurasi.meta,
+                 akurasi.msft, akurasi.nflx, akurasi.nvda) %>%
+  mutate(Keterangan = case_when(
+    MAPE < 10 ~ "Sangat Baik",
+    MAPE >= 10 & MAPE <= 20 ~ "Baik",
+    MAPE > 20 & MAPE <= 50 ~ "Layak",
+    MAPE > 50 ~ "Tidak Akurat"
+  )) %>% relocate(Keterangan, .before = 1)
+
+datatable(akurasi, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model yang paling sering digunakan. Hanya `AAPL` saja yang modelnya berbeda dari yang lainnya, yakni **ARIMA(2,1,3)**. Nilai **MAPE** terbaik yakni dimiliki oleh `AAPL` sebesar $3.229\%$. Terdapat dua nilai **MAPE** yang kurang baik yakni `AMZN` sebesar $35.305\%$ dan `GOOG` sebesar $37.535\%$ (`GOOG` merupakan yang terburuk).
+
+# Penutup
+
+```{r, warning=FALSE, message = FALSE}
+#Export Data
+install_load('openxlsx')
+#Model Tentatif 
+write.xlsx(list("AAPL" = model.tentaif_aapl, 
+                "AMZN" = model.tentaif_amzn, 
+                "GOOG" = model.tentaif_goog, 
+                "META" = model.tentaif_meta, 
+                "MSFT" = model.tentaif_msft, 
+                "NFLX" = model.tentaif_nflx, 
+                "NVDA" = model.tentaif_nvda), 
+           file = "Model_Tentatif.xlsx")
+
+# 1. Model Tanpa Intercept dan Tanpa Drift
+write.xlsx(list("AAPL" = drift1_aapl, 
+                "AMZN" = drift1_aapl, 
+                "GOOG" = drift1_aapl, 
+                "META" = drift1_aapl, 
+                "MSFT" = drift1_aapl, 
+                "NFLX" = drift1_aapl, 
+                "NVDA" = drift1_aapl), 
+           file = "Model_Drift1.xlsx")
+
+# 2. Model Dengan Intercept Tanpa Drift 
+write.xlsx(list("AAPL" = drift2_aapl, 
+                "AMZN" = drift2_aapl, 
+                "GOOG" = drift2_aapl, 
+                "META" = drift2_aapl, 
+                "MSFT" = drift2_aapl, 
+                "NFLX" = drift2_aapl, 
+                "NVDA" = drift2_aapl), 
+           file = "Model_Drift2.xlsx")
+
+# 3. Model Tanpa Intercept Dengan Drift
+write.xlsx(list("AAPL" = drift3_aapl, 
+                "AMZN" = drift3_aapl, 
+                "GOOG" = drift3_aapl, 
+                "META" = drift3_aapl, 
+                "MSFT" = drift3_aapl, 
+                "NFLX" = drift3_aapl, 
+                "NVDA" = drift3_aapl), 
+           file = "Model_Drift3.xlsx")
+
+# 4. Model dengan Intercept dan dengan Drift
+write.xlsx(list("AAPL" = drift4_aapl, 
+                "AMZN" = drift4_aapl, 
+                "GOOG" = drift4_aapl, 
+                "META" = drift4_aapl, 
+                "MSFT" = drift4_aapl, 
+                "NFLX" = drift4_aapl, 
+                "NVDA" = drift4_aapl), 
+           file = "Model_Drift4.xlsx")
+```
