@@ -175,7 +175,7 @@ if (length(missing_dates) == 0) {
 
 **Inputasi Data**
 
-```{r fig.align=, fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
 install_load('purrr')
 # Fungsi untuk mengisi data yang hilang
 fill_missing_data <- function(name) {
@@ -210,6 +210,7 @@ install_load('imputeTS')
 
 data <- na_interpolation(final_data$`Adj Close`)
 
+install_load('ggplot2')
 chart <- ggplot_na_imputations(final_data$`Adj Close`, data)
 chart
 #Export Chart
