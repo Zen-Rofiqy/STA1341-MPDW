@@ -3235,7 +3235,7 @@ ggplot(ramal, aes(x = Date, y = `Adj Close`, color = Name)) +
 chart
 #Export Chart
 ggsave("09_banding_ramal.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 20)
+        dpi = 300, height = 12, width = 27)
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sedikit menaikonstan setiap periodenya. Sedangkan harga saham lainnya cenderung naik dengan drastis.
