@@ -220,7 +220,8 @@ Data sudah benar, siap untuk dianalisis.
 
 ### Data Cleaned
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+install_load('DT')
 datatable(data, filter = 'top', 
           options = list(pageLength = 5))
 ```
