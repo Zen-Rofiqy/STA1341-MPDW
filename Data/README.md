@@ -1,3 +1,7 @@
+# Dataset Terbaru 
+> Kami menggunakan Dataset MAANG Stock Prices terbaru dari _website_ [finance.yahoo.com](https://finance.yahoo.com/).  
+> Dataset ini ada di folder [**New**](https://github.com/Zen-Rofiqy/STA1341-MPDW/tree/main/Data/New)  
+  
 ![1_2Yt3-zcGKc6MYuXCxgCL0A](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/2ff74a64-c4db-43b8-9276-78a590c60ad2)
 # Dataset MAANG Stock Prices 📈
 `Link Dataset` :  
