@@ -271,7 +271,7 @@ theme.ts1 <- list(
 
 Melihat keseluruhan *Time Series* data saham.
 
-```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+```{r dpi=300,  fig.height = 12, fig.width = 25, fig.align = "center", warning=FALSE, message = FALSE}
 install_load('viridis','ggrepel')
 #Plot
 chart <-
@@ -283,8 +283,8 @@ ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
                                 AAPL="lightskyblue4",
                                 GOOG="gold3", AMZN="orange2") ) +
   scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
-                                "META" = .25, "AAPL" = .25, "GOOG" = .25, 
-                                "AMZN" = 1)) +
+                                "META" = .25, "AAPL" = .25, "GOOG" = 1, 
+                                "AMZN" = .25)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Time Series MAANG",
@@ -310,31 +310,32 @@ ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     scale_x_date( #Sumbu x
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date("2018-07-30"), as.Date("2023-12-28"))
+    limits = c(as.Date(min(data$Date)), 
+               as.Date(max(data$Date)) + 120)
     #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
   ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
     annotate( #Buat nandain batas data
-    "text", x = as.Date("2023-7-28"), y = 50, 
-    label = "28 Juli", size=6
+    "text", x = as.Date(max(data$Date)), y = 50, 
+    label = max(data$Date), size=6
   ) +
   geom_vline( #Buat garis batas data
-    xintercept = as.numeric(as.Date("2023-07-28")), 
+    xintercept = as.numeric(as.Date( max(data$Date) )), 
              linetype = "dotted", color = "red")
 chart
 
 #Export Chart
 ggsave("01_Time Series MAANG.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 23)
+        dpi = 300, height = 12, width = 25)
 ```
 
-Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Amazon**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
+Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Google**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
 
 ```{r}
 data2 <- data %>%
-  filter(Date >= as.Date("2022-01-01")) 
+  filter(Date >= as.Date("2021-01-01")) 
 ```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
@@ -349,8 +350,8 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
                                 AAPL="lightskyblue4",
                                 GOOG="gold3", AMZN="orange2") ) +
   scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
-                                "META" = .25, "AAPL" = .25, "GOOG" = .25, 
-                                "AMZN" = 1)) +
+                                "META" = .25, "AAPL" = .25, "GOOG" = 1, 
+                                "AMZN" = .25)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Time Series MAANG",
@@ -376,18 +377,19 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     scale_x_date( #Sumbu x
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date(min(data2$Date)), as.Date("2023-09-28"))
+    limits = c(as.Date(min(data2$Date)), 
+               as.Date(max(data2$Date)) + 120)
     #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
   ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
     annotate( #Buat nandain batas data
-    "text", x = as.Date("2023-7-28"), y = 50, 
-    label = "28 Juli", size=6
+    "text", x = as.Date(max(data2$Date)), y = 50, 
+    label = max(data2$Date), size=6
   ) +
   geom_vline( #Buat garis batas data
-    xintercept = as.numeric(as.Date("2023-07-28")), 
+    xintercept = as.numeric(as.Date( max(data2$Date) )), 
              linetype = "dotted", color = "red")
 chart
 
