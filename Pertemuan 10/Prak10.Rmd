@@ -211,9 +211,9 @@ Data sudah di imputasi.
 cat("Ukuran data awal adalah", nrow(data2),
     "\nBanyaknya peride data yang hilang", length(missing_dates),
     "(PerSaham.", length(missing_dates) * 7, "Jika semua)",
-    "\nUkuran data yang baru seharusnya", 
+    "\nUkuran data yang baru seharusnya =", 
     nrow(data2) + length(missing_dates) * 7,
-    "\nIni sudah sesuai dengan Ukuran data input (", nrow(data), ")")
+    "\nIni sudah sesuai dengan Ukuran data input yakni =", nrow(data))
 ```
 
 Data sudah benar, siap untuk dianalisis.
