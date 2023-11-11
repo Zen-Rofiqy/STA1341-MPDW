@@ -1,8 +1,5 @@
-![1_2Yt3-zcGKc6MYuXCxgCL0A](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/2ff74a64-c4db-43b8-9276-78a590c60ad2)
-# Dataset MAANG Stock Prices 📈
-`Link Dataset` :  
-https://www.kaggle.com/datasets/adityamhaske/maang-stock-prices-july-2018-to-july-2023?resource=download  
-  
+`Link Dataset` : [finance.yahoo.com](https://finance.yahoo.com/)  
+## Deskripsi
 > Dataset ini merupakan koleksi data harga saham historis dari beberapa raksasa teknologi paling berpengaruh di dunia: 
 > _Microsoft_, _Apple_, _Amazon_, _Nvidia_, _Google_, _Netflix_, dan _Meta_ (sebelumnya dikenal sebagai Facebook). 
 > Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin 
@@ -25,6 +22,11 @@ karena mencerminkan harga saham yang sebenarnya setelah penyesuaian.
 7. **Volume:** Volume perdagangan saham selama periode tertentu. 
 Ini mencerminkan jumlah saham yang diperdagangkan selama hari perdagangan tersebut.
 
-## Catatan
-Data **tidak mencakup akhir pekan** seperti **sabtu** dan **minggu**. Oleh karena itu kami memutuskan untuk **inputasi** data dengan interplolasi.  
-> Harga saham tidak tersedia pada hari Sabtu dan Minggu karena umumnya bursa saham utama di seluruh dunia, termasuk yang berlokasi di Amerika Serikat, Eropa, dan Asia, menghentikan aktivitas perdagangan selama akhir pekan. Hal ini disebabkan oleh jadwal operasional bursa yang biasanya beroperasi pada hari kerja, dari Senin hingga Jumat, dengan jam perdagangan yang telah ditetapkan. Selain itu, akhir pekan digunakan untuk pemeliharaan sistem perdagangan, perbaikan infrastruktur, dan penyelesaian transaksi yang tertunda. Oleh karena itu, para investor dan pedagang tidak dapat melihat pergerakan harga saham selama hari libur akhir pekan, dan aktivitas perdagangan kembali dibuka pada hari kerja berikutnya.
+## Cara mendapatkan data
+|                                                             **Gambar**                                                            | **Langkah**                                                                                              |
+|:---------------------------------------------------------------------------------------------------------------------------------:|----------------------------------------------------------------------------------------------------------|
+| ![Screenshot 2023-11-02 162122](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/be0c42bf-ee41-47fc-95ef-ae243cdd850b) | 1. Ke link [finance.yahoo.com](https://finance.yahoo.com/)  <br /> 2. Cari Saham berdasarkan Kode saham. |
+| ![Screenshot 2023-11-02 162552](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/ec552272-4004-4cf3-9d7b-061a82e27fa8) | 1. Ke Historical Data  <br /> 2. Pilih `Time Periode` <br /> 3. Klik Done                                |
+| ![Screenshot 2023-11-02 163226](https://github.com/Zen-Rofiqy/STA1341-MPDW/assets/114891856/1ad2092f-6366-41c7-a9e0-e3ea7f924146) | 1. Pilih `Frequency`  <br /> 2. Klik `Apply` <br /> 3. Klik `Download`                                   |
+0 comments on commit 11ddabe
+
