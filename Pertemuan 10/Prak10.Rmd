@@ -43,9 +43,8 @@ install_load <- function (package1, ...)  {
        }
    } 
 }
-```
 
-```{r}
+#Path Function
 path <- function(){
   gsub  ( "\\\\",  "/",  readClipboard ()  )
 }
@@ -53,7 +52,11 @@ path <- function(){
 #Copy r path, paste ke var yang diinginkan
 ```
 
-```{r}
+```{r setup, include=FALSE, echo=FALSE}
+#SetWD
+require("knitr")
+opts_knit$set(root.dir = "C:/Users/Fathan/Documents/[Kuliah]/[semester 4]/07 AED/Tugas/Clustering")
+
 #Export chart
 export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 10/Chart"
 ```
@@ -86,6 +89,10 @@ Tujuan dari praktikum ini adalah untuk menganalisis pola perkiraan pergerakan ha
 ```{r, warning=FALSE, message = FALSE}
 install_load('rio')
 raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Data/MAANG%20Stock%20Prices.csv")
+```
+
+```{r}
+data1 <- read.csv()
 ```
 
 ### Data Checking
