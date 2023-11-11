@@ -55,7 +55,7 @@ path <- function(){
 
 ```{r}
 #Export chart
-export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 8/Chart"
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 08/Chart"
 ```
 
 # Pendahuluan
