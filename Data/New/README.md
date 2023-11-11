@@ -6,7 +6,7 @@
 > menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.  
   
 * **Jenis periode**: Harian  
-* **Rentang periode** `Juli 2018` sampai ` Juli 2023`  
+* **Rentang periode** `1 Januar 2018` sampai tahun `2023` terbaru
 * **Variabel** :
 1. **Open:** yakni Harga saham pada awal periode perdagangan tertentu. 
 Ini adalah harga saham pertama pada hari perdagangan tersebut.
