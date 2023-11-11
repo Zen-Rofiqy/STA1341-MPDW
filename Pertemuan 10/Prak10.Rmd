@@ -228,7 +228,7 @@ datatable(data, filter = 'top',
 
 # Eksplorasi Data
 
-Referensi : [Warna](https://bookdown.org/hneth/ds4psy/ds4psy_files/figure-html/apx-color-sample-1.png){.uri}
+Referensi : [Warna1](https://blog.datawrapper.de/colors-for-data-vis-style-guides/){.uri}, [Warna2](https://ux.mailchimp.com/patterns/data#palette){.uri}
 
 ## Plot Time Series {.tabset}
 
@@ -993,19 +993,33 @@ test_nvda.ts <- ts(test_nvda[,3])
 chart <-
 ggplot() + 
   geom_line(data = train_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "Data Latih", 
-                alpha = "Data Latih")) +
+            aes(x = Date, y = `Adj Close`, col = "train_nvda")) +
   geom_line(data = test_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "Data Uji",
-                alpha = "Data Uji")) +
+            aes(x = Date, y = `Adj Close`, col = "test_nvda",
+                alpha = "test_nvda")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham NVIDIA",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
-  scale_colour_manual(values = c("Data Latih"="green4", 
-                                 "Data Uji"="green4")) + 
-  scale_alpha_manual(values = c("Data Latih"=1, "Data Uji"=.35)) +
+  
+  geom_line(data = train_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_nflx")) +
+  geom_line(data = test_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "test_nflx",
+                alpha = "test_nflx")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  
+  scale_colour_manual(values = c("train_nflx"="firebrick3", 
+                                 "test_nflx"="firebrick3",
+                                 "train_nvda"="green4", 
+                                 "test_nvda"="green4")) + 
+  scale_alpha_manual(values = c("train_nflx"=1, "test_nflx"=.5,
+                                "train_nvda"=1, "test_nvda"=.5)) + 
   theme.ts1
+  
 chart
 #Export Chart
 ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
