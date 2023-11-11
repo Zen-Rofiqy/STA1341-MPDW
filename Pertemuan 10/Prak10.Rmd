@@ -278,10 +278,10 @@ chart <-
 ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
-  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
-                                MSFT="deepskyblue2", META="dodgerblue3", 
-                                AAPL="lightskyblue4",
-                                GOOG="gold3", AMZN="orange2") ) +
+  scale_color_manual(values = c(AAPL="#B6B0A4", AMZN="#D89534",
+                                GOOG="#DC509D", META="#4B75BA",
+                                MSFT="#4EC2C1", NFLX="#DC4F26", 
+                                NVDA="#36B450") ) +
   scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
                                 "META" = .25, "AAPL" = .25, "GOOG" = 1, 
                                 "AMZN" = .25)) +
