@@ -1,0 +1,71 @@
+---
+title: "Prep"
+author: "Angga Fathan Rofiqy"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: show
+    toc_depth: 3
+    number_sections: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    fig_caption: true
+pkgdown:
+  as_is: true
+---
+
+```{r, warning=FALSE, message = FALSE}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+
+#Path Function
+path <- function(){
+  gsub  ( "\\\\",  "/",  readClipboard ()  )
+}
+#Copy path, Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+```{r setup, include=FALSE, echo=FALSE}
+#SetWD
+require("knitr")
+opts_knit$set(root.dir = "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Data/New")
+```
+
+```{r}
+data1 <- rbind(
+  read.csv("AAPL.csv") %>% mutate(Name = "AAPL"),
+  read.csv("AMZN.csv") %>% mutate(Name = "AMZN"),
+  read.csv("GOOG.csv") %>% mutate(Name = "GOOG"),
+  read.csv("META.csv") %>% mutate(Name = "META"),
+  read.csv("MSFT.csv") %>% mutate(Name = "MSFT"),
+  read.csv("NFLX.csv") %>% mutate(Name = "NFLX"),
+  read.csv("NVDA.csv") %>% mutate(Name = "NVDA")  ) %>% 
+    relocate(Name, .before = 1)
+
+write.csv(data1, "@MAANG Stock Prices.csv", row.names=FALSE)
+```

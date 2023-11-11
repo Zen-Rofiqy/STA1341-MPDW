@@ -91,20 +91,6 @@ install_load('rio')
 raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Data/MAANG%20Stock%20Prices.csv")
 ```
 
-```{r}
-data1 <- rbind(
-  read.csv("AAPL.csv") %>% mutate(Name = "AAPL"),
-  read.csv("AMZN.csv") %>% mutate(Name = "AMZN"),
-  read.csv("GOOG.csv") %>% mutate(Name = "GOOG"),
-  read.csv("META.csv") %>% mutate(Name = "META"),
-  read.csv("MSFT.csv") %>% mutate(Name = "MSFT"),
-  read.csv("NFLX.csv") %>% mutate(Name = "NFLX"),
-  read.csv("NVDA.csv") %>% mutate(Name = "NVDA")  ) %>% 
-    relocate(Name, .before = 1)
-
-write.csv(data1, "@MAANG Stock Prices.csv", row.names=FALSE)
-```
-
 ### Data Checking
 
 Cek Tipe data.
