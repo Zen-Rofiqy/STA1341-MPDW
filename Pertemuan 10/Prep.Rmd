@@ -65,7 +65,8 @@ data1 <- rbind(
   read.csv("MSFT.csv") %>% mutate(Name = "MSFT"),
   read.csv("NFLX.csv") %>% mutate(Name = "NFLX"),
   read.csv("NVDA.csv") %>% mutate(Name = "NVDA")  ) %>% 
-    relocate(Name, .before = 1)
+    relocate(Name, .before = 1) %>% 
+  rename(`Adj Close` = Adj.Close)
 
 write.csv(data1, "@MAANG Stock Prices.csv", row.names=FALSE)
 ```

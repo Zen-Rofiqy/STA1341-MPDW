@@ -131,31 +131,10 @@ Cek kembali data kosong.
 cat('Banyaknya Data Kosong', sum(is.na(data)))
 ```
 
-Melihat baris, kolom mana data yang kosong.
-
-```{r message=FALSE, warning=FALSE}
-# Mencari indeks baris dan kolom yang mengandung NA
-na.idx <- which(is.na(data), arr.ind = TRUE)
-
-# Menampilkan data raw dengan baris dan kolom yang mengandung NA
-install_load('DT')
-datatable(raw.data[                        # Subsetting
-                unique(na.idx[, 1]),   # Vektor indeks baris yang mengandung NA
-                unique(na.idx[, 2])  ] # Vektor indeks kolom yang mengandung NA
-          )  
-```
-
-Ternyata pada baris tersebut ada data karakter text yang merupakan label dari tiap kolomnya. Sehingga ketika diubah ke numerik akan menjadi `NA`. Maka saya akan menghapus baris tersebut.
-
-```{r}
-data <- data %>%
-  filter(!row_number() %in% unique(na.idx[, 1]))
-data2 <- data
-```
-
 ### Cek Periode Data
 
 ```{r message=FALSE, warning=FALSE}
+data2 <- data
 install_load("lubridate")
 
 dates <- as.Date(data$Date)
