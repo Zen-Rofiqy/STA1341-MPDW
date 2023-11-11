@@ -101,6 +101,8 @@ data1 <- rbind(
   read.csv("NFLX.csv") %>% mutate(Name = "NFLX"),
   read.csv("NVDA.csv") %>% mutate(Name = "NVDA")  ) %>% 
     relocate(Name, .before = 1)
+
+write.csv(data1, "@MAANG Stock Prices.csv", row.names=FALSE)
 ```
 
 ### Data Checking
