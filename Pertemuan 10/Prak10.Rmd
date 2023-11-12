@@ -1065,7 +1065,7 @@ ggplot() +
             ymin=0, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling(0.92 * length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling(0.925 * length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * 0.95, 
     label = "Data Uji", size=10) +
   
@@ -1248,34 +1248,39 @@ Berdasarkan uji ADF tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$
 
 ```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 install_load('MASS')
-index <- seq(1:nrow(train_aapl))
 par(mfrow=c(2,4))
 
+index <- seq(1:nrow(train_aapl))
 bc =boxcox(train_aapl.ts~index, lambda=seq(-2, 4, by=.01))
 title("AAPL", cex.main = 4)
 lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_amzn))
 bc =boxcox(train_amzn.ts~index, lambda=seq(-2, 4, by=.01))
 title("AMZN", cex.main = 4)
 lambda_amzn <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_goog))
 bc =boxcox(train_goog.ts~index, lambda=seq(-2, 4, by=.01))
 title("GOOG", cex.main = 4)
 lambda_goog <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_meta))
 bc =boxcox(train_meta.ts~index, lambda=seq(-2, 4, by=.01))
 title("META", cex.main = 4)
 lambda_meta <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_msft))
 bc =boxcox(train_msft.ts~index, lambda=seq(-2, 4, by=.01))
 title("MSFT", cex.main = 4)
 lambda_msft <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_nflx))
 bc =boxcox(train_nflx.ts~index, lambda=seq(-2, 4, by=.01))
 title("NFLX", cex.main = 4)
 lambda_nflx <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
@@ -1296,34 +1301,39 @@ png(paste(export.chart, "/99_Stas_BoxCox.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
-index <- seq(1:nrow(train_aapl))
 par(mfrow=c(2,4))
 
+index <- seq(1:nrow(train_aapl))
 bc =boxcox(train_aapl.ts~index, lambda=seq(-2, 4, by=.01))
 title("AAPL", cex.main = 4)
 lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_amzn))
 bc =boxcox(train_amzn.ts~index, lambda=seq(-2, 4, by=.01))
 title("AMZN", cex.main = 4)
 lambda_amzn <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_goog))
 bc =boxcox(train_goog.ts~index, lambda=seq(-2, 4, by=.01))
 title("GOOG", cex.main = 4)
 lambda_goog <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_meta))
 bc =boxcox(train_meta.ts~index, lambda=seq(-2, 4, by=.01))
 title("META", cex.main = 4)
 lambda_meta <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_msft))
 bc =boxcox(train_msft.ts~index, lambda=seq(-2, 4, by=.01))
 title("MSFT", cex.main = 4)
 lambda_msft <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
+index <- seq(1:nrow(train_nflx))
 bc =boxcox(train_nflx.ts~index, lambda=seq(-2, 4, by=.01))
 title("NFLX", cex.main = 4)
 lambda_nflx <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
