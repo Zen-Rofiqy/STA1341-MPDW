@@ -909,14 +909,14 @@ test_nflx.ts <- ts(test_nflx[,3])
 chart <-
 ggplot() + 
   geom_line(data = train_nflx, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+            aes(x = Date, y = `Adj Close`, col = "train_nflx")) +
   geom_line(data = test_nflx, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Netflix",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
-  scale_colour_manual(values = c("Data Latih"=col.NFLX[1], 
+  scale_colour_manual(values = c("train_nflx"=col.NFLX[1], 
                                  "Data Uji"=col.NFLX[2])) + 
   theme.ts1
 
