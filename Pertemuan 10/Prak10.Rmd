@@ -1042,9 +1042,33 @@ ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
 
 Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan.]{.underline}
 
+## Data Train vs Test
+
 ```{r dpi=300, fig.height = 12, fig.width = 23, fig.align = "center"}
 chart <-
 ggplot() + 
+  #Label Data Asli 
+  annotate( "rect", alpha=0.1, fill="seagreen",
+            xmin=as.Date(min(data2$Date)), 
+            xmax=as.Date(data2$Date[nrow(train_goog)]),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="seagreen",
+            x = as.Date(data2$Date[ceiling(nrow(train_goog)/2)]), 
+            y = max(data2$`Adj Close`) * 0.95, 
+    label = "Data Asli", size=10) + 
+  
+  #Label Data Ramal
+  annotate( "rect", alpha=0.1, fill="violetred",
+            xmin=as.Date(data2$Date[nrow(train_meta)]), 
+            xmax=as.Date(max(data2$Date)),
+            ymin=0, ymax=Inf ) + 
+  
+  annotate( "text", color="violetred",
+            x = as.Date(data2$Date[ceiling(0.9 * length(data2$Date)/7)]) , 
+            y = max(data2$`Adj Close`) * 0.95, 
+    label = "Data Ramal\n115 Hari", size=10) +
+  
 #AAPL
 geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "AAPL")) +
@@ -1148,101 +1172,6 @@ geom_line(data = train_aapl, linewidth=2,
     xintercept = as.numeric(as.Date( max(data2$Date) )), 
              linetype = "dotted", color = "red") 
   
-chart
-#Export Chart
-ggsave("09_banding_train-test.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 23)
-```
-
-## Data Train vs Test
-
-```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=TRUE, message = FALSE}
-chart <-
-ggplot() + 
-  
-  #NVDA
-  geom_line(data = train_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = test_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
-  scale_colour_manual(name="Keterangan:", 
-                      breaks = c("Data Latih", "Data Uji"),
-                      values = c("green4", "grey30")) +
-  #Label Data Latih 
-  annotate( "rect", alpha=0.1, fill="seagreen",
-            xmin=as.Date(min(data2$Date)), 
-            xmax=data2$Date[ceiling(0.8 * length(data2$Date)/7)],
-            ymin=0, ymax=Inf ) + 
-  
-  annotate( "text", color="seagreen",
-            x = as.Date(data2$Date[ceiling(0.8 * length(data2$Date)/7/2)]), 
-            y = max(data2$`Adj Close`) * 0.95, 
-    label = "Data Latih\n80%", size=10) + 
-  
-  #Label Data Uji
-  annotate( "rect", alpha=0.1, fill="violetred",
-            xmin=data2$Date[ceiling(0.8 * length(data2$Date)/7)], 
-            xmax=as.Date(max(data2$Date)),
-            ymin=0, ymax=Inf ) + 
-  
-  annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling(0.9 * length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * 0.95, 
-    label = "Data Uji\n20%", size=10) +
-  
-  geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
-  #Color
-  scale_color_manual(values = c(NVDA="green4", NFLX="firebrick3", 
-                                MSFT="deepskyblue2", META="dodgerblue3", 
-                                AAPL="lightskyblue4",
-                                GOOG="gold3", AMZN="orange2") ) +
-  
-    scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = 1, "MSFT" = 1, 
-                                "META" = 1, "AAPL" = 1, "GOOG" = 1, 
-                                "AMZN" = 1)) +
-  theme.ts + #THeme
-  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Time Series MAANG",
-       subtitle = "Pembagian Data Latih dan data Uji\n") +
-  # Label / legend
-  geom_text_repel(
-    data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
-    aes(color = Name, label = Name), #Warna garis & label saham
-    size = 8, #Ukuran text
-    nudge_x = 20, #Posisi Text (kanan 50)
-    hjust = 0, #Ujung
-    segment.size = 1,               #Ukuran garis
-    segment.alpha = .75,             #transparasi garis
-    segment.linetype = "dotted",    #Time garis
-    box.padding = .4, #Biar label saham nggak dempetan
-    segment.curvature = -0.1, #biar garis mulus
-    segment.ncp = 8, 
-    segment.angle = 60 
-  ) +
-  #Axis
-    coord_cartesian(clip = "off"
-  ) +
-    scale_x_date( #Sumbu x
-    date_breaks = "1 year",  # Menampilkan label setiap tahun
-    date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date(min(data2$Date)), 
-               as.Date(max(data2$Date)) + 120)
-    #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
-  ) +
-    scale_y_continuous( #Sumbu y
-    labels = scales::dollar_format(prefix = "$") #tambahin dolar
-  ) +
-    annotate( #Buat nandain batas data
-    "text", x = as.Date(max(data2$Date)), y = 50, 
-    label = max(data2$Date), size=6
-  ) +
-  geom_vline( #Buat garis batas data
-    xintercept = as.numeric(as.Date( max(data2$Date) )), 
-             linetype = "dotted", color = "red") +
-  geom_vline( #Buat garis batas data
-    xintercept = data2$Date[ceiling(0.8 * length(data2$Date)/7)] , 
-             linetype = "dotted", color = "black", linewidth = 2) 
-            
 chart
 #Export Chart
 ggsave("09_banding_train-test.png", chart, path = export.chart,
