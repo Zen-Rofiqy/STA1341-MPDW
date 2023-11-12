@@ -230,6 +230,13 @@ datatable(data, filter = 'top',
 
 Referensi : [Warna1](https://blog.datawrapper.de/colors-for-data-vis-style-guides/){.uri}, [Warna2](https://ux.mailchimp.com/patterns/data#palette){.uri}
 
+```{r}
+col.AAPL <- c("#6F8086", "#B4CBD2"); col.AMZN <- c("#D89534", "#F9D173") 
+col.AAPL <- c("#6F8086", "#B4CBD2"); col.AMZN <- c("#D89534", "#F9D173") 
+col.AAPL <- c("#6F8086", "#B4CBD2"); col.AMZN <- c("#D89534", "#F9D173") 
+col.AAPL <- c("#6F8086", "#B4CBD2")
+```
+
 ## Plot Time Series {.tabset}
 
 ```{r, warning=FALSE, message = FALSE}
@@ -278,7 +285,7 @@ chart <-
 ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
-  scale_color_manual(values = c(AAPL="#B6B0A4", AMZN="#D89534",
+  scale_color_manual(values = c(AAPL="#6F8086", AMZN="#D89534",
                                 GOOG="#DC509D", META="#4B75BA",
                                 MSFT="#4EC2C1", NFLX="#DC4F26", 
                                 NVDA="#36B450") ) +
