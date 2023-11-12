@@ -1429,11 +1429,12 @@ trans_balik <- function(lambda) {
 
 # Menambahkan kolom Transformasi dan Trans Balik
 tran <- lsk %>%
-  filter(Keterangan == "Ragam Tidak Stasioner") %>%
   mutate(
     Transformasi = trans(Lambda),
     `Transformasi Balik` = trans_balik(Lambda)
   ) %>% dplyr::select(Lambda, Transformasi, `Transformasi Balik`)
+
+tran[]
 
 datatable(tran, filter = 'top', 
           options = list(pageLength = 7))
@@ -1668,7 +1669,7 @@ lsk.new <- data.frame(
                   min(sk_meta.new), min(sk_msft.new), min(sk_nflx),
                   min(sk_nvda.new)  ),
   Batas.Atas = c(max(sk_aapl.new), max(sk_amzn.new), max(sk_goog.new), 
-                 max(sk_meta.new), max(sk_msft.new), max(sk_nflx)
+                 max(sk_meta.new), max(sk_msft.new), max(sk_nflx),
                  max(sk_nvda.new)  )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
