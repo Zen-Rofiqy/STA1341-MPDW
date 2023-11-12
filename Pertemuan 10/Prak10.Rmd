@@ -473,13 +473,16 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "train_aapl")) +
   geom_line(data = test_aapl, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "test_aapl")) +
+  geom_point(data = tail(train_aapl, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Apple",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
-  scale_colour_manual(name="Keterangan:", 
-                      breaks = c("train_aapl", "test_aapl"),
-                      values = c(col.aapl[1], col.aapl[2])) + theme.ts1
+            scale_colour_manual(values = c("train_aapl"=col.aapl[1], 
+                                 "test_aapl"=col.aapl[2])) + 
+  theme.ts1
 chart
 #Export Chart
 ggsave("03_TS_AAPL_train-test.png", chart, path = export.chart,
@@ -560,13 +563,16 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "train_amzn")) +
   geom_line(data = test_amzn, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "test_amzn")) +
+  geom_point(data = tail(train_amzn, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Amazon",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
-  scale_colour_manual(name="Keterangan:", 
-                      breaks = c("train_amzn", "test_amzn"),
-                      values = c(col.amzn[1], col.amzn[2])) + theme.ts1
+          scale_colour_manual(values = c("train_amzn"=col.amzn[1], 
+                                 "test_amzn"=col.amzn[2])) + 
+  theme.ts1
 chart
 #Export Chart
 ggsave("02_TS_Amazon_train-test.png", chart, path = export.chart,
@@ -647,13 +653,16 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "train_goog")) +
   geom_line(data = test_goog, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "test_goog")) +
+  geom_point(data = tail(train_goog, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Google",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
-  scale_colour_manual(name="Keterangan:", 
-                      breaks = c("train_goog", "test_goog"),
-                      values = c(col.goog[1], col.goog[2])) + theme.ts1
+        scale_colour_manual(values = c("train_goog"=col.goog[1], 
+                                 "test_goog"=col.goog[2])) + 
+  theme.ts1
 chart
 #Export Chart
 ggsave("04_TS_GOOG_train-test.png", chart, path = export.chart,
@@ -734,13 +743,16 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "train_meta")) +
   geom_line(data = test_meta, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "test_meta")) +
+  geom_point(data = tail(train_meta, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham META",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
-  scale_colour_manual(name="Keterangan:", 
-                      breaks = c("train_meta", "test_meta"),
-                      values = c(col.meta[1], col.meta[2])) + theme.ts1
+      scale_colour_manual(values = c("train_meta"=col.meta[1], 
+                                 "test_meta"=col.meta[2])) + 
+  theme.ts1
 chart
 #Export Chart
 ggsave("05_TS_META_train-test.png", chart, path = export.chart,
@@ -821,13 +833,16 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "train_msft")) +
   geom_line(data = test_msft, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "test_msft")) +
+  geom_point(data = tail(train_msft, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Microsoft",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
-  scale_colour_manual(name="Keterangan:", 
-                      breaks = c("train_msft", "test_msft"),
-                      values = c(col.msft[1], col.msft[2])) + theme.ts1
+    scale_colour_manual(values = c("train_msft"=col.msft[1], 
+                                 "test_msft"=col.msft[2])) + 
+  theme.ts1
 chart
 #Export Chart
 ggsave("06_TS_MSFT_train-test.png", chart, path = export.chart,
@@ -908,6 +923,9 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "train_nflx")) +
   geom_line(data = test_nflx, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "test_nflx")) +
+  geom_point(data = tail(train_nflx, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Netflix",
        subtitle = "Pembagian Data Training dan Test\n") +
@@ -996,6 +1014,9 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "train_nvda")) +
   geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
+  geom_point(data = tail(train_nvda, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham NVIDIA",
        subtitle = "Pembagian Data Training dan Test\n") +
@@ -1016,26 +1037,80 @@ Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terli
 ```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
 chart <-
 ggplot() + 
+#AAPL
+geom_line(data = train_aapl, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_aapl")) +
+  geom_line(data = test_aapl, linewidth=1.5,
+            aes(x = Date, y = `Adj Close`, col = "test_aapl")) +
+  geom_point(data = tail(train_aapl, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
+  
+#AMZN
+  geom_line(data = train_amzn, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_amzn")) +
+  geom_line(data = test_amzn, linewidth=1.5,
+            aes(x = Date, y = `Adj Close`, col = "test_amzn")) +
+  geom_point(data = tail(train_amzn, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
+          scale_colour_manual(values = c("train_amzn"=col.amzn[1], 
+                                 "test_amzn"=col.amzn[2])) + 
+  
+#GOOG
+  geom_line(data = train_goog, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_goog")) +
+  geom_line(data = test_goog, linewidth=1.5,
+            aes(x = Date, y = `Adj Close`, col = "test_goog")) +
+  geom_point(data = tail(train_goog, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
+        scale_colour_manual(values = c("train_goog"=col.goog[1], 
+                                 "test_goog"=col.goog[2])) + 
+  
+#META
+  geom_line(data = train_meta, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_meta")) +
+  geom_line(data = test_meta, linewidth=1.5,
+            aes(x = Date, y = `Adj Close`, col = "test_meta")) +
+  geom_point(data = tail(train_meta, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
+      scale_colour_manual(values = c("train_meta"=col.meta[1], 
+                                 "test_meta"=col.meta[2])) + 
+ 
+#MSFT
+  geom_line(data = train_msft, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_msft")) +
+  geom_line(data = test_msft, linewidth=1.5,
+            aes(x = Date, y = `Adj Close`, col = "test_msft")) +
+  geom_point(data = tail(train_msft, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
+    scale_colour_manual(values = c("train_msft"=col.msft[1], 
+                                 "test_msft"=col.msft[2])) + 
+   
+#NFLx
+  geom_line(data = train_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_nflx")) +
+  geom_line(data = test_nflx, linewidth=1.5,
+            aes(x = Date, y = `Adj Close`, col = "test_nflx")) +
+  geom_point(data = tail(train_nflx, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
+  scale_colour_manual(values = c("train_nflx"=col.nflx[1], 
+                                 "test_nflx"=col.nflx[2])) + 
+
+#NVDA
   geom_line(data = train_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "train_nvda")) +
   geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
-  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham NVIDIA",
-       subtitle = "Pembagian Data Training dan Test\n") +
-  theme(legend.position = "none") +
-  
-  geom_line(data = train_nflx, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "train_nflx")) +
-  geom_line(data = test_nflx, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "test_nflx")) +
-  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Netflix",
-       subtitle = "Pembagian Data Training dan Test\n") +
-  theme(legend.position = "none") +
-  
-  scale_colour_manual(values = c("train_nflx"=col.nflx[1], 
-                                 "test_nflx"=col.nflx[2],
+  geom_point(data = tail(train_nvda, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 25, shape = 21, color = "black", fill="grey30") +
+  scale_colour_manual(values = c("train_aapl"=col.aapl[1], 
+                                 "test_aapl"=col.aapl[2],
                                  "train_nvda"=col.nvda[1], 
                                  "test_nvda"=col.nvda[2])) + 
   theme.ts1
