@@ -1494,13 +1494,11 @@ Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap
 ```{r}
 lsk.new <- data.frame(
   Lambda = c(lambda_aapl.new, lambda_amzn.new, lambda_goog.new, 
-             lambda_meta.new, lambda_msft.new, 
-             lambda_nvda.new ),
+             lambda_meta.new, lambda_msft.new, lambda_nvda.new ),
   Batas.Bawah = c(min(sk_aapl.new), min(sk_amzn.new), min(sk_goog.new), 
-                  min(sk_meta.new), min(sk_msft.new), min(sk_nflx.new), 
-                  min(sk_nvda.new)  ),
+                  min(sk_meta.new), min(sk_msft.new), min(sk_nvda.new)  ),
   Batas.Atas = c(max(sk_aapl.new), max(sk_amzn.new), max(sk_goog.new), 
-                 max(sk_meta.new), max(sk_msft.new),                  max(sk_nvda.new)  )
+                 max(sk_meta.new), max(sk_msft.new), max(sk_nvda.new)  )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
