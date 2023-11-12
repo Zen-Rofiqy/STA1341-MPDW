@@ -1434,7 +1434,7 @@ tran <- lsk %>%
     `Transformasi Balik` = trans_balik(Lambda)
   ) %>% dplyr::select(Lambda, Transformasi, `Transformasi Balik`)
 
-tran[]
+tran[6,c(2,3)] <- "-"
 
 datatable(tran, filter = 'top', 
           options = list(pageLength = 7))
@@ -1680,6 +1680,8 @@ lsk.new$Keterangan <- apply(lsk.new, 1, function(row) {
 })
 
 rownames(lsk.new) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+
+lsk.new <- cbind(lsk.new, tran[,-1])
 
 datatable(lsk.new, filter = 'top', 
           options = list(pageLength = 7))
