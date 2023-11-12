@@ -1293,7 +1293,7 @@ lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
-Gambar di atas menunjukkan bahwa hanya `AAPL` yang memuat *rounded value* ($\lambda$) di dalam selangnya. Sementara selainnya tidak memuatnya.
+Gambar di atas menunjukkan bahwa hanya `NFLX` yang memuat *rounded value* ($\lambda$) di dalam selangnya. Sementara selainnya tidak memuatnya.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
@@ -1373,7 +1373,7 @@ datatable(lsk, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kepercayaan diatas yang menyatakan bahwa selain `AAPL`{style="caret-color: white;"} tidak ada yang memuat nilai satu di dalam selangnya. Ini mengindikasikan bahwa hanya `AAPL`{style="caret-color: white;"} yang memiliki **stasioneritas dalam ragam**, Sementara yang lain memerlukan transformasi data karena **tidak** memiliki sifat **stasioner dalam ragam**.
+Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kepercayaan diatas yang menyatakan bahwa selain `NFLX` tidak ada yang memuat nilai satu di dalam selangnya. Ini mengindikasikan bahwa hanya `NFLX` yang memiliki **stasioneritas dalam ragam**, Sementara yang lain memerlukan transformasi data karena **tidak** memiliki sifat **stasioner dalam ragam**.
 
 ## **Penanganan Ketidakstasioneran Data**
 
@@ -1392,6 +1392,46 @@ Mengutip dari laman [r-coder.com](https://r-coder.com/box-cox-transformation-r/)
 |         2          |      $x^2$       |       $\sqrt{x}$       |
 
 : Karena semua data saham yang tidak stasioner memiliki nilai *rounded value* ($\lambda$) optimum nya mendekati 0, maka transformasi yang digunakan adalah transformasi $\log{(x)}$ dengan transfromasi baliknya $e^x$ atau $\exp{(x)}$.
+
+```{r}
+# Fungsi untuk mengonversi lambda ke transformasi
+trans <- function(lambda) {
+  case_when(
+    lambda == -2   ~ "1/x^2",
+    lambda == -1   ~ "1/x",
+    lambda == -0.5 ~ "1/sqrt(x)",
+    lambda == 0    ~ "log(x)",
+    lambda == 0.5  ~ "sqrt(x)",
+    lambda == 1    ~ "x",
+    lambda == 2    ~ "x^2",
+    TRUE           ~ NA_character_
+  )
+}
+
+# Fungsi untuk mengonversi lambda ke transformasi balik
+trans_balik <- function(lambda) {
+  case_when(
+    lambda == -2   ~ "1/sqrt(x)",
+    lambda == -1   ~ "1/x",
+    lambda == -0.5 ~ "1/x^2",
+    lambda == 0    ~ "exp(x)",
+    lambda == 0.5  ~ "x^2",
+    lambda == 1    ~ "x",
+    lambda == 2    ~ "sqrt(x)",
+    TRUE           ~ NA_character_
+  )
+}
+
+# Menambahkan kolom Transformasi dan Trans Balik
+lsk <- lsk %>%
+  mutate(
+    Transformasi = trans(Lambda),
+    `Transformasi Balik` = trans_balik(Lambda)
+  ) select(-(2:4)
+
+datatable(lsk, filter = 'top', 
+          options = list(pageLength = 7))
+```
 
 #### Transformasi
 
