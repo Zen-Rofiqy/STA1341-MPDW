@@ -282,7 +282,7 @@ Melihat keseluruhan *Time Series* data saham.
 install_load('viridis','ggrepel')
 #Plot
 chart <-
-ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+ggplot(data, aes(x=Date, y=`Adj Close`, color=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
   scale_color_manual(values = c(AAPL=col.AAPL[1], AMZN=col.AMZN[1],
