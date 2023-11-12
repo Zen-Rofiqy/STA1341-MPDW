@@ -231,9 +231,9 @@ datatable(data, filter = 'top',
 Referensi : [Warna1](https://blog.datawrapper.de/colors-for-data-vis-style-guides/){.uri}, [Warna2](https://ux.mailchimp.com/patterns/data#palette){.uri}
 
 ```{r}
-col.AAPL <- c("#6F8086", "#B4CBD2"); col.AMZN <- c("#D89534", "#F9D173") 
+col.AAPL <- c("#6F8086", "#B4CBD2"); col.AMZN <- c("#EDB64E", "#F6DEB3") 
 col.GOOG <- c("#919C49", "#CCD775"); col.META <- c("#4B75BA", "#9BC6EA") 
-col.MSFT <- c("#4EC2C1", "#9DD8D2"); col.NFLX <- c("#D02A49", "#E8646D") 
+col.MSFT <- c("#4EC2C1", "#B8E0DC"); col.NFLX <- c("#D02A49", "#F3AEAA") 
 col.NVDA <- c("#36B450", "#ACD694")
 ```
 
@@ -475,7 +475,7 @@ chart <-
 ggplot() + 
   geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = test_aapl, linewidth=2,
+  geom_line(data = test_aapl, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Apple",
@@ -527,7 +527,7 @@ percentage <- (which.min(amzn$`Adj Close`) / nrow(amzn)) * 100
 chart <-
 ggplot(amzn, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("orange2")) +
+  scale_color_manual(values = col.AMZN[1]) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Amazon",
        subtitle = "Seperti apa sih pola deret waktu saham Amazon?\n") +
@@ -562,7 +562,7 @@ chart <-
 ggplot() + 
   geom_line(data = train_amzn, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = test_amzn, linewidth=2,
+  geom_line(data = test_amzn, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Amazon",
@@ -570,7 +570,7 @@ ggplot() +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("orange", "grey30")) + theme.ts1
+                      values = c(col.AMZN[1], col.AMZN[2])) + theme.ts1
 chart
 #Export Chart
 ggsave("02_TS_Amazon_train-test.png", chart, path = export.chart,
@@ -614,7 +614,7 @@ percentage <- (which.min(goog$`Adj Close`) / nrow(goog)) * 100
 chart <-
 ggplot(goog, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("gold3")) +
+  scale_color_manual(values = col.GOOG[1]) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Google",
        subtitle = "Seperti apa sih pola deret waktu saham Google?\n") +
@@ -638,8 +638,8 @@ Melalui visualisasi grafik deret waktu yang disuguhkan, tampaknya sekitar $53.81
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
-train_goog <- goog[1: round(nrow(goog) *85/100),]
-test_goog <- goog[round(nrow(goog) *85/100 +1): nrow(goog),]
+train_goog <- goog[1: round(nrow(goog) *86/100),]
+test_goog <- goog[round(nrow(goog) *86/100 +1): nrow(goog),]
 train_goog.ts <- ts(train_goog[,3])
 test_goog.ts <- ts(test_goog[,3])
 ```
@@ -649,7 +649,7 @@ chart <-
 ggplot() + 
   geom_line(data = train_goog, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = test_goog, linewidth=2,
+  geom_line(data = test_goog, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Google",
@@ -657,7 +657,7 @@ ggplot() +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("gold3", "grey30")) + theme.ts1
+                      values = c(col.GOOG[1], col.GOOG[2])) + theme.ts1
 chart
 #Export Chart
 ggsave("04_TS_GOOG_train-test.png", chart, path = export.chart,
@@ -701,7 +701,7 @@ percentage <- (which.min(meta$`Adj Close`) / nrow(meta)) * 100
 chart <-
 ggplot(meta, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("dodgerblue3")) +
+  scale_color_manual(values = col.META[1]) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham META",
        subtitle = "Seperti apa sih pola deret waktu saham META?\n") +
@@ -736,7 +736,7 @@ chart <-
 ggplot() + 
   geom_line(data = train_meta, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = test_meta, linewidth=2,
+  geom_line(data = test_meta, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham META",
@@ -744,7 +744,7 @@ ggplot() +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("dodgerblue3", "grey30")) + theme.ts1
+                      values = c(col.META[1], col.META[2])) + theme.ts1
 chart
 #Export Chart
 ggsave("05_TS_META_train-test.png", chart, path = export.chart,
@@ -788,7 +788,7 @@ percentage <- (which.min(msft$`Adj Close`) / nrow(msft)) * 100
 chart <-
 ggplot(msft, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("deepskyblue2")) +
+  scale_color_manual(values = col.MSFT[1]) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Microsoft",
        subtitle = "Seperti apa sih pola deret waktu saham Microsoft?\n") +
@@ -823,7 +823,7 @@ chart <-
 ggplot() + 
   geom_line(data = train_msft, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
-  geom_line(data = test_msft, linewidth=2,
+  geom_line(data = test_msft, linewidth=1.5,
             aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Microsoft",
@@ -831,7 +831,7 @@ ggplot() +
   theme(legend.position = "none") +
   scale_colour_manual(name="Keterangan:", 
                       breaks = c("Data Latih", "Data Uji"),
-                      values = c("deepskyblue2", "grey30")) + theme.ts1
+                      values = c(col.MSFT[1], col.MSFT[2])) + theme.ts1
 chart
 #Export Chart
 ggsave("06_TS_MSFT_train-test.png", chart, path = export.chart,
@@ -875,7 +875,7 @@ percentage <- (which.min(nflx$`Adj Close`) / nrow(nflx)) * 100
 chart <-
 ggplot(nflx, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("firebrick3")) +
+  scale_color_manual(values = col.NFLX[1]) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Netflix",
        subtitle = "Seperti apa sih pola deret waktu saham Netflix?\n") +
@@ -909,18 +909,15 @@ test_nflx.ts <- ts(test_nflx[,3])
 chart <-
 ggplot() + 
   geom_line(data = train_nflx, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "Data Latih", 
-                alpha = "Data Latih")) +
-  geom_line(data = test_nflx, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "Data Uji",
-                alpha = "Data Uji")) +
+            aes(x = Date, y = `Adj Close`, col = "Data Latih")) +
+  geom_line(data = test_nflx, linewidth=1.5,
+            aes(x = Date, y = `Adj Close`, col = "Data Uji")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham Netflix",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
-  scale_colour_manual(values = c("Data Latih"="firebrick3", 
-                                 "Data Uji"="firebrick3")) + 
-  scale_alpha_manual(values = c("Data Latih"=1, "Data Uji"=.35)) + 
+  scale_colour_manual(values = c("Data Latih"=col.NFLX[1], 
+                                 "Data Uji"=col.NFLX[2])) + 
   theme.ts1
 
 chart
@@ -966,7 +963,7 @@ percentage <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
 chart <-
 ggplot(nvda, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
-  scale_color_manual(values = c("green4")) +
+  scale_color_manual(values = col.NVDA[1]) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham NVIDIA",
        subtitle = "Seperti apa sih pola deret waktu saham NVIDIA?\n") +
@@ -1002,29 +999,14 @@ ggplot() +
   geom_line(data = train_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "train_nvda")) +
   geom_line(data = test_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "test_nvda",
-                alpha = "test_nvda")) +
+            aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham NVIDIA",
        subtitle = "Pembagian Data Training dan Test\n") +
   theme(legend.position = "none") +
   
-  geom_line(data = train_nflx, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "train_nflx")) +
-  geom_line(data = test_nflx, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "test_nflx",
-                alpha = "test_nflx")) +
-  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham Netflix",
-       subtitle = "Pembagian Data Training dan Test\n") +
-  theme(legend.position = "none") +
-  
-  scale_colour_manual(values = c("train_nflx"="firebrick3", 
-                                 "test_nflx"="firebrick3",
-                                 "train_nvda"="green4", 
-                                 "test_nvda"="green4")) + 
-  scale_alpha_manual(values = c("train_nflx"=1, "test_nflx"=.5,
-                                "train_nvda"=1, "test_nvda"=.5)) + 
+  scale_colour_manual(values = c("train_nvda"=col.NVDA[1], 
+                                 "test_nvda"=col.NVDA[2])) + 
   theme.ts1
   
 chart
@@ -1034,6 +1016,39 @@ ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
 ```
 
 Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan.]{.underline}
+
+```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+chart <-
+ggplot() + 
+  geom_line(data = train_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_nvda")) +
+  geom_line(data = test_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham NVIDIA",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  
+  geom_line(data = train_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "train_nflx")) +
+  geom_line(data = test_nflx, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "test_nflx")) +
+  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
+       title = "Time Series Saham Netflix",
+       subtitle = "Pembagian Data Training dan Test\n") +
+  theme(legend.position = "none") +
+  
+  scale_colour_manual(values = c("train_nflx"=col.NFLX[1], 
+                                 "test_nflx"=col.NFLX[2],
+                                 "train_nvda"=col.NVDA[1], 
+                                 "test_nvda"=col.NVDA[2])) + 
+  theme.ts1
+  
+chart
+#Export Chart
+ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 20)
+```
 
 ## Data Train vs Test
 
