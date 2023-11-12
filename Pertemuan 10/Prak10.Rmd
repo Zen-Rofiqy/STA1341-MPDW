@@ -1394,6 +1394,7 @@ Mengutip dari laman [r-coder.com](https://r-coder.com/box-cox-transformation-r/)
 : Karena semua data saham yang tidak stasioner memiliki nilai *rounded value* ($\lambda$) optimum nya mendekati 0, maka transformasi yang digunakan adalah transformasi $\log{(x)}$ dengan transfromasi baliknya $e^x$ atau $\exp{(x)}$.
 
 ```{r}
+lamb <- c(-2, -1, -.5, 0, .5, 1, 2)
 # Fungsi untuk mengonversi lambda ke transformasi
 trans <- function(lambda) {
   case_when(
@@ -1423,13 +1424,13 @@ trans_balik <- function(lambda) {
 }
 
 # Menambahkan kolom Transformasi dan Trans Balik
-lsk <- lsk %>%
+tran <- lsk %>%
   mutate(
     Transformasi = trans(Lambda),
     `Transformasi Balik` = trans_balik(Lambda)
-  ) select(-(2:4)
+  ); tran <- tran[,c(1,5,6)]
 
-datatable(lsk, filter = 'top', 
+datatable(tran, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
