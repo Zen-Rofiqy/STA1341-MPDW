@@ -1391,7 +1391,7 @@ Mengutip dari laman [r-coder.com](https://r-coder.com/box-cox-transformation-r/)
 |         1          |       $x$        |          $x$           |
 |         2          |      $x^2$       |       $\sqrt{x}$       |
 
-: Namun dari laman tersebut dan dari laman [robjhyndman.com](https://robjhyndman.com/uwafiles/6-Stationarity-Transformations-Differencing.pdf) mengatakan bahwa *rounded value* ($\lambda$) = 1 itu cenderung tidak ada perubahan substansial atau signifikan yang terjadi pada data. Sehingga jika transformasi diatas tidak menyelesaikan masalah stasioneritas ragam maka **alternatif transfromasi** yang dapat dilakukan adalah degnan $(x^\lambda -1 )/\lambda$ dengan transformasi balik $(\lambda x+1)^{1/\lambda}$.
+: Namun dari laman tersebut dan dari laman [robjhyndman.com](https://robjhyndman.com/uwafiles/6-Stationarity-Transformations-Differencing.pdf) mengatakan bahwa *rounded value* ($\lambda$) = 1 itu cenderung tidak ada perubahan substansial atau signifikan yang terjadi pada data. Sehingga jika transformasi diatas tidak menyelesaikan masalah stasioneritas ragam maka **alternatif transfromasi** yang dapat dilakukan adalah dengan $(x^\lambda -1 )/\lambda$ dengan transformasi balik $(\lambda x+1)^{1/\lambda}$.
 
 Sehingga transformasi yang digunakan pada data saham yang tidak stasioner dalam ragam adalah sebagai berikut.
 
@@ -1512,6 +1512,8 @@ rownames(lsk.new) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
 datatable(lsk.new, filter = 'top', 
           options = list(pageLength = 7))
 ```
+
+Terlihat bahwa data `AMZN` dan `META` belum stasioner. Sehingga akan dilakukan transformasi ulang dengan $(x^\lambda -1 )/\lambda$ dengan transformasi balik $(\lambda x+1)^{1/\lambda}$.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
