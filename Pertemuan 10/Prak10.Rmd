@@ -232,9 +232,9 @@ Referensi : [Warna1](https://blog.datawrapper.de/colors-for-data-vis-style-guide
 
 ```{r}
 col.AAPL <- c("#6F8086", "#B4CBD2"); col.AMZN <- c("#D89534", "#F9D173") 
-col.AAPL <- c("#6F8086", "#B4CBD2"); col.AMZN <- c("#D89534", "#F9D173") 
-col.AAPL <- c("#6F8086", "#B4CBD2"); col.AMZN <- c("#D89534", "#F9D173") 
-col.AAPL <- c("#6F8086", "#B4CBD2")
+col.GOOG <- c("#919C49", "#CCD775"); col.META <- c("#4B75BA", "#9BC6EA") 
+col.MSFT <- c("#4EC2C1", "#9DD8D2"); col.NFLX <- c("#D02A49", "#E8646D") 
+col.NVDA <- c("#36B450", "#ACD694")
 ```
 
 ## Plot Time Series {.tabset}
@@ -285,13 +285,10 @@ chart <-
 ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
-  scale_color_manual(values = c(AAPL="#6F8086", AMZN="#D89534",
-                                GOOG="#DC509D", META="#4B75BA",
-                                MSFT="#4EC2C1", NFLX="#DC4F26", 
-                                NVDA="#36B450") ) +
-  scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
-                                "META" = .25, "AAPL" = .25, "GOOG" = 1, 
-                                "AMZN" = .25)) +
+  scale_color_manual(values = c(AAPL=col.AAPL[1], AMZN=col.AMZN[1],
+                                GOOG=col.GOOG[1], META=col.META[1],
+                                MSFT=col.MSFT[1], NFLX=col.NFLX[1], 
+                                NVDA=col.NVDA[1]) ) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Time Series MAANG",
