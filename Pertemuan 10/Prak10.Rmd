@@ -1044,7 +1044,7 @@ geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_aapl")) +
   geom_point(data = tail(train_aapl, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 25, shape = 21, color = "black", fill="grey30") +
+             size = 15, shape = 21, color = "black", fill="violetred") +
   
 #AMZN
   geom_line(data = train_amzn, linewidth=2,
@@ -1053,7 +1053,7 @@ geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_amzn")) +
   geom_point(data = tail(train_amzn, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 25, shape = 21, color = "black", fill="grey30") +
+             size = 15, shape = 21, color = "black", fill="violetred") +
 #GOOG
   geom_line(data = train_goog, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "train_goog")) +
@@ -1061,7 +1061,7 @@ geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_goog")) +
   geom_point(data = tail(train_goog, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 25, shape = 21, color = "black", fill="grey30") +
+             size = 15, shape = 21, color = "black", fill="violetred") +
   
 #META
   geom_line(data = train_meta, linewidth=2,
@@ -1070,7 +1070,7 @@ geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_meta")) +
   geom_point(data = tail(train_meta, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 25, shape = 21, color = "black", fill="grey30") +
+             size = 15, shape = 21, color = "black", fill="violetred") +
  
 #MSFT
   geom_line(data = train_msft, linewidth=2,
@@ -1079,7 +1079,7 @@ geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_msft")) +
   geom_point(data = tail(train_msft, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 25, shape = 21, color = "black", fill="grey30") +
+             size = 15, shape = 21, color = "black", fill="violetred") +
    
 #NFLx
   geom_line(data = train_nflx, linewidth=2,
@@ -1088,7 +1088,7 @@ geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nflx")) +
   geom_point(data = tail(train_nflx, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 25, shape = 21, color = "black", fill="grey30") +
+             size = 15, shape = 21, color = "black", fill="violetred") +
 
 #NVDA
   geom_line(data = train_nvda, linewidth=2,
@@ -1097,7 +1097,7 @@ geom_line(data = train_aapl, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
   geom_point(data = tail(train_nvda, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 25, shape = 21, color = "black", fill="grey30") +
+             size = 15, shape = 21, color = "black", fill="violetred") +
   scale_colour_manual(values = 
                       c("train_aapl"=col.aapl[1], "test_aapl"=col.aapl[2],
                         "train_amzn"=col.amzn[1], "test_amzn"=col.amzn[2],
@@ -1109,7 +1109,43 @@ geom_line(data = train_aapl, linewidth=2,
     theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Time Series MAANG",
-       subtitle = "Pembagian Data Latih dan data Uji\n") 
+       subtitle = "Pembagian Data Latih dan data Uji\n") +
+  # Label / legend
+  geom_text_repel(
+    data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
+    aes(x=Date, y=`Adj Close`, 
+        color=Name, label=Name), #Warna garis & label saham
+    size = 8, #Ukuran text
+    nudge_x = 20, #Posisi Text (kanan 50)
+    hjust = 0, #Ujung
+    segment.size = 1,               #Ukuran garis
+    segment.alpha = .75,             #transparasi garis
+    segment.linetype = "dotted",    #Time garis
+    box.padding = .4, #Biar label saham nggak dempetan
+    segment.curvature = -0.1, #biar garis mulus
+    segment.ncp = 8, 
+    segment.angle = 60 
+  ) +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(data2$Date)), 
+               as.Date(max(data2$Date)) + 120)
+    #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+    annotate( #Buat nandain batas data
+    "text", x = as.Date(max(data2$Date)), y = 50, 
+    label = max(data2$Date), size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date( max(data2$Date) )), 
+             linetype = "dotted", color = "red") 
   
 chart
 #Export Chart
