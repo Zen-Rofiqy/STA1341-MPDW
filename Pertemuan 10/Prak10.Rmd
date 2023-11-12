@@ -1056,7 +1056,7 @@ ggplot() +
   annotate( "text", color="seagreen",
             x = as.Date(data2$Date[ceiling(nrow(train_goog)/2)]), 
             y = max(data2$`Adj Close`) * 0.95, 
-    label = "Data Asli", size=10) + 
+    label = "Data Latih", size=10) + 
   
   #Label Data Ramal
   annotate( "rect", alpha=0.1, fill="violetred",
@@ -1065,9 +1065,9 @@ ggplot() +
             ymin=0, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling(0.9 * length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling(0.92 * length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * 0.95, 
-    label = "Data Ramal\n115 Hari", size=10) +
+    label = "Data Uji", size=10) +
   
 #AAPL
 geom_line(data = train_aapl, linewidth=2,
