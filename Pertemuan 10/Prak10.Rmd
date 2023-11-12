@@ -1293,7 +1293,7 @@ lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
-Gambar di atas menunjukkan bahwa hanya `NFLX` yang memuat *rounded value* ($\lambda$) di dalam selangnya. Sementara selainnya tidak memuatnya.
+Gambar di atas menunjukkan bahwa dari rentang nilai lambda -2 hingga 4, hanya `NFLX` yang memuat *rounded value* ($\lambda$) = 1 di dalam selangnya. Sementara selainnya tidak memuatnya.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
@@ -1391,10 +1391,10 @@ Mengutip dari laman [r-coder.com](https://r-coder.com/box-cox-transformation-r/)
 |         1          |       $x$        |          $x$           |
 |         2          |      $x^2$       |       $\sqrt{x}$       |
 
-: Karena semua data saham yang tidak stasioner memiliki nilai *rounded value* ($\lambda$) optimum nya mendekati 0, maka transformasi yang digunakan adalah transformasi $\log{(x)}$ dengan transfromasi baliknya $e^x$ atau $\exp{(x)}$.
+: Sehingga transformasi yang digunakan pada data saham yang tidak stasioner dalam ragam adalah sebagai berikut.
 
 ```{r}
-lamb <- c(-2, -1, -.5, 0, .5, 1, 2)
+lamb <- c(-2, -1, -.5, 0, .5, 2)
 # Fungsi untuk mengonversi lambda ke transformasi
 trans <- function(lambda) {
   lambda <- lamb[sapply(lambda, function(y) which.min(abs(y - lamb))) ]
@@ -1404,7 +1404,6 @@ trans <- function(lambda) {
     lambda == -0.5 ~ "1/sqrt(x)",
     lambda == 0    ~ "log(x)",
     lambda == 0.5  ~ "sqrt(x)",
-    lambda == 1    ~ "x",
     lambda == 2    ~ "x^2",
     TRUE           ~ NA_character_
   )
@@ -1419,7 +1418,6 @@ trans_balik <- function(lambda) {
     lambda == -0.5 ~ "1/x^2",
     lambda == 0    ~ "exp(x)",
     lambda == 0.5  ~ "x^2",
-    lambda == 1    ~ "x",
     lambda == 2    ~ "sqrt(x)",
     TRUE           ~ NA_character_
   )
@@ -1427,10 +1425,11 @@ trans_balik <- function(lambda) {
 
 # Menambahkan kolom Transformasi dan Trans Balik
 tran <- lsk %>%
+  filter(Keterangan == "Ragam Tidak Stasioner") %>%
   mutate(
     Transformasi = trans(Lambda),
     `Transformasi Balik` = trans_balik(Lambda)
-  ); tran <- tran[,c(1,5,6)]
+  ) %>% dplyr::select(Lambda, Transformasi, `Transformasi Balik`)
 
 datatable(tran, filter = 'top', 
           options = list(pageLength = 7))
@@ -1440,32 +1439,75 @@ datatable(tran, filter = 'top',
 
 ```{r fig.align="center", fig.height=7.5, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
 #Transformasi
-train_amzn.ts.new <- log(train_amzn.ts)
-train_goog.ts.new <- log(train_goog.ts)
-train_meta.ts.new <- log(train_meta.ts)
-train_msft.ts.new <- log(train_msft.ts)
-train_nflx.ts.new <- log(train_nflx.ts)
-train_nvda.ts.new <- log(train_nvda.ts)
+train_aapl.ts.new <- 1/sqrt(train_aapl.ts)
+train_amzn.ts.new <- (train_amzn.ts)^2
+train_goog.ts.new <- sqrt(train_goog.ts)
+train_meta.ts.new <- sqrt(train_meta.ts)
+train_msft.ts.new <- 1/(train_msft.ts)
+train_nvda.ts.new <- 1/sqrt(train_nvda.ts)
 
 #Plot BoxCox
 par(mfrow=c(2,3))
 index <- seq(1:nrow(train_aapl))
-bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-5, 6, by=.01))
+bc <-boxcox(train_aapl.ts.new ~index, lambda=seq(-2, 4, by=.01))
+title("AAPL", cex.main=3)
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+index <- seq(1:nrow(train_amzn))
+bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-2, 4, by=.01))
 title("AMZN", cex.main=3)
-bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-5, 6, by=.01))
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+index <- seq(1:nrow(train_goog))
+bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-2, 4, by=.01))
 title("GOOG", cex.main=3)
-bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-5, 6, by=.01))
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+index <- seq(1:nrow(train_meta))
+bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-2, 4, by=.01))
 title("META", cex.main=3)
-bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-5, 6, by=.01))
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
+index <- seq(1:nrow(train_msft))
+bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-2, 4, by=.01))
 title("MSFT", cex.main=3)
-bc <-boxcox(train_nflx.ts.new ~index, lambda=seq(-5, 6, by=.01))
-title("NFLX", cex.main=3)
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+
 index <- seq(1:nrow(train_nvda))
-bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-5, 6, by=.01))
+bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-2, 4, by=.01))
 title("NVDA", cex.main=3)
+lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
 Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap rangkaian data sekarang mencakup nilai satu dalam selangnya, yang menunjukkan bahwa data tersebut sekarang sudah **stasioner dalam ragam**.
+
+```{r}
+lsk <- data.frame(
+  Lambda = c(lambda_aapl, lambda_amzn, lambda_goog, lambda_meta, 
+             lambda_msft, lambda_nflx, lambda_nvda ),
+  Batas.Bawah = c(min(sk_aapl), min(sk_amzn), min(sk_goog), min(sk_meta),
+                  min(sk_msft), min(sk_nflx), min(sk_nvda)  ),
+  Batas.Atas = c(max(sk_aapl), max(sk_amzn), max(sk_goog), max(sk_meta),
+                 max(sk_msft), max(sk_nflx), max(sk_nvda)  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+lsk$Keterangan <- apply(lsk, 1, function(row) {
+  ifelse(row["Batas.Bawah"] <= 1 && row["Batas.Atas"] >= 1,
+         "Ragam Stasioner",  "Ragam Tidak Stasioner")
+})
+
+rownames(lsk) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+
+datatable(lsk, filter = 'top', 
+          options = list(pageLength = 7))
+```
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
