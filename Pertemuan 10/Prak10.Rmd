@@ -2259,10 +2259,10 @@ datatable(drift1_amzn, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2295.54$ dimiliki oleh model `ARIMA(1,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(1,1,1)`.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept dan Tanpa Drift pada `AMZN` tidak ada.
 
 ```{r}
-model_amzn.drift1 <- Arima(train_amzn.ts, order=c(1,1,1), method="ML")
+model_amzn.drift1 <- NA
 ```
 
 ### GOOG
