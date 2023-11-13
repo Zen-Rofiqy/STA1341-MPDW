@@ -2289,10 +2289,10 @@ datatable(drift1_meta, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,5)` dengan nilai AIC sebesar $3002.21$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept dan Tanpa Drift pada `META` tidak ada.
 
 ```{r}
-model_meta.drift1 <- Arima(train_meta.ts, order=c(3,1,5), method="ML")
+model_meta.drift1 <- NA
 ```
 
 ### MSFT
