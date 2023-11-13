@@ -2354,7 +2354,7 @@ model_terbaik <- function(model, rowname, mods) {
     )
     model_df$Keterangan <- 
       mods[which(mods$Model == 
-                     model_df["Model"]["AAPL",]), "Keterangan"]
+                     model_df["Model"]rowname,]), "Keterangan"]
   return(model_df)
     
   } else {
@@ -2367,50 +2367,16 @@ model_terbaik <- function(model, rowname, mods) {
   }
 }
 
-model_df <- bind_rows(
-  model_terbaik(model_aapl.drift1, 'AAPL', drift1_amzn),
+model_df <- rbind(
+  model_terbaik(model_aapl.drift1, 'AAPL', drift1_aapl),
   model_terbaik(model_amzn.drift1, 'AMZN', drift1_amzn),
-  model_terbaik(model_goog.drift1, 'GOOG', drift1_amzn),
-  model_terbaik(model_meta.drift1, 'META', drift1_amzn),
-  model_terbaik(model_msft.drift1, 'MSFT', drift1_amzn),
-  model_terbaik(model_nflx.drift1, 'NFLX', drift1_amzn),
-  model_terbaik(model_nvda.drift1, 'NVDA', drift1_amzn),
+  model_terbaik(model_goog.drift1, 'GOOG', drift1_goog),
+  model_terbaik(model_meta.drift1, 'META', drift1_meta),
+  model_terbaik(model_msft.drift1, 'MSFT', drift1_msft),
+  model_terbaik(model_nflx.drift1, 'NFLX', drift1_nflx),
+  model_terbaik(model_nvda.drift1, 'NVDA', drift1_nvda)
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
-rownames(model_df) <- unique(data$Name)
-
-model_terbaik <- function(model) {
-  if (!all(is.na(model))) {
-    data.frame(
-      Model = paste("ARIMA(", 
-              paste(as.character(model[["call"]][["order"]][-1]), 
-                    collapse = ","), ")", sep = ""),
-      AIC = model[["aicc"]]
-    )
-  } else {
-    data.frame(
-      Model = NA_character_,
-      AIC = NA_real_
-    )
-  }
-}
-
-model_df$Keterangan <-
- c(model[which(model$Model == 
-                     model_df["Model"]["AAPL",]), "Keterangan"],
-   drift1_amzn[which(drift1_amzn$Model == 
-                     model_df["Model"]["AMZN",]), "Keterangan"],
-   drift1_goog[which(drift1_goog$Model == 
-                     model_df["Model"]["GOOG",]), "Keterangan"],
-   drift1_meta[which(drift1_meta$Model == 
-                     model_df["Model"]["META",]), "Keterangan"],
-   drift1_msft[which(drift1_msft$Model == 
-                     model_df["Model"]["MSFT",]), "Keterangan"],
-   drift1_nflx[which(drift1_nflx$Model == 
-                     model_df["Model"]["NFLX",]), "Keterangan"],
-   drift1_nvda[which(drift1_nvda$Model == 
-                     model_df["Model"]["NVDA",]), "Keterangan"]
-   )
 
 datatable(model_df, filter = 'top', 
           options = list(pageLength = 7))
