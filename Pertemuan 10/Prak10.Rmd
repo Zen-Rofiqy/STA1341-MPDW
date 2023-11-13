@@ -2343,6 +2343,31 @@ model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
 ### Model Terbaik
 
 ```{r}
+model_terbaik <- function(model) {
+  data.frame(
+    Model = case_when(
+      !is.na(model) ~ paste("ARIMA(", paste(as.character(
+        model[["call"]][["order"]][-1]), 
+        collapse = ","), ")", sep = ""),
+      TRUE ~ NA_character_
+    ),
+    AIC = case_when(
+      !is.na(model) ~ model[["aicc"]],
+      TRUE ~ NA_real_
+    )
+  )
+}
+
+drift1 <- bind_rows(
+  model_terbaik(model_aapl.drift1),
+  model_terbaik(model_amzn.drift1),
+  model_terbaik(model_amzn.drift1),
+  model_terbaik(model_amzn.drift1),
+  model_terbaik(model_amzn.drift1),
+  model_terbaik(model_amzn.drift1),
+  model_terbaik(model_amzn.drift1),
+)
+
 drift1 <- data.frame(
   Model = 
     c( paste("ARIMA(", paste(as.character(
