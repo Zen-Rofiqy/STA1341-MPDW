@@ -2616,8 +2616,7 @@ datatable(drift4_aapl, filter = 'top',
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `AAPL` tidak ada.
 
 ```{r}
-model_aapl.drift4 <- Arima(train_aapl.diff, order=c(3,0,3), method="ML",
-                           include.drift=TRUE)
+model_aapl.drift4 <- NA
 ```
 
 ### AMZN
@@ -2629,11 +2628,10 @@ datatable(drift4_amzn, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,0,4)` dengan nilai AIC sebesar $-2110.08$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `AMZN` tidak ada.
 
 ```{r}
-model_amzn.drift4 <- Arima(train_amzn.diff, order=c(3,0,4), method="ML",
-                           include.drift=TRUE)
+model_amzn.drift4 <- NA
 ```
 
 ### GOOG
@@ -2645,11 +2643,10 @@ datatable(drift4_goog, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Walaupun jika mengabaikan kategorinya, pemilihan modle terbaiknya agak cukup sulit. Hanya ada **tiga** model yang parameternya tidak memiliki **NA** di dalamnya. Merika adalah `ARIMA(1,0,12)`, `ARIMA(4,0,11)`, dan `ARIMA(2,0,12)`. Itupun mereka banyak parameternya yang signifikan. Diputuskanlah model terbaiknya adalah `ARIMA(2,0,12)` dengan nilai AIC yang lebih kecil daripada ketiganya yakni sebesar $-2297.46$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `GOOG` tidak ada.
 
 ```{r}
-model_goog.drift4 <- Arima(train_goog.diff, order=c(2,0,12), method="ML",
-                           include.drift=TRUE)
+model_goog.drift4 <- NA
 ```
 
 ### META
@@ -2661,11 +2658,10 @@ datatable(drift4_meta, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(0,0,13)` dengan nilai AIC sebesar $-1826.41$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `AMETA` tidak ada.
 
 ```{r}
-model_meta.drift4 <- Arima(train_meta.diff, order=c(0,0,1), method="ML",
-                           include.drift=TRUE)
+model_meta.drift4 <- NA
 ```
 
 ### MSFT
@@ -2677,11 +2673,10 @@ datatable(drift4_msft, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(2,0,8)` dengan nilai AIC sebesar $-2433.85$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `MSFT` tidak ada.
 
 ```{r}
-model_msft.drift4 <- Arima(train_msft.diff, order=c(2,0,8), method="ML",
-                           include.drift=TRUE)
+model_msft.drift4 <- NA
 ```
 
 ### NFLX
@@ -2693,11 +2688,10 @@ datatable(drift4_nflx, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(0,0,1)` dengan nilai AIC sebesar $-1768.7$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `NFLX` tidak ada.
 
 ```{r}
-model_nflx.drift4 <- Arima(train_nflx.diff, order=c(0,0,1), method="ML",
-                           include.drift=TRUE)
+model_nflx.drift4 <- NA
 ```
 
 ### NVDA
@@ -2709,75 +2703,31 @@ datatable(drift4_nvda, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(5,1,5)` dengan nilai AIC sebesar $-2038.37$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `NVDA` tidak ada.
 
 ```{r}
-model_nvda.drift4 <- Arima(train_nvda.diff, order=c(5,1,5), method="ML",
-                           include.drift=TRUE)
+model_nvda.drift4 <- NA
 ```
 
 ### Model Terbaik
 
 ```{r}
-drift4 <- data.frame(
-  Model = 
-    c( paste("ARIMA(", paste(as.character(
-          model_aapl.drift4[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_amzn.drift4[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_goog.drift4[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_meta.drift4[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_msft.drift4[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_nflx.drift4[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_nvda.drift4[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = "")
-  ),
-  AIC = c(model_aapl.drift4[["aicc"]],
-          model_amzn.drift4[["aicc"]],
-          model_goog.drift4[["aicc"]],
-          model_meta.drift4[["aicc"]],
-          model_msft.drift4[["aicc"]],
-          model_nflx.drift4[["aicc"]],
-          model_nvda.drift4[["aicc"]]
-  )
+drift4 <- rbind(
+  model_terbaik(model_aapl.drift4, 'AAPL', drift4_aapl),
+  model_terbaik(model_amzn.drift4, 'AMZN', drift4_amzn),
+  model_terbaik(model_goog.drift4, 'GOOG', drift4_goog),
+  model_terbaik(model_meta.drift4, 'META', drift4_meta),
+  model_terbaik(model_msft.drift4, 'MSFT', drift4_msft),
+  model_terbaik(model_nflx.drift4, 'NFLX', drift4_nflx),
+  model_terbaik(model_nvda.drift4, 'NVDA', drift4_nvda)
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
-
-rownames(drift4) <- unique(data$Name)
-
-drift4$Keterangan <-
- c(drift4_aapl[which(drift4_aapl$Model == 
-                     drift4["Model"]["AAPL",]), "Keterangan"],
-   drift4_amzn[which(drift4_amzn$Model == 
-                     drift4["Model"]["AMZN",]), "Keterangan"],
-   drift4_goog[which(drift4_goog$Model == 
-                     drift4["Model"]["GOOG",]), "Keterangan"],
-   drift4_meta[which(drift4_meta$Model == 
-                     drift4["Model"]["META",]), "Keterangan"],
-   drift4_msft[which(drift4_msft$Model == 
-                     drift4["Model"]["MSFT",]), "Keterangan"],
-   drift4_nflx[which(drift4_nflx$Model == 
-                     drift4["Model"]["NFLX",]), "Keterangan"],
-   drift4_nvda[which(drift4_nvda$Model == 
-                     drift4["Model"]["NVDA",]), "Keterangan"]
-   )
 
 datatable(drift4, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
-Walaupun berlabel model terbaik, namun hanya terdapat satu model yang semua parameternya signifikan. Yakni Model `ARIMA(3,0,3)` dari `AAPL`. Mungkin ini bisa disebabkan karne`AAPL` tidak dilakukan transfomrasi, sedangkan yang lainnya dilakukan transformasi.
+Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya signifikan.
 
 # **Analisis Sisaan**
 
