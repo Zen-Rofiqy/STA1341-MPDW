@@ -2370,10 +2370,10 @@ datatable(drift2_amzn, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,0,4)` dengan nilai AIC sebesar $-2111.55$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `AMZN` tidak ada.
 
 ```{r}
-model_amzn.drift2 <- Arima(train_amzn.diff, order=c(3,0,4), method="ML")
+model_amzn.drift2 <- NA
 ```
 
 ### GOOG
@@ -2385,10 +2385,10 @@ datatable(drift2_goog, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(1,0,3)` dengan nilai AIC sebesar $-2311.74$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `GOOG` tidak ada.
 
 ```{r}
-model_goog.drift2 <- Arima(train_goog.diff, order=c(1,0,3), method="ML")
+model_goog.drift2 <- NA
 ```
 
 ### META
@@ -2400,10 +2400,10 @@ datatable(drift2_meta, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,0,4)` dengan nilai AIC sebesar $-1816.39$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `META` tidak ada.
 
 ```{r}
-model_meta.drift2 <- Arima(train_meta.diff, order=c(3,0,4), method="ML")
+model_meta.drift2 <- NA
 ```
 
 ### MSFT
@@ -2415,10 +2415,10 @@ datatable(drift2_msft, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(2,0,7)` dengan nilai AIC sebesar $-2433.07$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `MSFT` tidak ada.
 
 ```{r}
-model_msft.drift2 <- Arima(train_msft.diff, order=c(2,0,7), method="ML")
+model_msft.drift2 <- NA
 ```
 
 ### NFLX
@@ -2430,10 +2430,10 @@ datatable(drift2_nflx, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(2,0,4)` dengan nilai AIC sebesar $-1764.81$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `NFLX` tidak ada.
 
 ```{r}
-model_nflx.drift2 <- Arima(train_nflx.diff, order=c(2,0,4), method="ML")
+model_nflx.drift2 <- NA
 ```
 
 ### NVDA
@@ -2445,7 +2445,7 @@ datatable(drift2_nvda, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(4,0,5)` dengan nilai AIC sebesar $-2046.65$.
+Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `NVDA` tidak ada.
 
 ```{r}
 model_nvda.drift2 <- Arima(train_nvda.diff, order=c(4,0,5), method="ML")
