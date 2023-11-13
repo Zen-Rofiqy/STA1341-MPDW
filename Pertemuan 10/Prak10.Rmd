@@ -2345,19 +2345,23 @@ model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
 ```{r}
 model_terbaik <- function(model, rowname = NA_character_) {
   if (!all(is.na(model))) {
-    data.frame(
+    model_df <- data.frame(
       Model = paste("ARIMA(", 
                      paste(as.character(model[["call"]][["order"]][-1]), 
                            collapse = ","), ")", sep = ""),
       AIC = model[["aicc"]],
       row.names = rowname
     )
+    model_df$Keterangan <- KeteranganFungsi(model_df$Model)
+  return(model_df)
+    
   } else {
-    data.frame(
+    return(data.frame(
       Model = NA_character_,
       AIC = NA_real_,
+      Keterangan = NA_character_,
       row.names = rowname
-    )
+    ))
   }
 }
 
