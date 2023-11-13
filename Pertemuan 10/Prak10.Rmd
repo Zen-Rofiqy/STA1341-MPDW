@@ -1689,18 +1689,20 @@ datatable(lsk.new, filter = 'top',
           options = list(pageLength = 7))
 ```
 
+Ini juga dibuktikan dengan tabel diatas.
+
 ### Dalam Rataan: Differencing
 
 *Differencing* (diferensiasi) adalah suatu proses statistik yang digunakan untuk mengatasi ketidakstasioneran dalam data rata-rata atau tren data. Tujuannya adalah untuk membuat data menjadi lebih stasioner dengan mengurangi atau menghilangkan tren atau pola waktu yang mungkin ada dalam data tersebut.
 
 ```{r dpi=300, fig.height = 8, fig.width = 25, fig.align = "center"}
 #Diff
-train_aapl.diff <- diff(train_aapl.ts, differences = 1) 
+train_aapl.diff <- diff(train_aapl.ts.new, differences = 1) 
 train_amzn.diff <- diff(train_amzn.ts.new, differences = 1) 
 train_goog.diff <- diff(train_goog.ts.new, differences = 1) 
 train_meta.diff <- diff(train_meta.ts.new, differences = 1) 
 train_msft.diff <- diff(train_msft.ts.new, differences = 1) 
-train_nflx.diff <- diff(train_nflx.ts.new, differences = 1) 
+train_nflx.diff <- diff(train_nflx.ts, differences = 1) 
 train_nvda.diff <- diff(train_nvda.ts.new, differences = 1) 
 
 #Plot
@@ -1983,8 +1985,8 @@ Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), A
 Pemilihan model ARIMA terbaik dilakukan ketika memiliki nilai **AIC** yang terkecil, **Semua Parameter Signifikan**, dan **Tidak ada Parameter NA**.
 
 ```{r message=FALSE, warning=FALSE}
-install_load('TSA')
-install_load('forecast')
+install_load('TSA', 'forecast')
+install_load()
 
 # Fungsi untuk menghitung model ARIMA dan menganalisis parameter
 model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
@@ -1999,12 +2001,12 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
   for (p in 0:p_max) {
     for (q in 1:q_max) {
       #Pola Matriks segitiga bawah
-      if (!is.na(eacf_result$symbol[p + 1, q + 1]) && 
-          !is.na(eacf_result$symbol[p + 1, q + 2]) && 
-          !is.na(eacf_result$symbol[p + 2, q + 2])) {
-        if (eacf_result$symbol[p + 1, q + 1] == "o" && 
-            eacf_result$symbol[p + 1, q + 2] == "o" && 
-            eacf_result$symbol[p + 2, q + 2] == "o") {
+      if (!is.na(eacf_result$symbol[p + 1, q ]) && 
+          !is.na(eacf_result$symbol[p + 1, q + 1]) && 
+          !is.na(eacf_result$symbol[p + 2, q + 1])) {
+        if (eacf_result$symbol[p + 1, q ] == "o" && 
+            eacf_result$symbol[p + 1, q + 1] == "o" && 
+            eacf_result$symbol[p + 2, q + 1] == "o") {
       
           model <- Arima(data, order=c(p,d,q), method="ML", 
                          include.drift=drift)
@@ -2068,10 +2070,10 @@ datatable(model.tentaif_aapl, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $2139.54$ dimiliki oleh model `ARIMA(2,1,3)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,3)` .
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-9971$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
 
 ```{r}
-model_aapl.da <- Arima(train_aapl.diff, order=c(2,1,3), method="ML")
+model_aapl.da <- Arima(train_aapl.diff, order=c(0,1,1), method="ML")
 ```
 
 ### AMZN
@@ -2083,7 +2085,7 @@ datatable(model.tentaif_amzn, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2101.57$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $6957.12$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_amzn.da <- Arima(train_amzn.diff, order=c(0,1,1), method="ML")
@@ -2098,10 +2100,10 @@ datatable(model.tentaif_goog, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2301.96$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1868.36$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
 
 ```{r}
-model_goog.da <- Arima(train_goog.diff, order=c(0,1,1), method="ML")
+model_goog.da <- Arima(train_goog.diff, order=c(4,1,5), method="ML")
 ```
 
 ### META
@@ -2113,7 +2115,7 @@ datatable(model.tentaif_meta, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1815.84$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-737.20$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)` .
 
 ```{r}
 model_meta.da <- Arima(train_meta.diff, order=c(0,1,1), method="ML")
