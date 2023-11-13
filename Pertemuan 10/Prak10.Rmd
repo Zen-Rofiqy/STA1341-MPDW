@@ -2344,12 +2344,19 @@ model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
 
 ```{r}
 model_terbaik <- function(model) {
-  data.frame(
-    Model = ifelse(!is.na(model), 
-                   paste("ARIMA(", paste(as.character(model[["call"]][["order"]][-1]), collapse = ","), ")", sep = ""),
-                   NA_character_),
-    AIC = ifelse(!is.na(model), model[["aicc"]], NA_real_)
-  )
+  if (!all(is.na(model))) {
+    data.frame(
+      Model = paste("ARIMA(", 
+              paste(as.character(model[["call"]][["order"]][-1]), 
+                    collapse = ","), ")", sep = ""),
+      AIC = model[["aicc"]]
+    )
+  } else {
+    data.frame(
+      Model = NA_character_,
+      AIC = NA_real_
+    )
+  }
 }
 
 drift1 <- bind_rows(
