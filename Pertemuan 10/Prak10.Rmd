@@ -2274,10 +2274,10 @@ datatable(drift1_goog, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Namun jika mengabaikan kategorinya, maka model terbaiknya adalah `ARIMA(3,1,3)` dengan nilai AIC sebesar $2002.22$.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3620.64$ dimiliki oleh model `ARIMA(2,1,2)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,2)`.
 
 ```{r}
-model_goog.drift1 <- Arima(train_goog.ts, order=c(3,1,3), method="ML")
+model_goog.drift1 <- Arima(train_goog.ts, order=c(2,1,2), method="ML")
 ```
 
 ### META
