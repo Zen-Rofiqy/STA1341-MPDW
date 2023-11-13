@@ -2343,6 +2343,36 @@ model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
 ### Model Terbaik
 
 ```{r}
+model_terbaik <- function(model, rowname = NA_character_) {
+  if (!all(is.na(model))) {
+    data.frame(
+      Model = paste("ARIMA(", 
+                     paste(as.character(model[["call"]][["order"]][-1]), 
+                           collapse = ","), ")", sep = ""),
+      AIC = model[["aicc"]],
+      row.names = rowname
+    )
+  } else {
+    data.frame(
+      Model = NA_character_,
+      AIC = NA_real_,
+      row.names = rowname
+    )
+  }
+}
+
+drift1 <- bind_rows(
+  model_terbaik(model_aapl.drift1, 'AAPL'),
+  model_terbaik(model_amzn.drift1, 'AMZN'),
+  model_terbaik(model_goog.drift1, 'GOOG'),
+  model_terbaik(model_meta.drift1, 'META'),
+  model_terbaik(model_msft.drift1, 'MSFT'),
+  model_terbaik(model_nflx.drift1, 'NFLX'),
+  model_terbaik(model_nvda.drift1, 'NVDA'),
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+rownames(drift1) <- unique(data$Name)
+
 model_terbaik <- function(model) {
   if (!all(is.na(model))) {
     data.frame(
@@ -2358,18 +2388,6 @@ model_terbaik <- function(model) {
     )
   }
 }
-
-drift1 <- bind_rows(
-  model_terbaik(model_aapl.drift1),
-  model_terbaik(model_amzn.drift1),
-  model_terbaik(model_goog.drift1),
-  model_terbaik(model_meta.drift1),
-  model_terbaik(model_msft.drift1),
-  model_terbaik(model_nflx.drift1),
-  model_terbaik(model_nvda.drift1),
-) %>%
-  mutate(across(where(is.numeric), ~round(., 2)))
-rownames(drift1) <- unique(data$Name)
 
 drift1$Keterangan <-
  c(drift1_aapl[which(drift1_aapl$Model == 
