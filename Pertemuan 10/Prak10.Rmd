@@ -2168,58 +2168,40 @@ model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
 ## Model Tentatif Terbaik
 
 ```{r}
-tentatif <- data.frame(
-  Model = 
-    c( paste("ARIMA(", paste(as.character(
-          model_aapl.da[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_amzn.da[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_goog.da[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_meta.da[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_msft.da[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_nflx.da[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = ""),
-       paste("ARIMA(", paste(as.character(
-          model_nvda.da[["call"]][["order"]][-1]), 
-          collapse = ","), ")", sep = "")
-  ),
-  AIC = c(model_aapl.da[["aicc"]],
-          model_amzn.da[["aicc"]],
-          model_goog.da[["aicc"]],
-          model_meta.da[["aicc"]],
-          model_msft.da[["aicc"]],
-          model_nflx.da[["aicc"]],
-          model_nvda.da[["aicc"]]
-  )
+model_terbaik <- function(model, rowname, mods) {
+  if (!all(is.na(model))) {
+    model_df <- data.frame(
+      Model = paste("ARIMA(", 
+                     paste(as.character(model[["call"]][["order"]][-1]), 
+                           collapse = ","), ")", sep = ""),
+      AIC = model[["aicc"]],
+      row.names = rowname
+    )
+    model_df$Keterangan <- 
+      mods[which(mods$Model == 
+                     model_df["Model"][rowname,]), "Keterangan"]
+  return(model_df)
+    
+  } else {
+    return(data.frame(
+      Model = NA_character_,
+      AIC = NA_real_,
+      Keterangan = NA_character_,
+      row.names = rowname
+    ))
+  }
+}
+
+tentatif <- rbind(
+  model_terbaik(model_aapl.da, 'AAPL', model.tentaif_aapl), 
+  model_terbaik(model_amzn.da, 'AMZN', model.tentaif_amzn), 
+  model_terbaik(model_goog.da, 'GOOG', model.tentaif_goog),  
+  model_terbaik(model_meta.da, 'META', model.tentaif_meta), 
+  model_terbaik(model_msft.da, 'MSFT', model.tentaif_msft), 
+  model_terbaik(model_nflx.da, 'NFLX', model.tentaif_nflx), 
+  model_terbaik(model_nvda.da, 'NVDA', model.tentaif_nvda)  
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
-rownames(tentatif) <- unique(data$Name)
-
-tentatif$Keterangan <-
- c(model.tentaif_aapl[which(model.tentaif_aapl$Model == 
-                     tentatif["Model"]["AAPL",]), "Keterangan"],
-   model.tentaif_amzn[which(model.tentaif_amzn$Model == 
-                     tentatif["Model"]["AMZN",]), "Keterangan"],
-   model.tentaif_goog[which(model.tentaif_goog$Model == 
-                     tentatif["Model"]["GOOG",]), "Keterangan"],
-   model.tentaif_meta[which(model.tentaif_meta$Model == 
-                     tentatif["Model"]["META",]), "Keterangan"],
-   model.tentaif_msft[which(model.tentaif_msft$Model == 
-                     tentatif["Model"]["MSFT",]), "Keterangan"],
-   model.tentaif_nflx[which(model.tentaif_nflx$Model == 
-                     tentatif["Model"]["NFLX",]), "Keterangan"],
-   model.tentaif_nvda[which(model.tentaif_nvda$Model == 
-                     tentatif["Model"]["NVDA",]), "Keterangan"]
-   )
 
 datatable(tentatif, filter = 'top', 
           options = list(pageLength = 7))
@@ -2343,31 +2325,7 @@ model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
 ### Model Terbaik
 
 ```{r}
-model_terbaik <- function(model, rowname, mods) {
-  if (!all(is.na(model))) {
-    model_df <- data.frame(
-      Model = paste("ARIMA(", 
-                     paste(as.character(model[["call"]][["order"]][-1]), 
-                           collapse = ","), ")", sep = ""),
-      AIC = model[["aicc"]],
-      row.names = rowname
-    )
-    model_df$Keterangan <- 
-      mods[which(mods$Model == 
-                     model_df["Model"]rowname,]), "Keterangan"]
-  return(model_df)
-    
-  } else {
-    return(data.frame(
-      Model = NA_character_,
-      AIC = NA_real_,
-      Keterangan = NA_character_,
-      row.names = rowname
-    ))
-  }
-}
-
-model_df <- rbind(
+drift1 <- rbind(
   model_terbaik(model_aapl.drift1, 'AAPL', drift1_aapl),
   model_terbaik(model_amzn.drift1, 'AMZN', drift1_amzn),
   model_terbaik(model_goog.drift1, 'GOOG', drift1_goog),
@@ -2378,7 +2336,7 @@ model_df <- rbind(
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
-datatable(model_df, filter = 'top', 
+datatable(drift1, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
