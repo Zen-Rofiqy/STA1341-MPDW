@@ -2334,10 +2334,10 @@ datatable(drift1_nvda, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3105.62$ dimiliki oleh model `ARIMA(2,1,2)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,2)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $5063.53$ dimiliki oleh model `ARIMA(4,1,4)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,4)`.
 
 ```{r}
-model_nvda.drift1 <- Arima(train_nvda.ts, order=c(2,1,2), method="ML")
+model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
 ```
 
 ### Model Terbaik
