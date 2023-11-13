@@ -1986,13 +1986,12 @@ Pemilihan model ARIMA terbaik dilakukan ketika memiliki nilai **AIC** yang terke
 
 ```{r message=FALSE, warning=FALSE}
 install_load('TSA', 'forecast')
-install_load()
 
 # Fungsi untuk menghitung model ARIMA dan menganalisis parameter
 model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
   best_model <- NULL
   best_aic <- Inf
-  eacf_result <- eacf(data)
+  eacf_result <- eacf(data) #Untuk Ektraksi & identifikasi model
   models <- data.frame(Model = character(0), 
                        AIC = numeric(0), 
                        Signif = character(0), 
@@ -2130,10 +2129,10 @@ datatable(model.tentaif_msft, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-2421.48$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-13948.9$ dimiliki oleh model `ARIMA(4,1,5)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,5)`.
 
 ```{r}
-model_msft.da <- Arima(train_msft.diff, order=c(0,1,1), method="ML")
+model_msft.da <- Arima(train_msft.diff, order=c(4,1,5), method="ML")
 ```
 
 ### NFLX
@@ -2145,10 +2144,10 @@ datatable(model.tentaif_nflx, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1759.09$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $6170.43$ dimiliki oleh model `ARIMA(6,1,7)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(6,1,7)`.
 
 ```{r}
-model_nflx.da <- Arima(train_nflx.diff, order=c(0,1,1), method="ML")
+model_nflx.da <- Arima(train_nflx.diff, order=c(6,1,7), method="ML")
 ```
 
 ### NVDA
@@ -2160,7 +2159,7 @@ datatable(model.tentaif_nvda, filter = 'top',
           options = list(pageLength = 5))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-1578.14$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-8917.35$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
