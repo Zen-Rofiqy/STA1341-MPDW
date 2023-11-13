@@ -2343,7 +2343,7 @@ model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
 ### Model Terbaik
 
 ```{r}
-model_terbaik <- function(model, rowname = NA_character_) {
+model_terbaik <- function(model, rowname, mods) {
   if (!all(is.na(model))) {
     model_df <- data.frame(
       Model = paste("ARIMA(", 
@@ -2352,7 +2352,9 @@ model_terbaik <- function(model, rowname = NA_character_) {
       AIC = model[["aicc"]],
       row.names = rowname
     )
-    model_df$Keterangan <- KeteranganFungsi(model_df$Model)
+    model_df$Keterangan <- 
+      mods[which(mods$Model == 
+                     model_df["Model"]["AAPL",]), "Keterangan"]
   return(model_df)
     
   } else {
@@ -2365,17 +2367,17 @@ model_terbaik <- function(model, rowname = NA_character_) {
   }
 }
 
-drift1 <- bind_rows(
-  model_terbaik(model_aapl.drift1, 'AAPL'),
-  model_terbaik(model_amzn.drift1, 'AMZN'),
-  model_terbaik(model_goog.drift1, 'GOOG'),
-  model_terbaik(model_meta.drift1, 'META'),
-  model_terbaik(model_msft.drift1, 'MSFT'),
-  model_terbaik(model_nflx.drift1, 'NFLX'),
-  model_terbaik(model_nvda.drift1, 'NVDA'),
+model_df <- bind_rows(
+  model_terbaik(model_aapl.drift1, 'AAPL', drift1_amzn),
+  model_terbaik(model_amzn.drift1, 'AMZN', drift1_amzn),
+  model_terbaik(model_goog.drift1, 'GOOG', drift1_amzn),
+  model_terbaik(model_meta.drift1, 'META', drift1_amzn),
+  model_terbaik(model_msft.drift1, 'MSFT', drift1_amzn),
+  model_terbaik(model_nflx.drift1, 'NFLX', drift1_amzn),
+  model_terbaik(model_nvda.drift1, 'NVDA', drift1_amzn),
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
-rownames(drift1) <- unique(data$Name)
+rownames(model_df) <- unique(data$Name)
 
 model_terbaik <- function(model) {
   if (!all(is.na(model))) {
@@ -2393,24 +2395,24 @@ model_terbaik <- function(model) {
   }
 }
 
-drift1$Keterangan <-
- c(drift1_aapl[which(drift1_aapl$Model == 
-                     drift1["Model"]["AAPL",]), "Keterangan"],
+model_df$Keterangan <-
+ c(model[which(model$Model == 
+                     model_df["Model"]["AAPL",]), "Keterangan"],
    drift1_amzn[which(drift1_amzn$Model == 
-                     drift1["Model"]["AMZN",]), "Keterangan"],
+                     model_df["Model"]["AMZN",]), "Keterangan"],
    drift1_goog[which(drift1_goog$Model == 
-                     drift1["Model"]["GOOG",]), "Keterangan"],
+                     model_df["Model"]["GOOG",]), "Keterangan"],
    drift1_meta[which(drift1_meta$Model == 
-                     drift1["Model"]["META",]), "Keterangan"],
+                     model_df["Model"]["META",]), "Keterangan"],
    drift1_msft[which(drift1_msft$Model == 
-                     drift1["Model"]["MSFT",]), "Keterangan"],
+                     model_df["Model"]["MSFT",]), "Keterangan"],
    drift1_nflx[which(drift1_nflx$Model == 
-                     drift1["Model"]["NFLX",]), "Keterangan"],
+                     model_df["Model"]["NFLX",]), "Keterangan"],
    drift1_nvda[which(drift1_nvda$Model == 
-                     drift1["Model"]["NVDA",]), "Keterangan"]
+                     model_df["Model"]["NVDA",]), "Keterangan"]
    )
 
-datatable(drift1, filter = 'top', 
+datatable(model_df, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
