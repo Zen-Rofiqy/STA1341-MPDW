@@ -593,9 +593,12 @@ ggplot() +
             ymin=0, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling(length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * 0.95, 
     label = "Data Uji", size=10) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.Date(data2$Date[nrow(train_nvda)]) , 
+             linetype = "dotted", color = "black", linewidth = 2) +
 
 #NVDA
   geom_line(data = train_nvda, linewidth=2,
@@ -610,22 +613,6 @@ ggplot() +
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Time Series Saham NVDA",
        subtitle = "Pembagian Data Latih dan data Uji\n") +
-  # Label / legend
-  geom_text_repel(
-    data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
-    aes(x=Date, y=`Adj Close`, 
-        color=Name, label=Name), #Warna garis & label saham
-    size = 8, #Ukuran text
-    nudge_x = 20, #Posisi Text (kanan 50)
-    hjust = 0, #Ujung
-    segment.size = 1,               #Ukuran garis
-    segment.alpha = .75,             #transparasi garis
-    segment.linetype = "dotted",    #Time garis
-    box.padding = .4, #Biar label saham nggak dempetan
-    segment.curvature = -0.1, #biar garis mulus
-    segment.ncp = 8, 
-    segment.angle = 60 
-  ) +
   #Axis
     coord_cartesian(clip = "off"
   ) +
@@ -645,7 +632,20 @@ ggplot() +
   ) +
   geom_vline( #Buat garis batas data
     xintercept = as.numeric(as.Date( max(data2$Date) )), 
-             linetype = "dotted", color = "red") 
+             linetype = "dotted", color = "red") +
+  geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
+                   xend = as.Date(max(train_nvda$Date)), 
+                   y = max(nvda$`Adj Close`)* .58, 
+                   yend = max(nvda$`Adj Close`)*70/100), 
+               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
+               lineend = "round", color = "black", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(train_nvda$Date)), 
+                      y = max(nvda$`Adj Close`)*70/100, 
+                      label = max(data2$Date) ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "black", box.color = "white", parse = TRUE
+  )
   
 chart
 #Export Chart
