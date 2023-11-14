@@ -2755,8 +2755,8 @@ plot(c(1:length(sisaan_aapl.da)), sisaan_aapl.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_aapl.da, ylim=c(-.1,.1)) 
-pacf(sisaan_aapl.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_aapl.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_aapl.da, ylim=c(-.1,.1)) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar** **normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga **lebar pita** sisaan yang **cenderung berbeda** menandakan bahwa sisaan memiliki **ragam yang tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
@@ -2778,8 +2778,8 @@ plot(c(1:length(sisaan_aapl.da)), sisaan_aapl.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_aapl.da, ylim=c(-.1,.1)) 
-pacf(sisaan_aapl.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_aapl.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_aapl.da, ylim=c(-.1,.1)) 
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -2801,8 +2801,8 @@ plot(c(1:length(sisaan_amzn.da)), sisaan_amzn.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_amzn.da, ylim=c(-.1,.1)) 
-pacf(sisaan_amzn.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_amzn.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_amzn.da, ylim=c(-.1,.1)) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik-titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang **cenderung berbeda** menandakan bahwa sisaan memiliki **ragam yang tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
@@ -2824,8 +2824,8 @@ plot(c(1:length(sisaan_amzn.da)), sisaan_amzn.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_amzn.da, ylim=c(-.1,.1)) 
-pacf(sisaan_amzn.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_amzn.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_amzn.da, ylim=c(-.1,.1)) 
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -2847,8 +2847,8 @@ plot(c(1:length(sisaan_goog.da)), sisaan_goog.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_goog.da, ylim=c(-.1,.1)) 
-pacf(sisaan_goog.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_goog.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_goog.da, ylim=c(-.1,.1)) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan titik titik yang cenderung mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung tidak sama menandakan bahwa sisaan memiliki **ragam yang tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
@@ -2870,8 +2870,8 @@ plot(c(1:length(sisaan_goog.da)), sisaan_goog.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_goog.da, ylim=c(-.1,.1)) 
-pacf(sisaan_goog.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_goog.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_goog.da, ylim=c(-.1,.1)) 
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -2893,8 +2893,8 @@ plot(c(1:length(sisaan_meta.da)), sisaan_meta.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_meta.da, ylim=c(-.1,.1)) 
-pacf(sisaan_meta.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_meta.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_meta.da, ylim=c(-.1,.1)) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang **cenderung tidak sama** dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
@@ -2916,8 +2916,8 @@ plot(c(1:length(sisaan_meta.da)), sisaan_meta.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_meta.da, ylim=c(-.1,.1)) 
-pacf(sisaan_meta.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_meta.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_meta.da, ylim=c(-.1,.1)) 
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -2939,8 +2939,8 @@ plot(c(1:length(sisaan_msft.da)), sisaan_msft.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_msft.da, ylim=c(-.1,.1)) 
-pacf(sisaan_msft.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_msft.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_msft.da, ylim=c(-.1,.1)) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **menyebar tidak normal** ditandai dengan titik titik yang cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(4,1,5)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
@@ -2962,8 +2962,8 @@ plot(c(1:length(sisaan_msft.da)), sisaan_msft.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_msft.da, ylim=c(-.1,.1)) 
-pacf(sisaan_msft.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_msft.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_msft.da, ylim=c(-.1,.1)) 
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -2985,8 +2985,8 @@ plot(c(1:length(sisaan_nflx.da)), sisaan_nflx.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_nflx.da, ylim=c(-.1,.1)) 
-pacf(sisaan_nflx.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_nflx.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_nflx.da, ylim=c(-.1,.1)) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar normal** ditandai dengan tidak semua titik (ada pencilan) mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang **cenderung tidak sama** dikarenakan adanya pencilan menandakan bahwa sisaan memiliki ragam yang **tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(6,1,7)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
@@ -3008,8 +3008,8 @@ plot(c(1:length(sisaan_nflx.da)), sisaan_nflx.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_nflx.da, ylim=c(-.1,.1)) 
-pacf(sisaan_nflx.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_nflx.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_nflx.da, ylim=c(-.1,.1)) 
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -3031,8 +3031,8 @@ plot(c(1:length(sisaan_nvda.da)), sisaan_nvda.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
-pacf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_nvda.da, ylim=c(-.1,.1)) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **tidak normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
@@ -3054,8 +3054,8 @@ plot(c(1:length(sisaan_nvda.da)), sisaan_nvda.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
-pacf(sisaan_nvda.da, ylim=c(-.1,.1))
+stats::acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_nvda.da, ylim=c(-.1,.1))
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
