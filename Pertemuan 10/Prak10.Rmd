@@ -3540,13 +3540,13 @@ akurasi <- rbind(akurasi.aapl, akurasi.amzn, akurasi.goog, akurasi.meta,
     MAPE >= 10 & MAPE <= 20 ~ "Baik",
     MAPE > 20 & MAPE <= 50 ~ "Layak",
     MAPE > 50 ~ "Tidak Akurat"
-  )) %>% relocate(Keterangan, .before = 1)
+  )) %>% relocate(Keterangan, Model, MAPE)
 
 datatable(akurasi, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
-Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model yang paling sering digunakan. Hanya `AAPL` saja yang modelnya berbeda dari yang lainnya, yakni **ARIMA(2,1,3)**. Nilai **MAPE** terbaik yakni dimiliki oleh `AAPL` sebesar $3.229\%$. Terdapat dua nilai **MAPE** yang kurang baik yakni `AMZN` sebesar $35.305\%$ dan `GOOG` sebesar $37.535\%$ (`GOOG` merupakan yang terburuk).
+Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model yang paling sering digunakan. Model dengan kategori "Sangat baik" hanya ada di `GOOG` (**ARIMA(4,1,5)**) dan `MSFT` (**ARIMA(4,1,5)**). Di sisi lain, model dengan katergori "Baik" ada pada `NFLX` (**ARIMA(6,1,7)**) dan `NVDA` (**ARIMA(0,1,1)**).
 
 # Penutup
 
