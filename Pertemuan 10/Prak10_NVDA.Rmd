@@ -305,7 +305,7 @@ theme.ts1 <- list(
 
 Melihat keseluruhan *Time Series* data saham.
 
-```{r dpi=300,  fig.height = 12, fig.width = 25, fig.align = "center", warning=FALSE, message = FALSE}
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
 install_load('viridis','ggrepel')
 #Plot
 chart <-
@@ -362,7 +362,7 @@ chart
 
 #Export Chart
 ggsave("01_Time Series MAANG.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 25)
+        dpi = 300, height = 12, width = 27)
 ```
 
 Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Google**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
@@ -568,27 +568,27 @@ ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
-Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan.]{.underline}
-
 ## Data Train vs Test
 
-```{r dpi=300, fig.height = 12, fig.width = 27, fig.align = "center"}
+```{r fig.align=, fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300}
 chart <-
 ggplot() + 
   #Label Data Asli 
-  annotate( "rect", alpha=.1, fill="seagreen",
+  annotate( "rect", alpha=.1, fill="#4EC2C1",
             xmin=as.Date(min(data2$Date)), 
             xmax=as.Date(data2$Date[nrow(train_nvda)]),
             ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
   
-  annotate( "text", color="seagreen",
+  annotate( "text", color="#4EC2C1",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
             y = max(data2$`Adj Close`) * .95, 
     label = "Data Latih", size=10) + 
-  annotate( "text", color="seagreen",
+  annotate( "text", color="#4EC2C1",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
             y = max(data2$`Adj Close`) * .85, 
-    label = paste0(nrow(train_nvda)," Hari"), size=10) + 
+    label = paste0(nrow(train_nvda)," Hari (", 
+                   round(nrow(train_nvda)/nrow(nvda)*100, 1), 
+                   "%)"), size=10) + 
   
   #Label Data Ramal
   annotate( "rect", alpha=.1, fill="violetred",
@@ -603,7 +603,9 @@ ggplot() +
   annotate( "text", color="violetred",
             x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * .85, 
-    label = paste0(nrow(test_nvda)," Hari"), size=10) +
+    label = paste0(nrow(test_nvda)," Hari (", 
+                   round(nrow(test_nvda)/nrow(nvda)*100, 1), 
+                   "%)"), size=10) +
   
   geom_vline( #Buat garis batas data
     xintercept = as.Date(data2$Date[nrow(train_nvda)]) , 
@@ -647,12 +649,12 @@ ggplot() +
   geom_segment(aes(x = as.Date(max(data2$Date)), 
                    xend = as.Date(max(data2$Date)), 
                    y = max(nvda$`Adj Close`)* .95, 
-                   yend = max(nvda$`Adj Close`)*.98), 
+                   yend = max(nvda$`Adj Close`)*1.01), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#D02A49", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)), 
-                      y = max(nvda$`Adj Close`)*.98, 
+                      y = max(nvda$`Adj Close`)*1.01, 
                       label = max(data2$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#D02A49", box.color = "white", parse = TRUE
@@ -663,6 +665,8 @@ chart
 ggsave("09_banding_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
+
+Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih **tidak** memenuhi kriteria **stasioneritas dalam rataan maupun ragam**. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji **tidak stasioner dalam rataan**[.]{.underline}
 
 # Stasioneritas
 
