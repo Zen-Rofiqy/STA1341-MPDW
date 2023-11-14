@@ -625,13 +625,6 @@ ggplot() +
   #Axis
     coord_cartesian(clip = "off"
   ) +
-    scale_x_date( #Sumbu x
-    date_breaks = "1 year",  # Menampilkan label setiap tahun
-    date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date(min(data2$Date)), 
-               as.Date(max(data2$Date)) + 120)
-    #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
-  ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
@@ -642,6 +635,8 @@ ggplot() +
   geom_vline( #Buat garis batas data
     xintercept = as.numeric(as.Date( max(data2$Date) )), 
              linetype = "dotted", color = "red") +
+
+#Bagi Data Train & Test
   geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
                    xend = as.Date(max(train_nvda$Date)), 
                    y = max(nvda$`Adj Close`)* .58, 
