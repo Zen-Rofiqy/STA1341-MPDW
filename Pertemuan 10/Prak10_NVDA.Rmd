@@ -56,7 +56,7 @@ path <- function(){
 
 ```{r}
 #Export chart
-export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 10/Chart"
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 10/Chart2"
 ```
 
 # Pendahuluan
@@ -483,13 +483,13 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
                    y = min(nvda$`Adj Close`)* 1.01, 
                    yend = max(nvda$`Adj Close`)*40/100), 
                arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
-               lineend = "round", color = "#AB8264", size=1.5) +
+               lineend = "round", color = "#D02A49", size=1.5) +
   geom_richtext(
     data = data.frame(x = min_date, 
                       y = max(nvda$`Adj Close`)*40/100, 
                       label = paste0("Titik Terendah") ),
     aes(x, y, label = label), size = 7, color = "white", 
-    fill = "#AB8264", box.color = "white", parse = TRUE
+    fill = "#D02A49", box.color = "white", parse = TRUE
   ) +
   geom_text(aes(x = min_date-1*35, y = max(`Adj Close`)*40/100, label = 
                   paste0(min_date)), 
@@ -501,13 +501,13 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
                    y = max(nvda$`Adj Close`)* .99, 
                    yend = max(nvda$`Adj Close`)*70/100), 
                arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
-               lineend = "round", color = "#AB8264", size=1.5) +
+               lineend = "round", color = "#4B75BA", size=1.5) +
   geom_richtext(
     data = data.frame(x = max_date, 
                       y = max(nvda$`Adj Close`)*70/100, 
                       label = paste0("Titik Tertinggi") ),
     aes(x, y, label = label), size = 7, color = "white", 
-    fill = "#AB8264", box.color = "white", parse = TRUE
+    fill = "#4B75BA", box.color = "white", parse = TRUE
   ) + 
   geom_text(aes(x = max_date-1*35, y = max(`Adj Close`)*60/100, label = 
                   paste0(max_date)), 
@@ -536,36 +536,6 @@ train_nvda <- nvda[1: round(nrow(nvda) *78/100),]
 test_nvda <- nvda[round(nrow(nvda) *78/100  +1): nrow(nvda),]
 train_nvda.ts <- ts(train_nvda[,3])
 test_nvda.ts <- ts(test_nvda[,3])
-```
-
-```{r dpi=300, fig.height = 12, fig.width = 27, fig.align = "center"}
-chart <-
-ggplot() + 
-  geom_line(data = train_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "train_nvda")) +
-  geom_line(data = test_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
-  geom_point(data = tail(train_nvda, 1), alpha = .5, 
-             aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 15, shape = 21, color = "black", fill="violetred") +
-  geom_text(data = tail(train_nvda, 1), 
-            aes(x = Date, y = max(`Adj Close`), label = 
-                  paste0(max(train_nvda$Date) )), 
-            vjust = -1.5, hjust = 0, size = 7, color = "grey30") +
-  
-  labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
-       title = "Time Series Saham NVIDIA",
-       subtitle = "Pembagian Data Training dan Test\n") +
-  theme(legend.position = "none") +
-  
-  scale_colour_manual(values = c("train_nvda"=col.nvda[1], 
-                                 "test_nvda"=col.nvda[2])) + 
-  theme.ts1
-  
-chart
-#Export Chart
-ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 27)
 ```
 
 ## Data Train vs Test
@@ -662,7 +632,7 @@ ggplot() +
   
 chart
 #Export Chart
-ggsave("09_banding_train-test.png", chart, path = export.chart,
+ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
