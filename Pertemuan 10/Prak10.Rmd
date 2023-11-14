@@ -3398,7 +3398,7 @@ ggsave("09_banding_ramal.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
-Dapat dilihat bahwa rata-rata harga saham Apple diramalkan akan cenderung sedikit menaikonstan setiap periodenya. Sedangkan harga saham lainnya cenderung naik dengan drastis.
+Dapat dilihat bahwa rata-rata harga saham Amazon diramalkan akan cenderung sedikit menurun setiap periodenya. Di sisi lain, saham NVIDIA diramalkan akan menaik pesat setiap periodenya. Sedangkan harga saham lainnya cenderung naik sedikit.
 
 ## Perbandingan Data Aktual dengan Data Ramal {.tabset}
 
