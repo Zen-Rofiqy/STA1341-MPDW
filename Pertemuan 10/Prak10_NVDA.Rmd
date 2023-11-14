@@ -454,7 +454,7 @@ Ringkasan Data `Ajd CLose.`
 summary(nvda.ts)
 ```
 
-```{r dpi=300, fig.height = 12, fig.width = 27, fig.align = "center"}
+```{r fig.align=, fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300}
 min_value <- min(nvda$`Adj Close`)
 min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
 min_perc <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
@@ -463,6 +463,7 @@ max_value <- max(nvda$`Adj Close`)
 max_date <- nvda$Date[which.max(nvda$`Adj Close`)]
 max_perc <- (which.max(nvda$`Adj Close`) / nrow(nvda)) * 100
 
+install_load("ggtext")
 chart <-
 ggplot(nvda, aes(x=Date, y=`Adj Close`)) + 
   geom_line(aes(color=Name), linewidth=2) +
@@ -472,21 +473,44 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
        subtitle = "Seperti apa sih pola deret waktu saham NVIDIA?\n") +
   theme(legend.position = "none") +
   theme.ts1 + 
-  geom_vline(xintercept = as.numeric(min_date), 
-             linetype = "dotted", color = "grey30", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*30/100, label = 
-                  paste0("Titik Terendah\n","(",round(min_perc, 2), 
-                         "% Data)\n",
-                         "   ",min_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "grey30") +
+  
+#Ekstras
+  # Titik Terendah
+  geom_richtext(
+    data = data.frame(x = as.numeric(min_date), 
+                      y = max(`Adj Close`)*30/100, 
+                      label = paste0("Titik Terendah\n",
+                                     "(",round(min_perc, 2), "% Data)\n",
+                                     "   ",min_date)),
+    aes(x, y, label = label), size = 7, color = "grey30", 
+    fill = "white", box.color = "grey30", parse = TRUE, 
+    vjust = -1.5, hjust = 0
+  ) +
+  # Garis Panah
+  geom_segment(aes(x = as.numeric(min_date), xend = as.numeric(min_date), 
+                   y = 0, yend = max(`Adj Close`)*30/100),
+                arrow = arrow(type = "closed", 
+                              length = unit(0.1, "inches")), 
+                lineend = "round", color = "grey30", size = 1.5) +
+  
+  # Titik Tertinggi
+  geom_richtext(
+    data = data.frame(x = as.numeric(max_date), 
+                      y = max(`Adj Close`)*30/100, 
+                      label = paste0("Titik Tertinggi\n",
+                                     "(",round(max_perc, 2), "% Data)\n",
+                                     "   ",max_date)),
+    aes(x, y, label = label), size = 7, color = "grey30", 
+    fill = "white", box.color = "grey30", parse = TRUE, 
+    vjust = -1.5, hjust = 0
+  ) +
+  # Garis Panah
+  geom_segment(aes(x = as.numeric(max_date), xend = as.numeric(max_date), 
+                   y = 0, yend = max(`Adj Close`)*30/100),
+                arrow = arrow(type = "closed", 
+                              length = unit(0.1, "inches")), 
+                lineend = "round", color = "grey30", size = 1.5)
 
-  geom_vline(xintercept = as.numeric(max_date), 
-             linetype = "dotted", color = "grey30", linewidth = 1.5) +
-  geom_text(aes(x = max_date-1*40, y = max(`Adj Close`)*30/100, label = 
-                  paste0("Titik Tertinggi\n","(",round(max_perc, 2), 
-                         "% Data)\n",
-                         "   ",max_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
 chart
 #Export Chart
 ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
