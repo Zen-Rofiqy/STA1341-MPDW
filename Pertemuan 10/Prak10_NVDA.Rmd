@@ -507,7 +507,7 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
     aes(x, y, label = label), size = 7, color = "white", 
     fill = "#AB8264", box.color = "white", parse = TRUE
   ) + 
-  geom_text(aes(x = max_date-1*35, y = max(`Adj Close`)*63/100, label = 
+  geom_text(aes(x = max_date-1*35, y = max(`Adj Close`)*62/100, label = 
                   paste0(max_date)), 
             vjust = -1.5, hjust = 0, size = 7, color = "grey30")
 
