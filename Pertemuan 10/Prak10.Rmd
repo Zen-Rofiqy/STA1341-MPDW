@@ -1,5 +1,5 @@
 ---
-title: "Time Series MAANG dengan Metode ARIMA"
+title: "Time Series MAANG dengan Metode ARIMA & Kombinasi Drift"
 author: "Angga Fathan Rofiqy"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
