@@ -3546,7 +3546,7 @@ datatable(akurasi, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model yang paling sering digunakan. Model dengan kategori "Sangat baik" hanya ada di `GOOG` (**ARIMA(4,1,5)**) dan `MSFT` (**ARIMA(4,1,5)**). Di sisi lain, model dengan katergori "Baik" ada pada `NFLX` (**ARIMA(6,1,7)**) dan `NVDA` (**ARIMA(0,1,1)**).
+Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model yang paling sering digunakan. Model dengan kategori *"Sangat baik"* hanya ada di `GOOG` (**ARIMA(4,1,5)**) dan `MSFT` (**ARIMA(4,1,5)**). Di sisi lain, model dengan katergori *"Baik"* ada pada `NFLX` (**ARIMA(6,1,7)**) dan `NVDA` (**ARIMA(0,1,1)**). Sisanya mendapatkan kategori *"Layak".*
 
 # Penutup
 
