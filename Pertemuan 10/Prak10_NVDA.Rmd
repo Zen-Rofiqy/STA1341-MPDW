@@ -588,7 +588,7 @@ ggplot() +
   annotate( "text", color="seagreen",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
             y = max(data2$`Adj Close`) * 0.85, 
-    label = paste0(nrow(test_nvda)," Hari"), size=10) + 
+    label = paste0(nrow(train_nvda)," Hari"), size=10) + 
   
   #Label Data Ramal
   annotate( "rect", alpha=0.1, fill="violetred",
@@ -632,9 +632,6 @@ ggplot() +
     "text", x = as.Date(max(data2$Date)), y = 50, 
     label = max(data2$Date), size=6
   ) +
-  geom_vline( #Buat garis batas data
-    xintercept = as.numeric(as.Date( max(data2$Date) )), 
-             linetype = "dotted", color = "red") +
 
 #Bagi Data Train & Test
   geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
@@ -646,9 +643,23 @@ ggplot() +
   geom_richtext(
     data = data.frame(x = as.Date(max(train_nvda$Date)), 
                       y = max(nvda$`Adj Close`)*70/100, 
-                      label = max(data2$Date) ),
+                      label = max(train_nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
+  ) +
+
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date)), 
+                   y = max(nvda$`Adj Close`)* .95, 
+                   yend = max(nvda$`Adj Close`)*78/100), 
+               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
+               lineend = "round", color = "#D02A49", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date)), 
+                      y = max(nvda$`Adj Close`)*78/100, 
+                      label = max(data2$Date) ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "#D02A49", box.color = "white", parse = TRUE
   )
   
 chart
