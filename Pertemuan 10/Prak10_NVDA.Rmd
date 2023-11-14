@@ -475,22 +475,39 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
   
 #Ekstras
 
-  #Tambah Mean Value
+  #Titik terendah
   geom_richtext(
-    data = data.frame(x = min_date-1*40, 
-                      y = max(nvda$`Adj Close`)*30/100, 
-                      label = paste0("Titik Terendah\n",
+    data = data.frame(x = min_date, 
+                      y = max(nvda$`Adj Close`)*40/100, 
+                      label = paste0("Titik Terendah<br>",
                                      "(",round(min_perc, 2), 
-                         "% Data)\n",
+                         "% Data)<br>",
                          "   ",min_date) ),
     aes(x, y, label = label), size = 7, color = "white", 
     fill = "#AB8264", box.color = "white", parse = TRUE
   ) +
-  #Tambah panah
   geom_segment(aes(x = min_date, 
                    xend = min_date, 
-                   y = min(nvda$`Adj Close`), 
-                   yend = max(nvda$`Adj Close`)*30/100), 
+                   y = min(nvda$`Adj Close`)* 1.01, 
+                   yend = max(nvda$`Adj Close`)*40/100), 
+               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
+               lineend = "round", color = "#AB8264", size=1.5) +
+
+  #Titik tertinggi
+  geom_richtext(
+    data = data.frame(x = max_date, 
+                      y = max(nvda$`Adj Close`)*40/100, 
+                      label = paste0("Titik Tertinggi<br>",
+                                     "(",round(max_perc, 2), 
+                         "% Data)<br>",
+                         "   ",max_date) ),
+    aes(x, y, label = label), size = 7, color = "white", 
+    fill = "#AB8264", box.color = "white", parse = TRUE
+  ) +
+  geom_segment(aes(x = max_date, 
+                   xend = max_date, 
+                   y = max(nvda$`Adj Close`)* 1.01, 
+                   yend = max(nvda$`Adj Close`)*40/100), 
                arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
                lineend = "round", color = "#AB8264", size=1.5)
 
