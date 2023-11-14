@@ -576,33 +576,33 @@ Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terli
 chart <-
 ggplot() + 
   #Label Data Asli 
-  annotate( "rect", alpha=0.1, fill="seagreen",
+  annotate( "rect", alpha=.1, fill="seagreen",
             xmin=as.Date(min(data2$Date)), 
             xmax=as.Date(data2$Date[nrow(train_nvda)]),
             ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
   
   annotate( "text", color="seagreen",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
-            y = max(data2$`Adj Close`) * 0.95, 
+            y = max(data2$`Adj Close`) * .95, 
     label = "Data Latih", size=10) + 
   annotate( "text", color="seagreen",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
-            y = max(data2$`Adj Close`) * 0.85, 
+            y = max(data2$`Adj Close`) * .85, 
     label = paste0(nrow(train_nvda)," Hari"), size=10) + 
   
   #Label Data Ramal
-  annotate( "rect", alpha=0.1, fill="violetred",
+  annotate( "rect", alpha=.1, fill="violetred",
             xmin=as.Date(data2$Date[nrow(train_nvda)]), 
             xmax=as.Date(max(data2$Date)),
             ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
             x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * 0.95, 
+            y = max(data2$`Adj Close`) * .95, 
     label = "Data Uji", size=10) +
   annotate( "text", color="violetred",
             x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * 0.85, 
+            y = max(data2$`Adj Close`) * .85, 
     label = paste0(nrow(test_nvda)," Hari"), size=10) +
   
   geom_vline( #Buat garis batas data
@@ -628,21 +628,17 @@ ggplot() +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
-    annotate( #Buat nandain batas data
-    "text", x = as.Date(max(data2$Date)), y = 50, 
-    label = max(data2$Date), size=6
-  ) +
 
 #Bagi Data Train & Test
   geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
                    xend = as.Date(max(train_nvda$Date)), 
                    y = max(nvda$`Adj Close`)* .58, 
-                   yend = max(nvda$`Adj Close`)*70/100), 
+                   yend = max(nvda$`Adj Close`)*.7), 
                arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
                lineend = "round", color = "#4B75BA", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(train_nvda$Date)), 
-                      y = max(nvda$`Adj Close`)*70/100, 
+                      y = max(nvda$`Adj Close`)*.7, 
                       label = max(train_nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
@@ -651,12 +647,12 @@ ggplot() +
   geom_segment(aes(x = as.Date(max(data2$Date)), 
                    xend = as.Date(max(data2$Date)), 
                    y = max(nvda$`Adj Close`)* .95, 
-                   yend = max(nvda$`Adj Close`)*78/100), 
-               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
+                   yend = max(nvda$`Adj Close`)*.98), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#D02A49", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)), 
-                      y = max(nvda$`Adj Close`)*78/100, 
+                      y = max(nvda$`Adj Close`)*.98, 
                       label = max(data2$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#D02A49", box.color = "white", parse = TRUE
