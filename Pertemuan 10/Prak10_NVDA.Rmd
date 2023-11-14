@@ -370,24 +370,21 @@ data2 <- data %>%
   filter(Date >= as.Date("2021-01-01")) 
 ```
 
-```{r dpi=300,  fig.height = 12, fig.width = 23, fig.align = "center", warning=FALSE, message = FALSE}
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
 install_load('viridis','ggrepel')
 #Plot
 chart <-
-ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
+ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
   scale_color_manual(values = c(AAPL=col.aapl[1], AMZN=col.amzn[1],
                                 GOOG=col.goog[1], META=col.meta[1],
                                 MSFT=col.msft[1], NFLX=col.nflx[1], 
                                 NVDA=col.nvda[1]) ) +
-  scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
-                                "META" = .25, "AAPL" = .25, "GOOG" = 1, 
-                                "AMZN" = .25)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Time Series MAANG",
-       subtitle = "Seperti apa sih pola deret waktu saham MAANG pada 2022-2023?\n") +
+       subtitle = "Seperti apa sih pola deret waktu saham MAANG pada 2021-2023?\n") +
   # Label / legend
   geom_text_repel(
     data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
@@ -427,7 +424,7 @@ chart
 
 #Export Chart
 ggsave("01_Time Series MAANG_2022-2023.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 23)
+        dpi = 300, height = 12, width = 27)
 ```
 
 ### AAPL {style=".color:lightskyblue4;"}
