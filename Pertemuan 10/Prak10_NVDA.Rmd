@@ -522,7 +522,7 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
 
 chart
 #Export Chart
-ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
+ggsave("02_Time Series NVIDIA.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
@@ -630,7 +630,7 @@ ggplot() +
   
 chart
 #Export Chart
-ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
+ggsave("02_TS_NVDA_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
@@ -642,19 +642,13 @@ Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terli
 
 ### Plot ACF
 
-```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 install_load('tsibble','tseries')
-par(mfrow=c(2,4))
-acf(train_aapl.ts, main=""); mtext("AAPL", side=3, line=1, cex=2, font=2)
-acf(train_amzn.ts, main=""); mtext("AMZN", side=3, line=1, cex=2, font=2)
-acf(train_goog.ts, main=""); mtext("GOOG", side=3, line=1, cex=2, font=2)
-acf(train_meta.ts, main=""); mtext("META", side=3, line=1, cex=2, font=2)
-acf(train_msft.ts, main=""); mtext("MSFT", side=3, line=1, cex=2, font=2)
-acf(train_nflx.ts, main=""); mtext("NFLX", side=3, line=1, cex=2, font=2)
-acf(train_nvda.ts, main=""); mtext("NVDA", side=3, line=1, cex=2, font=2)
+acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
+mtext("NVDA", side=3, line=1, cex=2, font=2)
 ```
 
-Berdasarkan plot ACF, terlihat bahwa plot ACF seluruh data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data **tidak stasioner dalam rataan** dan tidak membentuk gelombang sinus.
+Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan (*tails of slowly*). Hal ini juga menjadi indikasi bahwa data **tidak stasioner dalam rataan** dan tidak membentuk gelombang sinus.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
@@ -662,14 +656,8 @@ png(paste(export.chart, "/99_Stas_ACF.png", sep=""),
     height = 7.5*300, width = 20*300, res=300)
 
 # Plot 
-par(mfrow=c(2,4))
-acf(train_aapl.ts, main=""); mtext("AAPL", side=3, line=1, cex=2, font=2)
-acf(train_amzn.ts, main=""); mtext("AMZN", side=3, line=1, cex=2, font=2)
-acf(train_goog.ts, main=""); mtext("GOOG", side=3, line=1, cex=2, font=2)
-acf(train_meta.ts, main=""); mtext("META", side=3, line=1, cex=2, font=2)
-acf(train_msft.ts, main=""); mtext("MSFT", side=3, line=1, cex=2, font=2)
-acf(train_nflx.ts, main=""); mtext("NFLX", side=3, line=1, cex=2, font=2)
-acf(train_nvda.ts, main=""); mtext("NVDA", side=3, line=1, cex=2, font=2)
+acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
+mtext("NVDA", side=3, line=1, cex=2, font=2)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
