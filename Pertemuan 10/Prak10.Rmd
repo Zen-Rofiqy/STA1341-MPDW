@@ -3268,7 +3268,8 @@ ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
   train_nvda.ts.new[length(train_nvda.ts)]
 
 #Transformasi Balik
-ramal_amzn <- exp(ramal_amzn)
+ramal_aapl <- 1/(ramal_aapl)^2
+ramal_amzn <- (lamb * (ramal_amzn) + 1)^(1/lamb)
 ramal_goog <- exp(ramal_goog)
 ramal_meta <- exp(ramal_meta)
 ramal_msft <- exp(ramal_msft)
