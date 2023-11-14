@@ -998,7 +998,7 @@ Ringkasan Data `Ajd CLose.`
 summary(nvda.ts)
 ```
 
-```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+```{r dpi=300, fig.height = 12, fig.width = 27, fig.align = "center"}
 min_value <- min(nvda$`Adj Close`)
 min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
 percentage <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
@@ -1021,7 +1021,7 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
 chart
 #Export Chart
 ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 20)
+        dpi = 300, height = 12, width = 27)
 ```
 
 Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $50.25\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-10-14`, terjadi perubahan pola menjadi [tren naik]{.underline} dan menaik tajam pada Juli 2023.
@@ -1036,7 +1036,7 @@ train_nvda.ts <- ts(train_nvda[,3])
 test_nvda.ts <- ts(test_nvda[,3])
 ```
 
-```{r dpi=300, fig.height = 12, fig.width = 20, fig.align = "center"}
+```{r dpi=300, fig.height = 12, fig.width = 27, fig.align = "center"}
 chart <-
 ggplot() + 
   geom_line(data = train_nvda, linewidth=2,
@@ -1045,7 +1045,12 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
   geom_point(data = tail(train_nvda, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 25, shape = 21, color = "black", fill="grey30") +
+             size = 15, shape = 21, color = "black", fill="violetred") +
+  geom_text(data = tail(train_nvda, 1), 
+            aes(x = Date, y = max(`Adj Close`), label = 
+                  paste0(max(train_nvda$Date) )), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") +
+  
   labs(x = "\nPeriode (Tahun)", y='Saham Harga penutup',
        title = "Time Series Saham NVIDIA",
        subtitle = "Pembagian Data Training dan Test\n") +
@@ -1058,7 +1063,7 @@ ggplot() +
 chart
 #Export Chart
 ggsave("08_TS_NVDA_train-test.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 20)
+        dpi = 300, height = 12, width = 27)
 ```
 
 Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih [tidak]{.underline} memenuhi kriteria [stasioneritas dalam rataan maupun ragam]{.underline}. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji [tidak stasioner dalam rataan.]{.underline}
