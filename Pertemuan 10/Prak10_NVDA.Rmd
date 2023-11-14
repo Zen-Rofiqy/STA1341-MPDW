@@ -474,21 +474,25 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
   theme.ts1 + 
   
 #Ekstras
-  geom_vline(xintercept = as.numeric(min_date), 
-             linetype = "dotted", color = "grey30", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*30/100, label = 
-                  paste0("Titik Terendah\n","(",round(min_perc, 2), 
-                         "% Data)\n",
-                         "   ",min_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "grey30") +
 
-  geom_vline(xintercept = as.numeric(max_date), 
-             linetype = "dotted", color = "grey30", linewidth = 1.5) +
-  geom_text(aes(x = max_date-1*40, y = max(`Adj Close`)*30/100, label = 
-                  paste0("Titik Tertinggi\n","(",round(max_perc, 2), 
+  #Tambah Mean Value
+  geom_richtext(
+    data = data.frame(x = min_date-1*40, 
+                      y = max(nvda$`Adj Close`)*30/100, 
+                      label = paste0("Titik Terendah\n",
+                                     "(",round(min_perc, 2), 
                          "% Data)\n",
-                         "   ",max_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
+                         "   ",min_date) ),
+    aes(x, y, label = label), size = 7, color = "white", 
+    fill = "#AB8264", box.color = "white", parse = TRUE
+  ) +
+  #Tambah panah
+  geom_segment(aes(x = min_date, 
+                   xend = min_date, 
+                   y = min(nvda$`Adj Close`), 
+                   yend = max(nvda$`Adj Close`)*30/100), 
+               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
+               lineend = "round", color = "#AB8264", size=1.5)
 
 chart
 #Export Chart
