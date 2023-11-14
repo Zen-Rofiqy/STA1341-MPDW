@@ -587,7 +587,7 @@ ggplot() +
     label = "Data Latih", size=10) + 
   annotate( "text", color="seagreen",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
-            y = max(data2$`Adj Close`) * 0.90, 
+            y = max(data2$`Adj Close`) * 0.85, 
     label = paste0(nrow(test_nvda)," Hari"), size=10) + 
   
   #Label Data Ramal
@@ -602,7 +602,7 @@ ggplot() +
     label = "Data Uji", size=10) +
   annotate( "text", color="violetred",
             x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * 0.90, 
+            y = max(data2$`Adj Close`) * 0.85, 
     label = paste0(nrow(test_nvda)," Hari"), size=10) +
   
   geom_vline( #Buat garis batas data
