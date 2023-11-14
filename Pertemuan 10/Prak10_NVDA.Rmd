@@ -528,7 +528,7 @@ ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
 
 Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa dari tahun `2021-2022` terjadi kenaikan harga saham/**tren naik**. Sedangkan `2022-2023` terjadi penurunan harga saham/**tren turun**. Dan pada tahun 2023 akhir tahun terjadi kenaikan harga saham yang drastis/**tren naik**.
 
-#### **Pembagian Data Training Dan Test.**
+## Data Train vs Test
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
@@ -537,8 +537,6 @@ test_nvda <- nvda[round(nrow(nvda) *78/100  +1): nrow(nvda),]
 train_nvda.ts <- ts(train_nvda[,3])
 test_nvda.ts <- ts(test_nvda[,3])
 ```
-
-## Data Train vs Test
 
 ```{r fig.align=, fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300}
 chart <-
