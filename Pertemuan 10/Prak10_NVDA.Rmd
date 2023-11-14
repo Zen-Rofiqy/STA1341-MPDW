@@ -262,7 +262,7 @@ cols <- c("AAPL"=col.aapl[1], "test_aapl"=col.aapl[2],
           "NVDA"=col.nvda[1], "test_nvda"=col.nvda[2] )
 ```
 
-## Plot Time Series {.tabset}
+## Plot Time Series
 
 ```{r, warning=FALSE, message = FALSE}
 install_load('ggplot2','extrafont')
@@ -526,7 +526,7 @@ ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
 
 Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa dari tahun `2021-2022` terjadi kenaikan harga saham/**tren naik**. Sedangkan `2022-2023` terjadi penurunan harga saham/**tren turun**. Dan pada tahun 2023 akhir tahun terjadi kenaikan harga saham yang drastis/**tren naik**.
 
-**Pembagian Data Training Dan Test.**
+#### **Pembagian Data Training Dan Test.**
 
 ```{r}
 #membagi 80% data latih (training) dan 20% data uji (testing)
@@ -594,59 +594,6 @@ ggplot() +
             x = as.Date(data2$Date[ceiling(0.925 * length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * 0.95, 
     label = "Data Uji", size=10) +
-  
-#AAPL
-geom_line(data = train_aapl, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "AAPL")) +
-  geom_line(data = test_aapl, linewidth=1.5,
-            aes(x = Date, y = `Adj Close`, col = "test_aapl")) +
-  geom_point(data = tail(train_aapl, 1), alpha = .5, 
-             aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 15, shape = 21, color = "black", fill="violetred") +
-  
-#AMZN
-  geom_line(data = train_amzn, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "AMZN")) +
-  geom_line(data = test_amzn, linewidth=1.5,
-            aes(x = Date, y = `Adj Close`, col = "test_amzn")) +
-  geom_point(data = tail(train_amzn, 1), alpha = .5, 
-             aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 15, shape = 21, color = "black", fill="violetred") +
-#GOOG
-  geom_line(data = train_goog, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "GOOG")) +
-  geom_line(data = test_goog, linewidth=1.5,
-            aes(x = Date, y = `Adj Close`, col = "test_goog")) +
-  geom_point(data = tail(train_goog, 1), alpha = .5, 
-             aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 15, shape = 21, color = "black", fill="violetred") +
-  
-#META
-  geom_line(data = train_meta, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "META")) +
-  geom_line(data = test_meta, linewidth=1.5,
-            aes(x = Date, y = `Adj Close`, col = "test_meta")) +
-  geom_point(data = tail(train_meta, 1), alpha = .5, 
-             aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 15, shape = 21, color = "black", fill="violetred") +
- 
-#MSFT
-  geom_line(data = train_msft, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "MSFT")) +
-  geom_line(data = test_msft, linewidth=1.5,
-            aes(x = Date, y = `Adj Close`, col = "test_msft")) +
-  geom_point(data = tail(train_msft, 1), alpha = .5, 
-             aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 15, shape = 21, color = "black", fill="violetred") +
-   
-#NFLx
-  geom_line(data = train_nflx, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "NFLX")) +
-  geom_line(data = test_nflx, linewidth=1.5,
-            aes(x = Date, y = `Adj Close`, col = "test_nflx")) +
-  geom_point(data = tail(train_nflx, 1), alpha = .5, 
-             aes(x = Date, y = `Adj Close`), stroke=2,
-             size = 15, shape = 21, color = "black", fill="violetred") +
 
 #NVDA
   geom_line(data = train_nvda, linewidth=2,
@@ -659,7 +606,7 @@ geom_line(data = train_aapl, linewidth=2,
   scale_colour_manual(values = cols) +
     theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Time Series MAANG",
+       title = "Time Series Saham NVDA",
        subtitle = "Pembagian Data Latih dan data Uji\n") +
   # Label / legend
   geom_text_repel(
