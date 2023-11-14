@@ -1044,7 +1044,7 @@ Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terli
 
 ## Data Train vs Test
 
-```{r dpi=300, fig.height = 12, fig.width = 23, fig.align = "center"}
+```{r dpi=300, fig.height = 12, fig.width = 27, fig.align = "center"}
 chart <-
 ggplot() + 
   #Label Data Asli 
@@ -1175,7 +1175,7 @@ geom_line(data = train_aapl, linewidth=2,
 chart
 #Export Chart
 ggsave("09_banding_train-test.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 23)
+        dpi = 300, height = 12, width = 27)
 ```
 
 # Stasioneritas
