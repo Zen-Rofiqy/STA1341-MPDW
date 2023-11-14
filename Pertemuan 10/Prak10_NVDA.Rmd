@@ -524,7 +524,7 @@ ggsave("08_Time Series NVIDIA.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
-Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa sekitar $50.25\%$ dari data menunjukkan kecenderungan [tren menurun]{.underline}. Kemudian, pada tanggal `2022-10-14`, terjadi perubahan pola menjadi [tren naik]{.underline} dan menaik tajam pada Juli 2023.
+Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa dari tahun `2021-2022` terjadi kenaikan harga saham/**tren naik**. Sedangkan `2022-2023` terjadi penurunan harga saham/**tren turun**. Dan pada tahun 2023 akhir tahun terjadi kenaikan harga saham yang drastis/**tren naik**.
 
 **Pembagian Data Training Dan Test.**
 
