@@ -457,7 +457,11 @@ summary(nvda.ts)
 ```{r dpi=300, fig.height = 12, fig.width = 27, fig.align = "center"}
 min_value <- min(nvda$`Adj Close`)
 min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
-percentage <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
+min_perc <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
+
+max_value <- max(nvda$`Adj Close`)
+max_date <- nvda$Date[which.max(nvda$`Adj Close`)]
+max_perc <- (which.max(nvda$`Adj Close`) / nrow(nvda)) * 100
 
 chart <-
 ggplot(nvda, aes(x=Date, y=`Adj Close`)) + 
@@ -470,9 +474,18 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
   theme.ts1 + 
   geom_vline(xintercept = as.numeric(min_date), 
              linetype = "dotted", color = "grey30", linewidth = 1.5) +
-  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*80/100, label = 
-                  paste0("Titik Terendah\n","(",round(percentage, 2), "%)",
+  geom_text(aes(x = min_date-1*40, y = max(`Adj Close`)*30/100, label = 
+                  paste0("Titik Terendah\n","(",round(min_perc, 2), 
+                         "% Data)\n",
                          "   ",min_date)), 
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") +
+
+  geom_vline(xintercept = as.numeric(max_date), 
+             linetype = "dotted", color = "grey30", linewidth = 1.5) +
+  geom_text(aes(x = max_date-1*40, y = max(`Adj Close`)*30/100, label = 
+                  paste0("Titik Tertinggi\n","(",round(max_perc, 2), 
+                         "% Data)\n",
+                         "   ",max_date)), 
             vjust = -1.5, hjust = 0, size = 7, color = "grey30") 
 chart
 #Export Chart
