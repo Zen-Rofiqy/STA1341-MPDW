@@ -652,8 +652,8 @@ Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+png(paste(export.chart, "/03_Stas_ACF.png", sep=""),
+    height = 3.75*300, width = 7.5*300, res=300)
 
 # Plot 
 acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
@@ -666,72 +666,25 @@ dev.off() # Menutup file PNG
 ### Uji ADF
 
 ```{r}
-adf <- data.frame(
-  p.value = c(tseries::adf.test(train_aapl.ts)[["p.value"]],
-               tseries::adf.test(train_amzn.ts)[["p.value"]],
-               tseries::adf.test(train_goog.ts)[["p.value"]],
-               tseries::adf.test(train_meta.ts)[["p.value"]],
-               tseries::adf.test(train_msft.ts)[["p.value"]],
-               tseries::adf.test(train_nflx.ts)[["p.value"]],
-               tseries::adf.test(train_nvda.ts)[["p.value"]]
-              )
-) %>%
-  mutate(across(where(is.numeric), ~round(., 2)))
-adf$Keterangan <- ifelse(adf$p.value < 0.05, "Rataan Stasioner", 
-                         "Rataan Tidak Stasioner")
-rownames(adf) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
-datatable(adf, filter = 'top', 
-          options = list(pageLength = 7))
+tseries::adf.test(train_nvda.ts)
+
+if (tseries::adf.test(train_nvda.ts)[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05. Maka Rataan Stasioner")
+} else {
+  cat("Karena p-value > 0.05. Maka Rataan Tidak Stasioner")
+}
 ```
 
 > $H_0$ : Data tidak stasioner dalam rataan
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
+Berdasarkan uji ADF tersebut, *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa data **tidak stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga ketidakstasioneran model kedepannya harus ditangani.
 
 ### Plot Box-Cox
 
 ```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
 install_load('MASS')
-par(mfrow=c(2,4))
-
-index <- seq(1:nrow(train_aapl))
-bc =boxcox(train_aapl.ts~index, lambda=seq(-2, 4, by=.01))
-title("AAPL", cex.main = 4)
-lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_amzn))
-bc =boxcox(train_amzn.ts~index, lambda=seq(-2, 4, by=.01))
-title("AMZN", cex.main = 4)
-lambda_amzn <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_goog))
-bc =boxcox(train_goog.ts~index, lambda=seq(-2, 4, by=.01))
-title("GOOG", cex.main = 4)
-lambda_goog <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_meta))
-bc =boxcox(train_meta.ts~index, lambda=seq(-2, 4, by=.01))
-title("META", cex.main = 4)
-lambda_meta <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_msft))
-bc =boxcox(train_msft.ts~index, lambda=seq(-2, 4, by=.01))
-title("MSFT", cex.main = 4)
-lambda_msft <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_nflx))
-bc =boxcox(train_nflx.ts~index, lambda=seq(-2, 4, by=.01))
-title("NFLX", cex.main = 4)
-lambda_nflx <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
 index <- seq(1:nrow(train_nvda)) #Beda titik potong
 bc =boxcox(train_nvda.ts~index, lambda=seq(-2, 4, by=.01))
 title("NVDA", cex.main = 4)
