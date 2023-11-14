@@ -454,7 +454,7 @@ Ringkasan Data `Ajd CLose.`
 summary(nvda.ts)
 ```
 
-```{r dpi=300, fig.height = 12, fig.width = 27, fig.align = "center"}
+```{r fig.align=, fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300}
 min_value <- min(nvda$`Adj Close`)
 min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
 min_perc <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
@@ -507,9 +507,16 @@ ggplot(nvda, aes(x=Date, y=`Adj Close`)) +
     aes(x, y, label = label), size = 7, color = "white", 
     fill = "#AB8264", box.color = "white", parse = TRUE
   ) + 
-  geom_text(aes(x = max_date-1*35, y = max(`Adj Close`)*62/100, label = 
+  geom_text(aes(x = max_date-1*35, y = max(`Adj Close`)*60/100, label = 
                   paste0(max_date)), 
-            vjust = -1.5, hjust = 0, size = 7, color = "grey30")
+            vjust = -1.5, hjust = 0, size = 7, color = "grey30") +
+  annotate( #Buat nandain batas data
+    "text", x = as.Date(max(data2$Date)) -32, y = 50, 
+    label = max(data2$Date), size=6
+  ) +
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date( max(data2$Date) )), 
+             linetype = "dotted", color = "red", linewidth=1.5) 
 
 chart
 #Export Chart
