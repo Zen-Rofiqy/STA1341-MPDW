@@ -22,6 +22,8 @@ pkgdown:
 
 Kode di `Hide` dalam *default*, untuk menampilkan kode, klik `Code` .
 
+Analisis sebelum ini : <https://rpubs.com/ZenR_Prog/MPDW-Prak10>
+
 ```{r, warning=FALSE, message = FALSE}
 #                      -=( Install & Load Package Function )=-
 install_load <- function (package1, ...)  {   
@@ -576,22 +578,22 @@ ggplot() +
   #Label Data Asli 
   annotate( "rect", alpha=0.1, fill="seagreen",
             xmin=as.Date(min(data2$Date)), 
-            xmax=as.Date(data2$Date[nrow(train_goog)]),
+            xmax=as.Date(data2$Date[nrow(train_nvda)]),
             ymin=0, ymax=Inf ) + 
   
   annotate( "text", color="seagreen",
-            x = as.Date(data2$Date[ceiling(nrow(train_goog)/2)]), 
+            x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
             y = max(data2$`Adj Close`) * 0.95, 
     label = "Data Latih", size=10) + 
   
   #Label Data Ramal
   annotate( "rect", alpha=0.1, fill="violetred",
-            xmin=as.Date(data2$Date[nrow(train_meta)]), 
+            xmin=as.Date(data2$Date[nrow(train_nvda)]), 
             xmax=as.Date(max(data2$Date)),
             ymin=0, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling(0.925 * length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling(length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * 0.95, 
     label = "Data Uji", size=10) +
 
