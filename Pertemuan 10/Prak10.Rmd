@@ -2729,6 +2729,10 @@ datatable(drift4, filter = 'top',
 
 Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya signifikan.
 
+## Kesimpulan
+
+Jika dibandingkan dengan model tentatif terbaik sebelumnya. Maka terlihat bahwa model itu jauh lebih baik. Sehingga model dengan kombinasi drift tidak dipilih.
+
 # **Analisis Sisaan**
 
 Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
@@ -2755,7 +2759,7 @@ acf(sisaan_aapl.da, ylim=c(-.1,.1))
 pacf(sisaan_aapl.da, ylim=c(-.1,.1)) 
 ```
 
-Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar** **normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
+Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan **tidak menyebar** **normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga **lebar pita** sisaan yang **cenderung berbeda** menandakan bahwa sisaan memiliki **ragam yang tidak homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga signifikan pada 20 lag awal yang menandakan **tidak saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
