@@ -1221,8 +1221,32 @@ model_nvda.drift4 <- NA
 ## Model Terbaik
 
 ```{r}
-drift4 <- rbind(
+model_terbaik <- function(model, rowname, mods) {
+  if (!all(is.na(model))) {
+    model_df <- data.frame(
+      Model = paste("ARIMA(", 
+                     paste(as.character(model[["call"]][["order"]][-1]), 
+                           collapse = ","), ")", sep = ""),
+      AIC = model[["aicc"]],
+      row.names = rowname
+    )
+    model_df$Keterangan <- 
+      mods[which(mods$Model == 
+                     model_df["Model"][rowname,]), "Keterangan"]
+  return(model_df)
+    
+  } else {
+    return(data.frame(
+      Model = NA_character_,
+      AIC = NA_real_,
+      Keterangan = NA_character_,
+      row.names = rowname
+    ))
+  }
+}
 
+best_model <- rbind(
+  model_terbaik(model_nvda.da, 'NVDA', model.tentaif_nvda),
   model_terbaik(model_nvda.drift1, 'NVDA', drift1_nvda),
   model_terbaik(model_nvda.drift2, 'NVDA', drift2_nvda),
   model_terbaik(model_nvda.drift3, 'NVDA', drift3_nvda),
@@ -1230,11 +1254,11 @@ drift4 <- rbind(
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
-datatable(drift4, filter = 'top', 
+datatable(best_model, filter = 'top', 
           options = list(pageLength = 7))
 ```
 
-Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya signifikan.
+Terlihat bahwa model paling terbaik adalah model tentatif tanpa kombinasi drift. Sangat disayangkan, dari 4 kombinasi drift yang ada, hanya kombinasi 1 yang memiliki kategori model terbaik. Sehingga model yang akan digunakan adalah `model_nvda.da`
 
 ## Kesimpulan
 
