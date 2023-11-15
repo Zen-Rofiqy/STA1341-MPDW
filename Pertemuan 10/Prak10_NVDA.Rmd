@@ -1202,7 +1202,29 @@ Uji ARCH Engle merupakan uji multiplier Lagrange untuk menilai signifikansi efek
 
 Pertimbangkan pengujian hipotesis:
 
-Uji ARCH sering diterapkan pada data hasil mentah (raw returns).
+> $H_0$ : Tidak ada efek ARCH
+>
+> $H_1$ : Ada efek ARCH
+
+> **Uji ARCH sering diterapkan pada data hasil mentah (raw returns).**
+
+### **3. Engle\'s ARCH(p) Model**
+
+ARCH, yang merupakan heteroskedastisitas bersyarat, menyatakan bahwa volatilitas tidak konstan, dan berubah hampir sepanjang waktu.
+
+> **Model ARCH(1) adalah model GARCH paling sederhana.**
+
+Dalam model ARCH, 'autokorelasi dalam volatilitas' dimodelkan dengan memperbolehkan ragam bersyarat dari kesalahan untuk bergantung pada nilai sebelumnya secara langsung dari kesalahan kuadrat:
+
+$$
+\sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1}
+$$
+
+Kasus umum di mana ragam kesalahan bergantung pada q lag dari kesalahan kuadrat, yang dikenal sebagai model ARCH(q):
+
+$$
+\sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q} 
+$$
 
 ## Model Terbaik
 
