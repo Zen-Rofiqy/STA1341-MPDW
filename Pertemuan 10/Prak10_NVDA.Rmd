@@ -1284,13 +1284,13 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 ks.test(sisaan_nvda.da, "pnorm")
 
 if (ks.test(sisaan_nvda.da, "pnorm")[["p.value"]] < 0.05) {
-  cat("Karena p-value < 0.05, Sisaan Tidak Menyebar Normal")
+  cat("Karena p-value < 0.05, Maka Sisaan Tidak Menyebar Normal")
 } else {
-  cat("Karena p-value > 0.05, Sisaan Menyebar Normal")
+  cat("Karena p-value > 0.05, Maka Sisaan Menyebar Normal")
 }
 ```
 
-Berdasarkan uji KS tersebut, didapat *p-value* yang sangat kecil yakni kurang dari $2.2\times10^{-16}$. Semua *p-value* nya kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
+Berdasarkan uji KS tersebut, didapat *p-value* yang sangat kecil yakni kurang dari $2.2\times10^{-16}$. *p-value* nya kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
 
 ### Sisaan saling bebas
 
@@ -1301,30 +1301,16 @@ Selanjutnya akan dilakukan uji formal untuk kebebasan sisaan menggunakan uji Lju
 > $H_1$ : Sisaan tidak tidak saling bebas
 
 ```{r}
-#tak tolak H0 > sisaan saling bebas
-bebas <- data.frame(
-  p.value = c(Box.test(sisaan_aapl.da, type = "Ljung")[["p.value"]],
-              Box.test(sisaan_amzn.da, type = "Ljung")[["p.value"]],
-              Box.test(sisaan_goog.da, type = "Ljung")[["p.value"]],
-              Box.test(sisaan_meta.da, type = "Ljung")[["p.value"]],
-              Box.test(sisaan_msft.da, type = "Ljung")[["p.value"]],
-              Box.test(sisaan_nflx.da, type = "Ljung")[["p.value"]],
-              Box.test(sisaan_nvda.da, type = "Ljung")[["p.value"]]
-              )
-) 
-bebas$Keterangan <- ifelse(bebas$p.value < 0.05, 
-                              "Sisaan Tidak Saling Bebas", 
-                              "Sisaan Saling Bebas")
+Box.test(sisaan_nvda.da, type = "Ljung")
 
-bebas$p.value <- ifelse(bebas$p.value == 0, "< 2.2e-16",
-                           round(bebas$p.value, 2) )
-
-rownames(bebas) <- unique(data$Name)
-datatable(bebas, filter = 'top', 
-          options = list(pageLength = 7))
+if (Box.test(sisaan_nvda.da, type = "Ljung")[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05, Maka Sisaan Tidak Saling Bebas")
+} else {
+  cat("Karena p-value > 0.05, Maka Sisaan Saling Bebas")
+}
 ```
 
-Berdasarkan uji Ljung-Box tersebut, semua *p-value* nya lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Yang berarti tidak ada autokorelasi. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
+Berdasarkan uji Ljung-Box tersebut, *p-value* nya lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **sisaan saling bebas**. Yang berarti tidak ada autokorelasi. Hal ini sesuai dengan hasil eksplorasi menggunakan plot ACF dan PACF.
 
 ### Sisaan homogen
 
@@ -1335,33 +1321,16 @@ Hipotesis yang digunakan untuk uji kehomogenan ragam adalah sebagai berikut.
 > $H_1$ : Ragam sisaan tidak homogen
 
 ```{r}
-#tak tolak H0 > sisaan homogen
-homogen <- data.frame(
-  p.value = c(Box.test((sisaan_aapl.da)^2, type = "Ljung")[["p.value"]],
-              Box.test((sisaan_amzn.da)^2, type = "Ljung")[["p.value"]], 
-              Box.test((sisaan_goog.da)^2, type = "Ljung")[["p.value"]], 
-              Box.test((sisaan_meta.da)^2, type = "Ljung")[["p.value"]], 
-              Box.test((sisaan_msft.da)^2, type = "Ljung")[["p.value"]], 
-              Box.test((sisaan_nflx.da)^2, type = "Ljung")[["p.value"]], 
-              Box.test((sisaan_nvda.da)^2, type = "Ljung")[["p.value"]]
-              )
-) 
-homogen$Keterangan <- ifelse(homogen$p.value < 0.05, 
-                              "Sisaan Tidak Homogen", 
-                              "Sisaan Homogen")
+Box.test((sisaan_nvda.da)^2, type = "Ljung")
 
-homogen$p.value <- ifelse(homogen$p.value == 0, "< 2.2e-16",
-                           (round(homogen$p.value, 3)) )
-
-homogen$p.value <- ifelse(homogen$p.value == 0, "< 2.2e-16",
-                           (round(homogen$p.value, 3)) )
-
-rownames(homogen) <- unique(data$Name)
-datatable(homogen, filter = 'top', 
-          options = list(pageLength = 7))
+if (Box.test((sisaan_nvda.da)^2, type = "Ljung")[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05, Maka Sisaan Tidak Homogen")
+} else {
+  cat("Karena p-value > 0.05, Maka Sisaan Homogen")
+}
 ```
 
-Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, hanya ada 2 yang lebih besar dari dari taraf nyata $5\%$ yakni `META` dan `NFLX`. Yang berarti **tak tolak** $H_0$ dan menandakan bahwa **ragam sisaan homogen**. Sisanya lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
+Berdasarkan uji Ljung-Box terhadap sisaan kuadrat tersebut, *p-value* nya lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ dan menandakan bahwa **ragam sisaan tidak homogen**.
 
 ### Nilai tengah sama dengan nol
 
@@ -1372,30 +1341,16 @@ Terakhir, dengan uji-t, akan dicek apakah nilai tengah sisaan sama dengan nol. H
 > $H_1$ : nilai tengah sisaan tidak sama dengan 0
 
 ```{r}
-#tak tolak h0 > nilai tengah sisaan sama dengan 0 
-nol <- data.frame(
-  p.value = c(t.test(sisaan_aapl.da, mu=0, conf.level=.95)[["p.value"]],
-              t.test(sisaan_amzn.da, mu=0, conf.level=.95)[["p.value"]], 
-              t.test(sisaan_goog.da, mu=0, conf.level=.95)[["p.value"]], 
-              t.test(sisaan_meta.da, mu=0, conf.level=.95)[["p.value"]], 
-              t.test(sisaan_msft.da, mu=0, conf.level=.95)[["p.value"]], 
-              t.test(sisaan_nflx.da, mu=0, conf.level=.95)[["p.value"]], 
-              t.test(sisaan_nvda.da, mu=0, conf.level=.95)[["p.value"]]
-              )
-) 
-nol$Keterangan <- ifelse(nol$p.value < 0.05, 
-                              "Nilai Tengah \u2260 0", 
-                              "Nilai Tengah = 0")
+t.test(sisaan_nvda.da, mu=0, conf.level=.95)
 
-nol$p.value <- ifelse(nol$p.value == 0, "< 2.2e-16",
-                           round(nol$p.value, 3) )
-
-rownames(nol) <- unique(data$Name)
-datatable(nol, filter = 'top', 
-          options = list(pageLength = 7))
+if (t.test(sisaan_nvda.da, mu=0, conf.level=.95)[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05, Maka Nilai Tengah \u2260 0")
+} else {
+  cat("Karena p-value > 0.05, Maka Nilai Tengah = 0")
+}
 ```
 
-Berdasarkan uji-t tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+Berdasarkan uji-t tersebut, *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
 
 # Model ARCH-GARCH
 
