@@ -912,7 +912,7 @@ if (tseries::adf.test(train_nvda.diff)[["p.value"]] < 0.05) {
 >
 > $H_1$ : Data stasioner dalam rataan
 
-Berdasarkan uji ADF tersebut, semua data saham mendapatkan *p-value* sebesar $0.01$ yang lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
+Berdasarkan uji ADF tersebut, *p-value* yang didapatkan yakni lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
 
 # Model Tentatif
 
@@ -925,56 +925,26 @@ Identifikasi model tentatif dapat dilakukan dengan melihat pada plot ACF, PACF d
 
 ## Plot ACF & PACF
 
-```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
-par(mfrow=c(2,4))
-pacf(train_aapl.diff, ylim=c(-.1,.1) , main="")
-mtext("AAPL", side=3, line=1, cex=2, font=2)
+```{r fig.align="center", fig.height=4.7, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
+par(mfrow=c(1,2))
+stats::acf(train_nvda.diff, main="", col=col.nvda[1], lwd=2, ylim=c(-.1,.1))
+mtext("NVDA", side=3, line=1, cex=2, font=2)
 
-pacf(train_amzn.diff, ylim=c(-.1,.1) , main="")
-mtext("AMZN", side=3, line=1, cex=2, font=2)
-
-pacf(train_goog.diff, ylim=c(-.1,.1) , main="")
-mtext("GOOG", side=3, line=1, cex=2, font=2)
-
-pacf(train_meta.diff, ylim=c(-.1,.1) , main="")
-mtext("META", side=3, line=1, cex=2, font=2)
-
-pacf(train_msft.diff, ylim=c(-.1,.1) , main="")
-mtext("MSFT", side=3, line=1, cex=2, font=2)
-
-pacf(train_nflx.diff, ylim=c(-.1,.1) , main="")
-mtext("NFLX", side=3, line=1, cex=2, font=2)
-
-pacf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+stats::pacf(train_nvda.diff, main="", col=col.nvda[1], lwd=2, ylim=c(-.1,.1))
 mtext("NVDA", side=3, line=1, cex=2, font=2)
 ```
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_PACF.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+png(paste(export.chart, "/03_Stas_6_ACF-PACF.png", sep=""),
+    height = 4.7*300, width = 15*300, res=300)
 
 # Plot 
-par(mfrow=c(2,4))
-pacf(train_aapl.diff, ylim=c(-.1,.1) , main="")
-mtext("AAPL", side=3, line=1, cex=2, font=2)
+par(mfrow=c(1,2))
+stats::acf(train_nvda.diff, main="", col=col.nvda[1], lwd=2, ylim=c(-.1,.1))
+mtext("NVDA", side=3, line=1, cex=2, font=2)
 
-pacf(train_amzn.diff, ylim=c(-.1,.1) , main="")
-mtext("AMZN", side=3, line=1, cex=2, font=2)
-
-pacf(train_goog.diff, ylim=c(-.1,.1) , main="")
-mtext("GOOG", side=3, line=1, cex=2, font=2)
-
-pacf(train_meta.diff, ylim=c(-.1,.1) , main="")
-mtext("META", side=3, line=1, cex=2, font=2)
-
-pacf(train_msft.diff, ylim=c(-.1,.1) , main="")
-mtext("MSFT", side=3, line=1, cex=2, font=2)
-
-pacf(train_nflx.diff, ylim=c(-.1,.1) , main="")
-mtext("NFLX", side=3, line=1, cex=2, font=2)
-
-pacf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+stats::pacf(train_nvda.diff, main="", col=col.nvda[1], lwd=2, ylim=c(-.1,.1))
 mtext("NVDA", side=3, line=1, cex=2, font=2)
 
 # Menyimpan plot sebagai file PNG
@@ -1007,12 +977,10 @@ acf.pacf <- function(dt){ #Fungsi Deteksi Cut off plot ACF & PACF
 }
 
 data_frames <- list(
-  train_aapl.diff, train_amzn.diff, train_goog.diff,
-  train_meta.diff, train_msft.diff, train_nflx.diff,
   train_nvda.diff
 )
 
-name <- unique(data$Name)
+name <- "NVDA"
 
 acf.pacf.tab <- data.frame()
 for(i in 1:length(name)){
@@ -1023,11 +991,10 @@ for(i in 1:length(name)){
     acf.pacf.tab <- merge(acf.pacf.tab, dex, by=0, all=TRUE)[-1]
 }
 
-datatable(acf.pacf.tab, filter = 'top', 
-          options = list(pageLength = 7))
+datatable(acf.pacf.tab, filter = 'none')
 ```
 
-Berdasarkan plot tersebut, terlihat bahwa plot ACF cuts off pada lag 13, dan lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
+Berdasarkan plot tersebut, terlihat bahwa plot ACF cut off pada lag 0. Sedangkan pada plot PACF cut off pada lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
 ## Tabel EACF {.tabset}
 
