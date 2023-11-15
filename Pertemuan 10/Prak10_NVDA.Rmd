@@ -1390,17 +1390,65 @@ atau
 
 > Terapkan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat Sebagai alternatif dari uji ARCH Engle, Anda dapat memeriksa ketergantungan berurutan (efek ARCH) dalam sebuah deret residual dengan melakukan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat.
 
-### Memeriksa keberadaan volatilitas
+### Cek keberadaan volatilitas
 
-```{r fig.align=, fig.height=7, fig.width=12, message=FALSE, warning=FALSE, dpi=300}
+1.  **Grafik Harga atau Hasil Log:** Melihat perubahan harga atau hasil log dari waktu ke waktu dapat memberikan gambaran tentang tingkat volatilitas. Jika ada variasi besar dalam harga atau hasil log, ini menunjukkan keberadaan volatilitas.
+
+2.  **Analisis Hasil Kuadrat:** Volatilitas sering kali terkait dengan variasi kuadrat dari hasil. Melakukan analisis terhadap hasil kuadrat atau volatilitas kondisional dapat membantu mengidentifikasi keberadaan volatilitas.
+
+3.  **Analisis Hasil Mutlak:** Melihat hasil mutlak (absolute returns) juga dapat membantu dalam mendeteksi volatilitas, karena hasil mutlak mencerminkan besarnya perubahan harga tanpa memperhatikan arahnya.
+
+```{r fig.align=, fig.height=5, fig.width=10, message=FALSE, warning=FALSE, dpi=300}
 install_load('fGarch', 'PerformanceAnalytics', 'rugarch', 'xts', 'FinTS')
 
 #calculate log returns and remove first NA value
-nvda.z <- zoo(x=nvda$`Adj Close`, order.by=nvda$Date)
-Return.nvda <- Return.calculate(nvda.ts, method = "log")[-1]
+Return.nvda <- Return.calculate(train_nvda.ts, method = "log")[-1]
 volatility <- cbind(Return.nvda, Return.nvda^2, abs(Return.nvda))
 colnames(volatility) <- c("Returns", "Returns^2", "abs(Returns)")
-plot.zoo(volatility, main="NVDA Daily Returns", col="blue")
+plot.zoo(volatility, main="NVDA Daily Returns", col=col.nvda[1], lwd=1.5)
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "05_Arch_1_volatility.png", sep=""),
+    height = 5*300, width = 10*300, res=300)
+
+# Plot 
+plot.zoo(volatility, main="NVDA Daily Returns", col=col.nvda[1], lwd=1.5)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+### Cek Efek ARCH
+
+```{r fig.align="center", fig.height=3.75, fig.width=11.25, message=FALSE, warning=FALSE, dpi=300}
+# plot autocorrelations of returns, returns^2 and abs(returns)
+par(mfrow=c(1,3))
+stats::acf(Return.nvda, main="NVDA Returns", col=col.nvda[1], lwd=2,
+           cex.main=10, ylim=c(-.2,.3))
+stats::acf(Return.nvda^2, main="NVDA Returns^2", col=col.nvda[1], lwd=2,
+           cex.main=10, ylim=c(-.2,.3))
+stats::acf(abs(Return.nvda), main="NVDA abs(Returns)", col=col.nvda[1], lwd=2,
+           cex.main=10, ylim=c(-.2,.3))
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/05_Arch_2_acf.png", sep=""),
+    height = 3.75*300, width = 11.25*300, res=300)
+
+# Plot 
+par(mfrow=c(1,3))
+stats::acf(Return.nvda, main="NVDA Returns", col=col.nvda[1], lwd=2,
+           cex.main=10, ylim=c(-.2,.3))
+stats::acf(Return.nvda^2, main="NVDA Returns^2", col=col.nvda[1], lwd=2,
+           cex.main=10, ylim=c(-.2,.3))
+stats::acf(abs(Return.nvda), main="NVDA abs(Returns)", col=col.nvda[1], lwd=2,
+           cex.main=10, ylim=c(-.2,.3))
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
 ```
 
 ## **3. Engle's ARCH(p) Model**
