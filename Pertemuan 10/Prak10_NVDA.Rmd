@@ -683,16 +683,16 @@ Berdasarkan uji ADF tersebut, *p-value* lebih besar dari taraf nyata $5\%$ sehin
 
 ### Plot Box-Cox
 
-```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 install_load('MASS')
 index <- seq(1:nrow(train_nvda)) #Beda titik potong
 bc =boxcox(train_nvda.ts~index, lambda=seq(-2, 4, by=.01))
-title("NVDA", cex.main = 4)
+title("NVDA", cex.main = 2)
 lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
-Gambar di atas menunjukkan bahwa dari rentang nilai lambda -2 hingga 4, hanya `NFLX` yang memuat *rounded value* ($\lambda$) = 1 di dalam selangnya. Sementara selainnya tidak memuatnya.
+Gambar di atas menunjukkan bahwa dari rentang nilai $\lambda$ -2 hingga 4, pada selang yang dibuatnya tidak memuat nilai $\lambda=1$.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
