@@ -996,7 +996,7 @@ datatable(acf.pacf.tab, filter = 'none')
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cut off pada lag 0. Sedangkan pada plot PACF cut off pada lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
-## Tabel EACF {.tabset}
+## Tabel EACF
 
 Referensi : [[University of South Carolina] Chapter 6: Model Specification for Time Series](https://people.stat.sc.edu/hitchcock/stat520ch6slides.pdf){.uri}
 
@@ -1093,7 +1093,7 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
 model.tentaif_nvda <- 
   model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_nvda, filter = 'top', 
-          options = list(pageLength = 5))
+          options = list(pageLength = 7))
 ```
 
 Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-8917.35$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
@@ -1148,101 +1148,11 @@ Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model terbaik 
 
 # Model ARIMA dengan Drift
 
-Tren menentukan bagaimana perubahan deret waktu dari waktu ke waktu. Dalam model ARIMA, ini dapat dimodelkan menggunakan persamaan dasar berikut [1]. "a" disebut "**intercept**" dan "b" disebut "**drift**". "Drift" adalah hanyalah kemiringan garis lurus. Selanjutnya akan dilakukan kombinasi model ARIMA dengan Intercept dan Drift.
+Tren menentukan bagaimana perubahan deret waktu dari waktu ke waktu. Dalam model ARIMA, ini dapat dimodelkan menggunakan persamaan dasar berikut "a" disebut "**intercept**" dan "b" disebut "**drift**". "Drift" adalah hanyalah kemiringan garis lurus. Selanjutnya akan dilakukan kombinasi model ARIMA dengan Intercept dan Drift.
 
 ## 1. Model Tanpa Intercept dan Tanpa Drift {.tabset}
 
 Simpelnya ini merupakan model **data train** yang diberi differencing. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q)**.
-
-### AAPL
-
-```{r message=FALSE, warning=FALSE}
-drift1_aapl <- 
-  model_tentatif(train_aapl.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift1_aapl, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3644.95$ dimiliki oleh model `ARIMA(4,1,4)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,4)`.
-
-```{r}
-model_aapl.drift1 <- Arima(train_aapl.ts, order=c(4,1,4), method="ML")
-```
-
-### AMZN
-
-```{r message=FALSE, warning=FALSE}
-drift1_amzn <- 
-  model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift1_amzn, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept dan Tanpa Drift pada `AMZN` tidak ada.
-
-```{r}
-model_amzn.drift1 <- NA
-```
-
-### GOOG
-
-```{r message=FALSE, warning=FALSE}
-drift1_goog <- 
-  model_tentatif(train_goog.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift1_goog, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3620.64$ dimiliki oleh model `ARIMA(2,1,2)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(2,1,2)`.
-
-```{r}
-model_goog.drift1 <- Arima(train_goog.ts, order=c(2,1,2), method="ML")
-```
-
-### META
-
-```{r message=FALSE, warning=FALSE}
-drift1_meta <- 
-  model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift1_meta, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept dan Tanpa Drift pada `META` tidak ada.
-
-```{r}
-model_meta.drift1 <- NA
-```
-
-### MSFT
-
-```{r message=FALSE, warning=FALSE}
-drift1_msft <- 
-  model_tentatif(train_msft.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift1_msft, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept dan Tanpa Drift pada `MSFT` tidak ada.
-
-```{r}
-model_msft.drift1 <- NA
-```
-
-### NFLX
-
-```{r message=FALSE, warning=FALSE}
-drift1_nflx <- 
-  model_tentatif(train_nflx.ts, p_max = 6, d = 1, q_max = 12)
-datatable(drift1_nflx, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $6165.15$ dimiliki oleh model `ARIMA(6,1,6)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(6,1,6)`.
-
-```{r}
-model_nflx.drift1 <- Arima(train_nflx.ts, order=c(6,1,6), method="ML")
-```
 
 ### NVDA
 
@@ -1283,96 +1193,6 @@ Walaupun berlabel model terbaik, namun terdapat dua model yang tidak semua param
 
 Simpelnya ini merupakan model **data differencing** tanpa diberi differencing. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q)**.
 
-### AAPL
-
-```{r message=FALSE, warning=FALSE}
-drift2_aapl <- 
-  model_tentatif(train_aapl.diff, p_max =6, d = 0, q_max = 12)
-datatable(drift2_aapl, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `AAPL` tidak ada.
-
-```{r}
-model_aapl.drift2 <- NA
-```
-
-### AMZN
-
-```{r message=FALSE, warning=FALSE}
-drift2_amzn <- 
-  model_tentatif(train_amzn.diff, p_max = 6, d = 0, q_max = 12)
-datatable(drift2_amzn, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `AMZN` tidak ada.
-
-```{r}
-model_amzn.drift2 <- NA
-```
-
-### GOOG
-
-```{r message=FALSE, warning=FALSE}
-drift2_goog <- 
-  model_tentatif(train_goog.diff, p_max = 6, d = 0, q_max = 12)
-datatable(drift2_goog, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `GOOG` tidak ada.
-
-```{r}
-model_goog.drift2 <- NA
-```
-
-### META
-
-```{r message=FALSE, warning=FALSE}
-drift2_meta <- 
-  model_tentatif(train_meta.diff, p_max = 6, d = 0, q_max = 12)
-datatable(drift2_meta, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `META` tidak ada.
-
-```{r}
-model_meta.drift2 <- NA
-```
-
-### MSFT
-
-```{r message=FALSE, warning=FALSE}
-drift2_msft <- 
-  model_tentatif(train_msft.diff, p_max = 6, d = 0, q_max = 12)
-datatable(drift2_msft, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `MSFT` tidak ada.
-
-```{r}
-model_msft.drift2 <- NA
-```
-
-### NFLX
-
-```{r message=FALSE, warning=FALSE}
-drift2_nflx <- 
-  model_tentatif(train_nflx.diff, p_max = 6, d = 0, q_max = 12)
-datatable(drift2_nflx, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `NFLX` tidak ada.
-
-```{r}
-model_nflx.drift2 <- NA
-```
-
 ### NVDA
 
 ```{r message=FALSE, warning=FALSE}
@@ -1412,96 +1232,6 @@ Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya
 
 Simpelnya ini merupakan model **data train** yang diberi **differencing** dan **drift**. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q) + include.drift**.
 
-### AAPL
-
-```{r message=FALSE, warning=FALSE}
-drift3_aapl <- 
-  model_tentatif(train_aapl.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
-datatable(drift3_aapl, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept Dengan Drift pada `AAPL` tidak ada.
-
-```{r}
-model_aapl.drift3 <- NA
-```
-
-### AMZN
-
-```{r message=FALSE, warning=FALSE}
-drift3_amzn <- 
-  model_tentatif(train_amzn.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
-datatable(drift3_amzn, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept Dengan Drift pada `AMZN` tidak ada.
-
-```{r}
-model_amzn.drift3 <- NA
-```
-
-### GOOG
-
-```{r message=FALSE, warning=FALSE}
-drift3_goog <- 
-  model_tentatif(train_goog.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
-datatable(drift3_goog, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept Dengan Drift pada `GOOG` tidak ada.
-
-```{r}
-model_goog.drift3 <- NA
-```
-
-### META
-
-```{r message=FALSE, warning=FALSE}
-drift3_meta <- 
-  model_tentatif(train_meta.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
-datatable(drift3_meta, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept Dengan Drift pada `META` tidak ada.
-
-```{r}
-model_meta.drift3 <- NA
-```
-
-### MSFT
-
-```{r message=FALSE, warning=FALSE}
-drift3_msft <- 
-  model_tentatif(train_msft.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
-datatable(drift3_msft, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept Dengan Drift pada `MSFT` tidak ada.
-
-```{r}
-model_msft.drift3 <- NA
-```
-
-### NFLX
-
-```{r message=FALSE, warning=FALSE}
-drift3_nflx <- 
-  model_tentatif(train_nflx.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
-datatable(drift3_nflx, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept Dengan Drift pada `NFLX` tidak ada.
-
-```{r}
-model_nflx.drift3 <- NA
-```
-
 ### NVDA
 
 ```{r message=FALSE, warning=FALSE}
@@ -1540,96 +1270,6 @@ Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya
 ## 4. Model dengan Intercept dan dengan Drift {.tabset}
 
 Simpelnya ini merupakan model **data differencing** tanpa diberi differencing namun diberi drift. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q) + include.drift**.
-
-### AAPL
-
-```{r message=FALSE, warning=FALSE}
-drift4_aapl <- 
-  model_tentatif(train_aapl.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
-datatable(drift4_aapl, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `AAPL` tidak ada.
-
-```{r}
-model_aapl.drift4 <- NA
-```
-
-### AMZN
-
-```{r message=FALSE, warning=FALSE}
-drift4_amzn <- 
-  model_tentatif(train_amzn.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
-datatable(drift4_amzn, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `AMZN` tidak ada.
-
-```{r}
-model_amzn.drift4 <- NA
-```
-
-### GOOG
-
-```{r message=FALSE, warning=FALSE}
-drift4_goog <- 
-  model_tentatif(train_goog.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
-datatable(drift4_goog, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `GOOG` tidak ada.
-
-```{r}
-model_goog.drift4 <- NA
-```
-
-### META
-
-```{r message=FALSE, warning=FALSE}
-drift4_meta <- 
-  model_tentatif(train_meta.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
-datatable(drift4_meta, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `AMETA` tidak ada.
-
-```{r}
-model_meta.drift4 <- NA
-```
-
-### MSFT
-
-```{r message=FALSE, warning=FALSE}
-drift4_msft <- 
-  model_tentatif(train_msft.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
-datatable(drift4_msft, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `MSFT` tidak ada.
-
-```{r}
-model_msft.drift4 <- NA
-```
-
-### NFLX
-
-```{r message=FALSE, warning=FALSE}
-drift4_nflx <- 
-  model_tentatif(train_nflx.diff, p_max = 6, d = 0, q_max = 12, drift=TRUE)
-datatable(drift4_nflx, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `NFLX` tidak ada.
-
-```{r}
-model_nflx.drift4 <- NA
-```
 
 ### NVDA
 
