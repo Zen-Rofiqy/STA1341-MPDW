@@ -1232,8 +1232,6 @@ Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya
 
 Simpelnya ini merupakan model **data train** yang diberi **differencing** dan **drift**. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q) + include.drift**.
 
-### NVDA
-
 ```{r message=FALSE, warning=FALSE}
 drift3_nvda <- 
   model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
@@ -1247,31 +1245,9 @@ Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC t
 model_nvda.drift3 <- NA
 ```
 
-### Model Terbaik
-
-```{r}
-drift3 <- rbind(
-  model_terbaik(model_aapl.drift3, 'AAPL', drift3_aapl),
-  model_terbaik(model_amzn.drift3, 'AMZN', drift3_amzn),
-  model_terbaik(model_goog.drift3, 'GOOG', drift3_goog),
-  model_terbaik(model_meta.drift3, 'META', drift3_meta),
-  model_terbaik(model_msft.drift3, 'MSFT', drift3_msft),
-  model_terbaik(model_nflx.drift3, 'NFLX', drift3_nflx),
-  model_terbaik(model_nvda.drift3, 'NVDA', drift3_nvda)
-) %>%
-  mutate(across(where(is.numeric), ~round(., 2)))
-
-datatable(drift3, filter = 'top', 
-          options = list(pageLength = 7))
-```
-
-Walaupun berlabel model terbaik, namun tidak ada satupun yang semua parameternya signifikan.
-
-## 4. Model dengan Intercept dan dengan Drift {.tabset}
+## 4. Model dengan Intercept dan dengan Drift
 
 Simpelnya ini merupakan model **data differencing** tanpa diberi differencing namun diberi drift. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q) + include.drift**.
-
-### NVDA
 
 ```{r message=FALSE, warning=FALSE}
 drift4_nvda <- 
@@ -1286,16 +1262,14 @@ Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC t
 model_nvda.drift4 <- NA
 ```
 
-### Model Terbaik
+## Model Terbaik
 
 ```{r}
 drift4 <- rbind(
-  model_terbaik(model_aapl.drift4, 'AAPL', drift4_aapl),
-  model_terbaik(model_amzn.drift4, 'AMZN', drift4_amzn),
-  model_terbaik(model_goog.drift4, 'GOOG', drift4_goog),
-  model_terbaik(model_meta.drift4, 'META', drift4_meta),
-  model_terbaik(model_msft.drift4, 'MSFT', drift4_msft),
-  model_terbaik(model_nflx.drift4, 'NFLX', drift4_nflx),
+
+  model_terbaik(model_nvda.drift1, 'NVDA', drift1_nvda),
+  model_terbaik(model_nvda.drift2, 'NVDA', drift2_nvda),
+  model_terbaik(model_nvda.drift3, 'NVDA', drift3_nvda),
   model_terbaik(model_nvda.drift4, 'NVDA', drift4_nvda)
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
