@@ -1245,7 +1245,8 @@ Model GARCH(1,1) dapat diperluas menjadi formulasi GARCH(p,q), di mana varians b
 $$
 \begin{equation}
 \begin{aligned}
-\sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q} \\ & + \beta_1 \sigma^2_{t-1} + \beta_2 \sigma^2_{t-2} + \dots + \beta_p \sigma^2_{t-p}
+\sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q} \\ & + \beta_1 \sigma^2_{t-1} + \beta_2 \sigma^2_{t-2} + \dots + \beta_p \sigma^2_{t-p} \\
+\sigma^2_t = &\text{ } \alpha_0 + \sum_{i=1}^q \alpha_i u^2_{t-i} + \sum_{j=1}^p \beta_i \sigma^2_{t-i} 
 \end{aligned}
 \end{equation}
 $$
