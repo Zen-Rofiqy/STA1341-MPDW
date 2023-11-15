@@ -1178,81 +1178,6 @@ Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC t
 model_nvda.drift4 <- NA
 ```
 
-## Model ARCH-GARCH
-
-Sumber : [Volatility Modeling with R : ARCH and GARCH Models](https://blog.devgenius.io/using-r-to-examine-the-stylized-facts-of-financial-returns-39b86ff4fb4b){.uri}
-
-Model-model tipe ARIMA tidak dapat menjelaskan sejumlah fitur penting yang umum terdapat pada sebagian besar deret waktu. Ada banyak jenis model deret waktu non-linear yang berbeda. Model-model ARCH atau GARCH, yang digunakan untuk memodelkan dan memprediksi volatilitas, merupakan model non-linear yang paling banyak digunakan.
-
-### **1. ARCH Effect**
-
-Penting untuk mempertimbangkan sebuah model yang tidak mengasumsikan bahwa ragam konstan karena dalam kasus deret waktu keuangan, tidak mungkin ragam dari kesalahan akan tetap konstan sepanjang waktu.
-
-Dengan memasukkan **volatilitas bersyarat** daripada asumsi **volatilitas konstan**, model autoregressive conditional heteroskedastisitas (ARCH) diciptakan untuk meningkatkan model ekonometrika.
-
-> Jika ragam dari error tidak konstan, ini disebut sebagai **heteroskedastisitas**. Deret waktu yang menunjukkan heteroskedastisitas bersyarat atau otonomi dalam **deret kuadrat** dikatakan memiliki **efek** autoregressive conditional heteroskedastisitas (**ARCH**).
->
-> **Penting untuk menguji Efek ARCH sebelum menerapkan Model ARCH atau GARCH.**
-
-### **2. Test for ARCH Effect**
-
-Lebih masuk akal untuk melakukan uji ARCH Engle (1982) sebelum mengestimasi model tipe GARCH untuk memastikan bahwa kelas model ini sesuai untuk data tersebut.
-
-Uji ARCH Engle merupakan uji multiplier Lagrange untuk menilai signifikansi efek ARCH:
-
-Pertimbangkan pengujian hipotesis:
-
-> $H_0$ : Tidak ada efek ARCH
->
-> $H_1$ : Ada efek ARCH
-
-> **Uji ARCH sering diterapkan pada data hasil mentah (raw returns).**
-
-### **3. Engle\'s ARCH(p) Model**
-
-ARCH, yang merupakan heteroskedastisitas bersyarat, menyatakan bahwa volatilitas tidak konstan, dan berubah hampir sepanjang waktu.
-
-> **Model ARCH(1) adalah model GARCH paling sederhana.**
-
-Dalam model ARCH, 'autokorelasi dalam volatilitas' dimodelkan dengan memperbolehkan ragam bersyarat dari kesalahan untuk bergantung pada nilai sebelumnya secara langsung dari kesalahan kuadrat:
-
-$$
-\sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1}
-$$
-
-Kasus umum di mana ragam kesalahan bergantung pada q lag dari kesalahan kuadrat, yang dikenal sebagai model ARCH(q):
-
-$$
-\sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q} 
-$$
-
-### **4. GARCH(p,q) Models**
-
-Ketika berbicara tentang menangkap pengelompokan volatilitas hasil keuangan, model heteroskedastisitas bersyarat autoregresif umum (GARCH) karya Taylor (1986) dan Bollerslev (1986) mendominasi.
-
-> **Generalized Autoregressive Conditional Heteroskedasticity (GARCH) merupakan penyempurnaan dari model ARCH asli yang dibuat oleh Engle (1986).**
-
-Model GARCH memungkinkan ragam bersyarat bergantung pada lag sendiri sebelumnya dan istilah kesalahan kuadrat.
-
-Model heteroskedastisitas bersyarat autoregresif umum yang paling sederhana dapat dituliskan sebagai:
-
-$$
-\sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1} + \beta \sigma^2_{t-1}
-$$
-
-Model GARCH(1,1) dapat diperluas menjadi formulasi GARCH(p,q), di mana varians bersyarat saat ini diparameterisasi untuk bergantung pada q lag dari kesalahan kuadrat dan p lag dari varians bersyarat:
-
-$$
-\begin{equation}
-\begin{aligned}
-\sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q} \\ & + \beta_1 \sigma^2_{t-1} + \beta_2 \sigma^2_{t-2} + \dots + \beta_p \sigma^2_{t-p} \\
-\sigma^2_t = &\text{ } \alpha_0 + \sum_{i=1}^q \alpha_i u^2_{t-i} + \sum_{j=1}^p \beta_i \sigma^2_{t-i} 
-\end{aligned}
-\end{equation}
-$$
-
-Dalam kebanyakan kasus, model GARCH(1,1) sudah cukup untuk menangkap pengelompokan volatilitas dalam data, dan jarang sekali model berorde lebih tinggi diestimasi atau bahkan dipertimbangkan dalam literatur keuangan akademis.
-
 ## Model Terbaik
 
 ```{r}
@@ -1763,6 +1688,76 @@ datatable(nol, filter = 'top',
 ```
 
 Berdasarkan uji-t tersebut, semua *p-value* lebih besar dari taraf nyata $5\%$ sehingga **tak tolak** $H_0$ dan menandakan bahwa **nilai tengah sisaan sama dengan nol.**
+
+# Model ARCH-GARCH
+
+Sumber : [Volatility Modeling with R : ARCH and GARCH Models](https://blog.devgenius.io/using-r-to-examine-the-stylized-facts-of-financial-returns-39b86ff4fb4b){.uri}
+
+Model-model tipe ARIMA tidak dapat menjelaskan sejumlah fitur penting yang umum terdapat pada sebagian besar deret waktu. Ada banyak jenis model deret waktu non-linear yang berbeda. Model-model ARCH atau GARCH, yang digunakan untuk memodelkan dan memprediksi volatilitas, merupakan model non-linear yang paling banyak digunakan.
+
+## **1. Efek ARCH**
+
+Penting untuk mempertimbangkan sebuah model yang tidak mengasumsikan bahwa ragam konstan karena dalam kasus deret waktu keuangan, tidak mungkin ragam dari kesalahan akan tetap konstan sepanjang waktu.
+
+Dengan memasukkan **volatilitas bersyarat** daripada asumsi **volatilitas konstan**, model autoregressive conditional heteroskedastisitas (ARCH) diciptakan untuk meningkatkan model ekonometrika.
+
+> Jika ragam dari error tidak konstan, ini disebut sebagai **heteroskedastisitas**. Deret waktu yang menunjukkan heteroskedastisitas bersyarat atau otonomi dalam **deret kuadrat** dikatakan memiliki **efek** autoregressive conditional heteroskedastisitas (**ARCH**).
+>
+> **Penting untuk menguji Efek ARCH sebelum menerapkan Model ARCH atau GARCH.**
+
+## **2. Uji untuk Efek ARCH** 
+
+Lebih masuk akal untuk melakukan uji ARCH Engle (1982) sebelum mengestimasi model tipe GARCH untuk memastikan bahwa kelas model ini sesuai untuk data tersebut.
+
+Uji ARCH Engle merupakan uji multiplier Lagrange untuk menilai signifikansi efek ARCH:
+
+Pertimbangkan pengujian hipotesis:
+
+> $H_0$ : Tidak ada efek ARCH
+>
+> $H_1$ : Ada efek ARCH
+
+> **Uji ARCH sering diterapkan pada data hasil mentah (raw returns).**
+
+Saat melakukan Uji :
+
+> Jika uji LM menunjukkan nilai p kurang dari $0.05$ , yang menunjukkan bahwa $H_0$ (tanpa efek ARCH) dapat ditolak. Oleh karena itu, log dari hasil saham akan **memiliki efek ARCH**.
+
+atau
+
+> Terapkan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat Sebagai alternatif dari uji ARCH Engle, Anda dapat memeriksa ketergantungan berurutan (efek ARCH) dalam sebuah deret residual dengan melakukan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat.
+
+## **3. Engle\'s ARCH(p) Model**
+
+ARCH, yang merupakan heteroskedastisitas bersyarat, menyatakan bahwa volatilitas tidak konstan, dan berubah hampir sepanjang waktu.
+
+> **Model ARCH(1) adalah model GARCH paling sederhana.**
+
+Dalam model ARCH, 'autokorelasi dalam volatilitas' dimodelkan dengan memperbolehkan ragam bersyarat dari kesalahan untuk bergantung pada nilai sebelumnya secara langsung dari kesalahan kuadrat:
+
+$$ \sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1} $$
+
+Kasus umum di mana ragam kesalahan bergantung pada q lag dari kesalahan kuadrat, yang dikenal sebagai model ARCH(q):
+
+$$ \sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q}  $$
+
+## **4. GARCH(p,q) Models**
+
+Ketika berbicara tentang menangkap pengelompokan volatilitas hasil keuangan, model heteroskedastisitas bersyarat autoregresif umum (GARCH) karya Taylor (1986) dan Bollerslev (1986) mendominasi.
+
+> **Generalized Autoregressive Conditional Heteroskedasticity (GARCH) merupakan penyempurnaan dari model ARCH asli yang dibuat oleh Engle (1986).**
+
+Model GARCH memungkinkan ragam bersyarat bergantung pada lag sendiri sebelumnya dan istilah kesalahan kuadrat.
+
+Model heteroskedastisitas bersyarat autoregresif umum yang paling sederhana dapat dituliskan sebagai:
+
+$$ \sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1} + \beta \sigma^2_{t-1} $$
+
+Model GARCH(1,1) dapat diperluas menjadi formulasi GARCH(p,q), di mana varians bersyarat saat ini diparameterisasi untuk bergantung pada q lag dari kesalahan kuadrat dan p lag dari varians bersyarat:
+
+$$ \begin{equation} \begin{aligned} \sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q} \\ & + \beta_1 \sigma^2_{t-1} + \beta_2 \sigma^2_{t-2} + \dots + \beta_p \sigma^2_{t-p} \\ \sigma^2_t = &\text{ } \alpha_0 + \sum_{i=1}^q \alpha_i u^2_{t-i} + \sum_{j=1}^p \beta_i \sigma^2_{t-i}  \end{aligned} \end{equation} $$
+
+> **Dalam kebanyakan kasus, model GARCH(1,1) sudah cukup untuk menangkap pengelompokan volatilitas dalam data, dan jarang sekali model berorde lebih tinggi diestimasi atau bahkan dipertimbangkan dalam literatur keuangan akademis.**
 
 # **Peramalan**
 
