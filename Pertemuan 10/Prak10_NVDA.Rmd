@@ -1182,13 +1182,27 @@ model_nvda.drift4 <- NA
 
 Sumber : [Volatility Modeling with R : ARCH and GARCH Models](https://blog.devgenius.io/using-r-to-examine-the-stylized-facts-of-financial-returns-39b86ff4fb4b){.uri}
 
-Model-model tipe ARIMA tidak dapat menjelaskan sejumlah fitur penting yang umum terdapat pada sebagian besar deret waktu keuangan. Dalam pos terpisah, saya membahas semua fakta stilisasi dari hasil keuangan.
+Model-model tipe ARIMA tidak dapat menjelaskan sejumlah fitur penting yang umum terdapat pada sebagian besar deret waktu. Ada banyak jenis model deret waktu non-linear yang berbeda. Model-model ARCH atau GARCH, yang digunakan untuk memodelkan dan memprediksi volatilitas, merupakan model non-linear yang paling banyak digunakan.
 
-Ada banyak jenis model deret waktu non-linear yang berbeda. Model-model ARCH atau GARCH, yang digunakan untuk memodelkan dan memprediksi volatilitas, merupakan model keuangan non-linear yang paling banyak digunakan.
+### **1. ARCH Effect**
 
-Konsep ARCH dikembangkan oleh ekonom Robert F. Engle III pada tahun 1980-an. ARCH secara langsung meningkatkan pemodelan keuangan, sehingga Engle memenangkan Hadiah Nobel Memorial 2003 di Bidang Ilmu Ekonomi.
+Penting untuk mempertimbangkan sebuah model yang tidak mengasumsikan bahwa ragam konstan karena dalam kasus deret waktu keuangan, tidak mungkin ragam dari kesalahan akan tetap konstan sepanjang waktu.
 
-Robert F. Engle III, seorang ekonom, menciptakan konsep ARCH pada tahun 1980-an. Engle memenangkan Hadiah Nobel Memorial 2003 di Bidang Ilmu Ekonomi sebagai hasil dari perbaikan instan ARCH terhadap pemodelan keuangan.
+Dengan memasukkan **volatilitas bersyarat** daripada asumsi **volatilitas konstan**, model autoregressive conditional heteroskedastisitas (ARCH) diciptakan untuk meningkatkan model ekonometrika.
+
+> Jika ragam dari error tidak konstan, ini disebut sebagai **heteroskedastisitas**. Deret waktu yang menunjukkan heteroskedastisitas bersyarat atau otonomi dalam **deret kuadrat** dikatakan memiliki **efek** autoregressive conditional heteroskedastisitas (**ARCH**).
+>
+> **Penting untuk menguji Efek ARCH sebelum menerapkan Model ARCH atau GARCH.**
+
+### **2. Test for ARCH Effect**
+
+Lebih masuk akal untuk melakukan uji ARCH Engle (1982) sebelum mengestimasi model tipe GARCH untuk memastikan bahwa kelas model ini sesuai untuk data tersebut.
+
+Uji ARCH Engle merupakan uji multiplier Lagrange untuk menilai signifikansi efek ARCH:
+
+Pertimbangkan pengujian hipotesis:
+
+Uji ARCH sering diterapkan pada data hasil mentah (raw returns).
 
 ## Model Terbaik
 
