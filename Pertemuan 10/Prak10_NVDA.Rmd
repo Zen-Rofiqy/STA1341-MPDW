@@ -914,7 +914,9 @@ if (tseries::adf.test(train_nvda.diff)[["p.value"]] < 0.05) {
 
 Berdasarkan uji ADF tersebut, *p-value* yang didapatkan yakni lebih kecil dari taraf nyata $5\%$ sehingga **tolak** $H_0$ atau **data stasioner dalam rataan**. Hal ini sesuai dengan hasil eksplorasi menggunakan plot time series dan plot ACF, sehingga dalam hal ini ketidakstasioneran data sudah berhasil ditangani dan dapat dilanjutkan ke pemodelan.
 
-# Model Tentatif
+# Model
+
+## Model Tentatif
 
 Identifikasi model tentatif dapat dilakukan dengan melihat pada plot ACF, PACF dan Tabel EACF. Mengutip dari postingan pada laman [medium.com](https://medium.com/@ooemma83/how-to-interpret-acf-and-pacf-plots-for-identifying-ar-ma-arma-or-arima-models-498717e815b6) **Panduan dasar** untuk menginterpretasikan plot ACF dan PACF adalah sebagai berikut :
 
@@ -923,7 +925,7 @@ Identifikasi model tentatif dapat dilakukan dengan melihat pada plot ACF, PACF d
 3.  Jika *tail off* terjadi pada PACF → **model MA** → *cut off* pada ACF akan memberikan nilai q untuk MA(q).
 4.  Jika terjadi *tail off* pada kedua ACF dan PACF → **model ARMA**.
 
-## Plot ACF & PACF
+### Plot ACF & PACF
 
 ```{r fig.align="center", fig.height=4.7, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
 par(mfrow=c(1,2))
@@ -996,7 +998,7 @@ datatable(acf.pacf.tab, filter = 'none')
 
 Berdasarkan plot tersebut, terlihat bahwa plot ACF cut off pada lag 0. Sedangkan pada plot PACF cut off pada lag 14. Sehingga model tidak dapat di identifikasi dengan plot ACF.
 
-## Tabel EACF
+### Tabel EACF
 
 Referensi : [[University of South Carolina] Chapter 6: Model Specification for Time Series](https://people.stat.sc.edu/hitchcock/stat520ch6slides.pdf){.uri}
 
@@ -1096,11 +1098,11 @@ datatable(model.tentaif_nvda, filter = 'top',
 
 Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-8917.35$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
-# Model ARIMA dengan Drift
+## Model ARIMA dengan Drift
 
 Tren menentukan bagaimana perubahan deret waktu dari waktu ke waktu. Dalam model ARIMA, ini dapat dimodelkan menggunakan persamaan dasar berikut "a" disebut "**intercept**" dan "b" disebut "**drift**". "Drift" adalah hanyalah kemiringan garis lurus. Selanjutnya akan dilakukan kombinasi model ARIMA dengan Intercept dan Drift.
 
-## 1. Model Tanpa Intercept dan Tanpa Drift
+### 1. Model Tanpa Intercept dan Tanpa Drift
 
 Simpelnya ini merupakan model **data train** yang diberi differencing. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q)**.
 
@@ -1117,7 +1119,7 @@ Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $5063.53$ dimiliki o
 model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
 ```
 
-## 2. Model Dengan Intercept Tanpa Drift
+### 2. Model Dengan Intercept Tanpa Drift
 
 Simpelnya ini merupakan model **data differencing** tanpa diberi differencing. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q)**.
 
@@ -1134,7 +1136,7 @@ Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC t
 model_nvda.drift2 <- NA
 ```
 
-## 3. Model Tanpa Intercept Dengan Drift
+### 3. Model Tanpa Intercept Dengan Drift
 
 Simpelnya ini merupakan model **data train** yang diberi **differencing** dan **drift**. Yakni memodelkan data train dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 1, sehingga kan membentuk model **ARIMA(p, 1, q) + include.drift**.
 
@@ -1151,7 +1153,7 @@ Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC t
 model_nvda.drift3 <- NA
 ```
 
-## 4. Model dengan Intercept dan dengan Drift
+### 4. Model dengan Intercept dan dengan Drift
 
 Simpelnya ini merupakan model **data differencing** tanpa diberi differencing namun diberi drift. Yakni memodelkan data differencing dengan ordo **I** dari **ARIMA(p, d, q)** sama dengan 0, sehingga kan membentuk model **ARIMA(p, 0, q) + include.drift**.
 
@@ -1167,6 +1169,8 @@ Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC t
 ```{r}
 model_nvda.drift4 <- NA
 ```
+
+## Model ARCH-GARCH
 
 ## Model Terbaik
 
