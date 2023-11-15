@@ -1226,6 +1226,32 @@ $$
 \sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q} 
 $$
 
+### **4. GARCH(p,q) Models**
+
+Ketika berbicara tentang menangkap pengelompokan volatilitas hasil keuangan, model heteroskedastisitas bersyarat autoregresif umum (GARCH) karya Taylor (1986) dan Bollerslev (1986) mendominasi.
+
+> **Generalized Autoregressive Conditional Heteroskedasticity (GARCH) merupakan penyempurnaan dari model ARCH asli yang dibuat oleh Engle (1986).**
+
+Model GARCH memungkinkan ragam bersyarat bergantung pada lag sendiri sebelumnya dan istilah kesalahan kuadrat.
+
+Model heteroskedastisitas bersyarat autoregresif umum yang paling sederhana dapat dituliskan sebagai:
+
+$$
+\sigma^2_t = \alpha_0 + \alpha_1 u^2_{t-1} + \beta \sigma^2_{t-1}
+$$
+
+Model GARCH(1,1) dapat diperluas menjadi formulasi GARCH(p,q), di mana varians bersyarat saat ini diparameterisasi untuk bergantung pada q lag dari kesalahan kuadrat dan p lag dari varians bersyarat:
+
+$$
+\begin{equation}
+\begin{aligned}
+\sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u^2_{t-1} + \alpha_2 u^2_{t-2} + \dots + \alpha_q u^2_{t-q} \\ & + \beta_1 \sigma^2_{t-1} + \beta_2 \sigma^2_{t-2} + \dots + \beta_p \sigma^2_{t-p}
+\end{aligned}
+\end{equation}
+$$
+
+Dalam kebanyakan kasus, model GARCH(1,1) sudah cukup untuk menangkap pengelompokan volatilitas dalam data, dan jarang sekali model berorde lebih tinggi diestimasi atau bahkan dipertimbangkan dalam literatur keuangan akademis.
+
 ## Model Terbaik
 
 ```{r}
