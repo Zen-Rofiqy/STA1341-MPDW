@@ -1087,24 +1087,6 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
 }
 ```
 
-```{r}
-for (i in 1:5) {
-  for (j in 1:5) {
-    # Kondisi tertentu
-    if (j == 3) {
-      # Lakukan perintah
-      cat("i =", i, ", j =", j, ": Melakukan perintah\n")
-      
-      # Langsung ke loop i selanjutnya
-      break
-    }
-    
-    # Perintah untuk j yang tidak memenuhi kondisi
-    cat("i =", i, ", j =", j, ": Lanjut ke j berikutnya\n")
-  }
-}
-```
-
 ### AAPL
 
 ```{r message=FALSE, warning=FALSE}

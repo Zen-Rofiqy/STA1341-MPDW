@@ -2048,6 +2048,7 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
                 best_aic <- aic
             }
           }
+          break #jika model ditemukan pada baris p. Maka lanjut ke p+1
         }
       }
     }
