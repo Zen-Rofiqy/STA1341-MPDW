@@ -1087,8 +1087,6 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
 }
 ```
 
-### NVDA
-
 ```{r message=FALSE, warning=FALSE}
 model.tentaif_nvda <- 
   model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
@@ -1097,54 +1095,6 @@ datatable(model.tentaif_nvda, filter = 'top',
 ```
 
 Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-8917.35$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
-
-```{r}
-model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
-```
-
-## Model Tentatif Terbaik
-
-```{r}
-model_terbaik <- function(model, rowname, mods) {
-  if (!all(is.na(model))) {
-    model_df <- data.frame(
-      Model = paste("ARIMA(", 
-                     paste(as.character(model[["call"]][["order"]][-1]), 
-                           collapse = ","), ")", sep = ""),
-      AIC = model[["aicc"]],
-      row.names = rowname
-    )
-    model_df$Keterangan <- 
-      mods[which(mods$Model == 
-                     model_df["Model"][rowname,]), "Keterangan"]
-  return(model_df)
-    
-  } else {
-    return(data.frame(
-      Model = NA_character_,
-      AIC = NA_real_,
-      Keterangan = NA_character_,
-      row.names = rowname
-    ))
-  }
-}
-
-tentatif <- rbind(
-  model_terbaik(model_aapl.da, 'AAPL', model.tentaif_aapl), 
-  model_terbaik(model_amzn.da, 'AMZN', model.tentaif_amzn), 
-  model_terbaik(model_goog.da, 'GOOG', model.tentaif_goog),  
-  model_terbaik(model_meta.da, 'META', model.tentaif_meta), 
-  model_terbaik(model_msft.da, 'MSFT', model.tentaif_msft), 
-  model_terbaik(model_nflx.da, 'NFLX', model.tentaif_nflx), 
-  model_terbaik(model_nvda.da, 'NVDA', model.tentaif_nvda)  
-) %>%
-  mutate(across(where(is.numeric), ~round(., 2)))
-
-datatable(tentatif, filter = 'top', 
-          options = list(pageLength = 7))
-```
-
-Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model terbaik yang paling sering digunakan.
 
 # Model ARIMA dengan Drift
 
@@ -1175,7 +1125,7 @@ Simpelnya ini merupakan model **data differencing** tanpa diberi differencing. Y
 drift2_nvda <- 
   model_tentatif(train_nvda.diff, p_max = 6, d = 0, q_max = 12)
 datatable(drift2_nvda, filter = 'top', 
-          options = list(pageLength = 5))
+          options = list(pageLength = 7))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Dengan Intercept Tanpa Drift pada `NVDA` tidak ada.
@@ -1192,7 +1142,7 @@ Simpelnya ini merupakan model **data train** yang diberi **differencing** dan **
 drift3_nvda <- 
   model_tentatif(train_nvda.ts, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift3_nvda, filter = 'top', 
-          options = list(pageLength = 5))
+          options = list(pageLength = 7))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model Tanpa Intercept Dengan Drift pada `NVDA` tidak ada.
@@ -1209,7 +1159,7 @@ Simpelnya ini merupakan model **data differencing** tanpa diberi differencing na
 drift4_nvda <- 
   model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12, drift=TRUE)
 datatable(drift4_nvda, filter = 'top', 
-          options = list(pageLength = 5))
+          options = list(pageLength = 7))
 ```
 
 Kategori Model terbaik **tidak ada** yang terpenuhi, yakni tidak ada nilai AIC terkecil dengan semua parameter nya signifikan dan tidak ada NA di dalam nya. Sehingga Model dengan Intercept dan dengan Drift pada `NVDA` tidak ada.
@@ -1258,11 +1208,7 @@ datatable(best_model, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Terlihat bahwa model paling terbaik adalah model tentatif tanpa kombinasi drift. Sangat disayangkan, dari 4 kombinasi drift yang ada, hanya kombinasi 1 yang memiliki kategori model terbaik. Sehingga model yang akan digunakan adalah `model_nvda.da`
-
-## Kesimpulan
-
-Jika dibandingkan dengan model tentatif terbaik sebelumnya. Maka terlihat bahwa model itu jauh lebih baik. Sehingga model dengan kombinasi drift tidak dipilih.
+Terlihat bahwa model paling terbaik adalah model tentatif tanpa kombinasi drift. Sangat disayangkan, dari 4 kombinasi drift yang ada, hanya kombinasi 1 yang memiliki kategori model terbaik. Sehingga model yang akan digunakan adalah `model_nvda.da`.
 
 # **Analisis Sisaan**
 
