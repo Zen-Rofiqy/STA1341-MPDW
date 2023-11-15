@@ -677,9 +677,9 @@ dev.off() # Menutup file PNG
 tseries::adf.test(train_nvda.ts)
 
 if (tseries::adf.test(train_nvda.ts)[["p.value"]] < 0.05) {
-  cat("Karena p-value < 0.05. Maka Rataan Stasioner")
+  cat("Karena p-value < 0.05, Maka Rataan Stasioner")
 } else {
-  cat("Karena p-value > 0.05. Maka Rataan Tidak Stasioner")
+  cat("Karena p-value > 0.05, Maka Rataan Tidak Stasioner")
 }
 ```
 
@@ -910,9 +910,9 @@ dev.off() # Menutup file PNG
 tseries::adf.test(train_nvda.diff)
 
 if (tseries::adf.test(train_nvda.diff)[["p.value"]] < 0.05) {
-  cat("Karena p-value < 0.05. Maka Rataan Stasioner")
+  cat("Karena p-value < 0.05, Maka Rataan Stasioner")
 } else {
-  cat("Karena p-value > 0.05. Maka Rataan Tidak Stasioner")
+  cat("Karena p-value > 0.05, Maka Rataan Tidak Stasioner")
 }
 ```
 
@@ -1224,9 +1224,7 @@ Terlihat bahwa model paling terbaik adalah model tentatif tanpa kombinasi drift.
 
 Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
 
-## **Eksplorasi Sisaan** 
-
-### NVDA
+## **Eksplorasi Sisaan**
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #Eksplorasi 
@@ -1250,7 +1248,7 @@ Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan me
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Sisaan_NVDA.png", sep=""),
+png(paste(export.chart, "/04_Sisaan_NVDA.png", sep=""),
     height = 7*300, width = 12*300, res=300)
 
 # Plot 
@@ -1283,27 +1281,13 @@ Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pa
 > $H_1$ : Sisaan tidak menyebar normal
 
 ```{r}
-#tak tolak H0 > sisaan menyebar normal
-normal <- data.frame(
-  p.value = c(ks.test(sisaan_aapl.da, "pnorm")[["p.value"]],
-              ks.test(sisaan_amzn.da, "pnorm")[["p.value"]],
-              ks.test(sisaan_goog.da, "pnorm")[["p.value"]],
-              ks.test(sisaan_meta.da, "pnorm")[["p.value"]],
-              ks.test(sisaan_msft.da, "pnorm")[["p.value"]],
-              ks.test(sisaan_nflx.da, "pnorm")[["p.value"]],
-              ks.test(sisaan_nvda.da, "pnorm")[["p.value"]]
-              )
-) 
-normal$Keterangan <- ifelse(normal$p.value < 0.05, 
-                              "Sisaan Tidak Menyebar Normal", 
-                              "Sisaan Menyebar Normal")
+ks.test(sisaan_nvda.da, "pnorm")
 
-normal$p.value <- ifelse(normal$p.value == 0, "< 2.2e-16",
-                           sprintf("%.2e", normal$p.value) )
-
-rownames(normal) <- unique(data$Name)
-datatable(normal, filter = 'top', 
-          options = list(pageLength = 7))
+if (ks.test(sisaan_nvda.da, "pnorm")[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05, Sisaan Tidak Menyebar Normal")
+} else {
+  cat("Karena p-value > 0.05, Sisaan Menyebar Normal")
+}
 ```
 
 Berdasarkan uji KS tersebut, didapat *p-value* yang sangat kecil yakni kurang dari $2.2\times10^{-16}$. Semua *p-value* nya kurang dari taraf nyata $5\%$ **sehingga tolak** $H_0$ dan menandakan bahwa **sisaan tidak menyebar normal.** Sesuai dengan qqplot sisaan.
@@ -1429,7 +1413,7 @@ Dengan memasukkan **volatilitas bersyarat** daripada asumsi **volatilitas konsta
 >
 > **Penting untuk menguji Efek ARCH sebelum menerapkan Model ARCH atau GARCH.**
 
-## **2. Uji untuk Efek ARCH** 
+## **2. Uji untuk Efek ARCH**
 
 Lebih masuk akal untuk melakukan uji ARCH Engle (1982) sebelum mengestimasi model tipe GARCH untuk memastikan bahwa kelas model ini sesuai untuk data tersebut.
 
@@ -1451,7 +1435,7 @@ atau
 
 > Terapkan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat Sebagai alternatif dari uji ARCH Engle, Anda dapat memeriksa ketergantungan berurutan (efek ARCH) dalam sebuah deret residual dengan melakukan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat.
 
-## **3. Engle\'s ARCH(p) Model**
+## **3. Engle's ARCH(p) Model**
 
 ARCH, yang merupakan heteroskedastisitas bersyarat, menyatakan bahwa volatilitas tidak konstan, dan berubah hampir sepanjang waktu.
 
