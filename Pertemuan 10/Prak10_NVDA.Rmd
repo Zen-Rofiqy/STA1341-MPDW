@@ -692,57 +692,17 @@ lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
-Gambar di atas menunjukkan bahwa dari rentang nilai $\lambda$ -2 hingga 4, pada selang yang dibuatnya tidak memuat nilai $\lambda=1$.
+Gambar di atas menunjukkan bahwa dari rentang nilai $\lambda$ -2 hingga 4, pada selang yang dibuatnya tidak memuat nilai $\lambda=1$, sehingga ragam tidak stasioner.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_BoxCox.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+png(paste(export.chart, "/03_Stas_BoxCox.png", sep=""),
+    height = 3.75*300, width = 7.5*300, res=300)
 
 # Plot 
-par(mfrow=c(2,4))
-
-index <- seq(1:nrow(train_aapl))
-bc =boxcox(train_aapl.ts~index, lambda=seq(-2, 4, by=.01))
-title("AAPL", cex.main = 4)
-lambda_aapl <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_aapl <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_amzn))
-bc =boxcox(train_amzn.ts~index, lambda=seq(-2, 4, by=.01))
-title("AMZN", cex.main = 4)
-lambda_amzn <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_amzn <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_goog))
-bc =boxcox(train_goog.ts~index, lambda=seq(-2, 4, by=.01))
-title("GOOG", cex.main = 4)
-lambda_goog <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_goog <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_meta))
-bc =boxcox(train_meta.ts~index, lambda=seq(-2, 4, by=.01))
-title("META", cex.main = 4)
-lambda_meta <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_meta <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_msft))
-bc =boxcox(train_msft.ts~index, lambda=seq(-2, 4, by=.01))
-title("MSFT", cex.main = 4)
-lambda_msft <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_msft <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_nflx))
-bc =boxcox(train_nflx.ts~index, lambda=seq(-2, 4, by=.01))
-title("NFLX", cex.main = 4)
-lambda_nflx <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_nflx <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
 index <- seq(1:nrow(train_nvda)) #Beda titik potong
 bc =boxcox(train_nvda.ts~index, lambda=seq(-2, 4, by=.01))
-title("NVDA", cex.main = 4)
-lambda_nvda <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_nvda <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+title("NVDA", cex.main = 2)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -752,12 +712,9 @@ dev.off() # Menutup file PNG
 
 ```{r}
 lsk <- data.frame(
-  Lambda = c(lambda_aapl, lambda_amzn, lambda_goog, lambda_meta, 
-             lambda_msft, lambda_nflx, lambda_nvda ),
-  Batas.Bawah = c(min(sk_aapl), min(sk_amzn), min(sk_goog), min(sk_meta),
-                  min(sk_msft), min(sk_nflx), min(sk_nvda)  ),
-  Batas.Atas = c(max(sk_aapl), max(sk_amzn), max(sk_goog), max(sk_meta),
-                 max(sk_msft), max(sk_nflx), max(sk_nvda)  )
+  Lambda = c(lambda_nvda ),
+  Batas.Bawah = c( min(sk_nvda)  ),
+  Batas.Atas = c(max(sk_nvda) )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
@@ -766,13 +723,12 @@ lsk$Keterangan <- apply(lsk, 1, function(row) {
          "Ragam Stasioner",  "Ragam Tidak Stasioner")
 })
 
-rownames(lsk) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
+rownames(lsk) <- c("NVDA")
 
-datatable(lsk, filter = 'top', 
-          options = list(pageLength = 7))
+datatable(lsk, filter = "none")
 ```
 
-Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kepercayaan diatas yang menyatakan bahwa selain `NFLX` tidak ada yang memuat nilai satu di dalam selangnya. Ini mengindikasikan bahwa hanya `NFLX` yang memiliki **stasioneritas dalam ragam**, Sementara yang lain memerlukan transformasi data karena **tidak** memiliki sifat **stasioner dalam ragam**.
+Hal ini dibuktikan dengan tabel nilai *rounded value* ($\lambda$) dan selang kepercayaan diatas yang menyatakan bahwa memuat nilai satu di dalam selangnya. Ini mengindikasikan bahwa `NVDA` memerlukan transformasi data karena **tidak** memiliki sifat **stasioner dalam ragam**.
 
 ## **Penanganan Ketidakstasioneran Data**
 
@@ -792,7 +748,7 @@ Mengutip dari laman [r-coder.com](https://r-coder.com/box-cox-transformation-r/)
 
 : Namun dari laman tersebut dan dari laman [robjhyndman.com](https://robjhyndman.com/uwafiles/6-Stationarity-Transformations-Differencing.pdf) mengatakan bahwa *rounded value* ($\lambda$) = 1 itu cenderung tidak ada perubahan substansial atau signifikan yang terjadi pada data. Sehingga jika transformasi diatas tidak menyelesaikan masalah stasioneritas ragam maka **alternatif transfromasi** yang dapat dilakukan adalah dengan $(x^\lambda -1 )/\lambda$ dengan transformasi balik $(\lambda x+1)^{1/\lambda}$.
 
-Sehingga transformasi yang digunakan pada data saham yang tidak stasioner dalam ragam adalah sebagai berikut.
+Sehingga transformasi yang digunakan pada data saham NVDIA adalah sebagai berikut.
 
 ```{r}
 lamb <- c(-2, -1, -.5, 0, .5, 1, 2)
@@ -833,58 +789,19 @@ tran <- lsk %>%
     `Transformasi Balik` = trans_balik(Lambda)
   ) %>% dplyr::select(Lambda, Transformasi, `Transformasi Balik`)
 
-tran[6,c(2,3)] <- "-"
-
-datatable(tran, filter = 'top', 
-          options = list(pageLength = 7))
+datatable(tran, filter = 'none')
 ```
 
 #### Transformasi
 
-```{r fig.align="center", fig.height=7.5, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 #Transformasi
-train_aapl.ts.new <- 1/sqrt(train_aapl.ts)
-train_amzn.ts.new <- (train_amzn.ts)
-train_goog.ts.new <- sqrt(train_goog.ts)
-train_meta.ts.new <- sqrt(train_meta.ts)
-train_msft.ts.new <- 1/(train_msft.ts)
 train_nvda.ts.new <- 1/sqrt(train_nvda.ts)
 
 #Plot BoxCox
-par(mfrow=c(2,3))
-index <- seq(1:nrow(train_aapl))
-bc <-boxcox(train_aapl.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("AAPL", cex.main=3)
-lambda_aapl.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_aapl.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_amzn))
-bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("AMZN", cex.main=3)
-lambda_amzn.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_amzn.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_goog))
-bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("GOOG", cex.main=3)
-lambda_goog.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_goog.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_meta))
-bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("META", cex.main=3)
-lambda_meta.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_meta.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_msft))
-bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("MSFT", cex.main=3)
-lambda_msft.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_msft.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
 index <- seq(1:nrow(train_nvda))
 bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("NVDA", cex.main=3)
+title("NVDA", cex.main=2)
 lambda_nvda.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
