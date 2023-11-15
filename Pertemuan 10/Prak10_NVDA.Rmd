@@ -824,12 +824,9 @@ dev.off() # Menutup file PNG
 
 ```{r}
 lsk.new <- data.frame(
-  Lambda = c(lambda_aapl.new, lambda_amzn.new, lambda_goog.new, 
-             lambda_meta.new, lambda_msft.new, lambda_nvda.new ),
-  Batas.Bawah = c(min(sk_aapl.new), min(sk_amzn.new), min(sk_goog.new), 
-                  min(sk_meta.new), min(sk_msft.new), min(sk_nvda.new)  ),
-  Batas.Atas = c(max(sk_aapl.new), max(sk_amzn.new), max(sk_goog.new), 
-                 max(sk_meta.new), max(sk_msft.new), max(sk_nvda.new)  )
+  Lambda = c(lambda_nvda.new ),
+  Batas.Bawah = c( min(sk_nvda.new)  ),
+  Batas.Atas = c( max(sk_nvda.new)  )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
@@ -838,10 +835,9 @@ lsk.new$Keterangan <- apply(lsk.new, 1, function(row) {
          "Ragam Stasioner",  "Ragam Tidak Stasioner")
 })
 
-rownames(lsk.new) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NVDA")
+rownames(lsk.new) <- c("NVDA")
 
-datatable(lsk.new, filter = 'top', 
-          options = list(pageLength = 7))
+datatable(lsk.new, filter = 'none')
 ```
 
 Terlihat bahwa data `AMZN` dan `META` belum stasioner. Sehingga akan dilakukan transformasi ulang dengan $(x^\lambda -1 )/\lambda$ dengan transformasi balik $(\lambda x+1)^{1/\lambda}$.
