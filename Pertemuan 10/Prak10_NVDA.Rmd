@@ -652,7 +652,7 @@ Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/03_Stas_ACF.png", sep=""),
+png(paste(export.chart, "/03_Stas_1_ACF.png", sep=""),
     height = 3.75*300, width = 7.5*300, res=300)
 
 # Plot 
@@ -696,7 +696,7 @@ Gambar di atas menunjukkan bahwa dari rentang nilai $\lambda$ -2 hingga 4, pada 
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/03_Stas_BoxCox.png", sep=""),
+png(paste(export.chart, "/03_Stas_2_BoxCox.png", sep=""),
     height = 3.75*300, width = 7.5*300, res=300)
 
 # Plot 
@@ -808,7 +808,7 @@ sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/03_Stas_BoxCox_Trans.png", sep=""),
+png(paste(export.chart, "/03_Stas_3_BoxCox.png", sep=""),
     height = 3.75*300, width = 7.5*300, res=300)
 
 # Plot 
@@ -858,7 +858,7 @@ Berdasarkan plot data deret waktu yang sudah di *Differencing*, terlihat bahwa s
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_Diff.png", sep=""),
+png(paste(export.chart, "/03_Stas_4_Diff.png", sep=""),
     height = 6*300, width = 12*300, res=300)
 
 # Plot 
@@ -876,27 +876,8 @@ Akan dilakukan uji ulang untuk mengecek kestasioneran data dalam rataan.
 
 ### Plot ACF
 
-```{r fig.align="center", fig.height=7.5, fig.width=20, message=FALSE, warning=FALSE, dpi=300}
-par(mfrow=c(2,4))
-acf(train_aapl.diff, ylim=c(-.1,.1) , main="")
-mtext("AAPL", side=3, line=1, cex=2, font=2)
-
-acf(train_amzn.diff, ylim=c(-.1,.1) , main="")
-mtext("AMZN", side=3, line=1, cex=2, font=2)
-
-acf(train_goog.diff, ylim=c(-.1,.1) , main="")
-mtext("GOOG", side=3, line=1, cex=2, font=2)
-
-acf(train_meta.diff, ylim=c(-.1,.1) , main="")
-mtext("META", side=3, line=1, cex=2, font=2)
-
-acf(train_msft.diff, ylim=c(-.1,.1) , main="")
-mtext("MSFT", side=3, line=1, cex=2, font=2)
-
-acf(train_nflx.diff, ylim=c(-.1,.1) , main="")
-mtext("NFLX", side=3, line=1, cex=2, font=2)
-
-acf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+stats::acf(train_nvda.diff, main="", col=col.nvda[1], lwd=2, ylim=c(-.1,.1))
 mtext("NVDA", side=3, line=1, cex=2, font=2)
 ```
 
@@ -904,30 +885,11 @@ Berdasarkan ketujuh plot ACF tersebut, dapat dilihat bahwa lag nya sudah tidak *
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_ACF2.png", sep=""),
-    height = 7.5*300, width = 20*300, res=300)
+png(paste(export.chart, "/03_Stas_5_ACF.png", sep=""),
+    height = 3.75*300, width = 7.5*300, res=300)
 
 # Plot 
-par(mfrow=c(2,4))
-acf(train_aapl.diff, ylim=c(-.1,.1) , main="")
-mtext("AAPL", side=3, line=1, cex=2, font=2)
-
-acf(train_amzn.diff, ylim=c(-.1,.1) , main="")
-mtext("AMZN", side=3, line=1, cex=2, font=2)
-
-acf(train_goog.diff, ylim=c(-.1,.1) , main="")
-mtext("GOOG", side=3, line=1, cex=2, font=2)
-
-acf(train_meta.diff, ylim=c(-.1,.1) , main="")
-mtext("META", side=3, line=1, cex=2, font=2)
-
-acf(train_msft.diff, ylim=c(-.1,.1) , main="")
-mtext("MSFT", side=3, line=1, cex=2, font=2)
-
-acf(train_nflx.diff, ylim=c(-.1,.1) , main="")
-mtext("NFLX", side=3, line=1, cex=2, font=2)
-
-acf(train_nvda.diff, ylim=c(-.1,.1) , main="")
+stats::acf(train_nvda.diff, main="", col=col.nvda[1], lwd=2, ylim=c(-.1,.1))
 mtext("NVDA", side=3, line=1, cex=2, font=2)
 
 # Menyimpan plot sebagai file PNG
@@ -937,21 +899,13 @@ dev.off() # Menutup file PNG
 ### Uji ADF
 
 ```{r message=FALSE, warning=FALSE}
-adf1 <- data.frame(
-  p.value = c(tseries::adf.test(train_aapl.diff)[["p.value"]],
-              tseries::adf.test(train_amzn.diff)[["p.value"]],
-              tseries::adf.test(train_goog.diff)[["p.value"]],
-              tseries::adf.test(train_meta.diff)[["p.value"]],
-              tseries::adf.test(train_msft.diff)[["p.value"]],
-              tseries::adf.test(train_nflx.diff)[["p.value"]],
-              tseries::adf.test(train_nvda.diff)[["p.value"]]
-              )
-)
-adf1$Keterangan <- ifelse(adf1$p.value < 0.05, "Rataan Stasioner", 
-                         "Rataan Tidak Stasioner")
-rownames(adf1) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
-datatable(adf1, filter = 'top', 
-          options = list(pageLength = 7))
+tseries::adf.test(train_nvda.diff)
+
+if (tseries::adf.test(train_nvda.diff)[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05. Maka Rataan Stasioner")
+} else {
+  cat("Karena p-value > 0.05. Maka Rataan Tidak Stasioner")
+}
 ```
 
 > $H_0$ : Data tidak stasioner dalam rataan
