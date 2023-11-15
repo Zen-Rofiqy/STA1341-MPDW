@@ -810,46 +810,13 @@ Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/99_Stas_BoxCox_Trans.png", sep=""),
-    height = 7.5*300, width = 15*300, res=300)
+png(paste(export.chart, "/03_Stas_BoxCox_Trans.png", sep=""),
+    height = 3.75*300, width = 7.5*300, res=300)
 
 # Plot 
-par(mfrow=c(2,3))
-index <- seq(1:nrow(train_aapl))
-bc <-boxcox(train_aapl.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("AAPL", cex.main=3)
-lambda_aapl.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_aapl.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_amzn))
-bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("AMZN", cex.main=3)
-lambda_amzn.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_amzn.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_goog))
-bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("GOOG", cex.main=3)
-lambda_goog.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_goog.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_meta))
-bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("META", cex.main=3)
-lambda_meta.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_meta.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_msft))
-bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("MSFT", cex.main=3)
-lambda_msft.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_msft.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
 index <- seq(1:nrow(train_nvda))
 bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("NVDA", cex.main=3)
-lambda_nvda.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+title("NVDA", cex.main=2)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
