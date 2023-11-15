@@ -1433,6 +1433,8 @@ stats::acf(abs(Return.nvda), main="NVDA abs(Returns)", col=col.nvda[1], lwd=2,
            cex.main=10, ylim=c(-.2,.3))
 ```
 
+Terlihat bahwa baik dari log, kuadrat, dan mutlak memperlihatkan **tidak adanya autokorelasi** yang ditandai oleh plot tidak berpola *tails of slowly*.
+
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/05_Arch_2_acf.png", sep=""),
