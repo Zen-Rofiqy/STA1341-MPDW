@@ -1390,6 +1390,19 @@ atau
 
 > Terapkan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat Sebagai alternatif dari uji ARCH Engle, Anda dapat memeriksa ketergantungan berurutan (efek ARCH) dalam sebuah deret residual dengan melakukan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat.
 
+### Memeriksa keberadaan volatilitas
+
+```{r fig.align=, fig.height=7, fig.width=12, message=FALSE, warning=FALSE, dpi=300}
+install_load('fGarch', 'PerformanceAnalytics', 'rugarch', 'xts', 'FinTS')
+
+#calculate log returns and remove first NA value
+nvda.z <- zoo(x=nvda$`Adj Close`, order.by=nvda$Date)
+Return.nvda <- Return.calculate(nvda.ts, method = "log")[-1]
+volatility <- cbind(Return.nvda, Return.nvda^2, abs(Return.nvda))
+colnames(volatility) <- c("Returns", "Returns^2", "abs(Returns)")
+plot.zoo(volatility, main="NVDA Daily Returns", col="blue")
+```
+
 ## **3. Engle's ARCH(p) Model**
 
 ARCH, yang merupakan heteroskedastisitas bersyarat, menyatakan bahwa volatilitas tidak konstan, dan berubah hampir sepanjang waktu.
