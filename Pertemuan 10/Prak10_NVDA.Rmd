@@ -528,6 +528,12 @@ ggsave("02_Time Series NVIDIA.png", chart, path = export.chart,
 
 Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa dari tahun `2021-2022` terjadi kenaikan harga saham/**tren naik**. Sedangkan `2022-2023` terjadi penurunan harga saham/**tren turun**. Dan pada tahun 2023 akhir tahun terjadi kenaikan harga saham yang drastis/**tren naik**.
 
+### Seasonal
+
+```{r}
+
+```
+
 ## Data Train vs Test
 
 ```{r}
@@ -2084,3 +2090,9 @@ write.xlsx(list("AAPL" = drift4_aapl,
                 "NVDA" = drift4_aapl), 
            file = "Model_Drift4.xlsx")
 ```
+
+## Referensi
+
+-   [Forecasting: Principles and Practice](https://otexts.com/fpp2/){.uri}, *Rob J Hyndman and George Athanasopoulos.* Monash University, Australia.
+
+-   [BOOSTEDML : Time series](https://boostedml.com/category/time-series){.uri}, Articles on Statistics and Machine Learning for Healthcare.
