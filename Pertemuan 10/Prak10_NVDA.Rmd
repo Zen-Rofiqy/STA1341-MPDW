@@ -1453,10 +1453,6 @@ stats::acf(abs(Return.nvda), main="NVDA abs(Returns)", col=col.nvda[1], lwd=2,
 dev.off() # Menutup file PNG
 ```
 
-> $H_0$ : Tidak ada Auto-korelasi
->
-> $H_1$ : Ada Auto-korelasi
-
 ```{r}
 corr <- data.frame(
   p.value = c(Box.test(coredata(Return.nvda), 
@@ -1480,7 +1476,13 @@ datatable(corr, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-### Efek ARCH
+> $H_0$ : Tidak ada Auto-korelasi
+>
+> $H_1$ : Ada Auto-korelasi
+
+Terlihat bahwa hasil kuadrat dan hasil mutlak nilai *p-value* nya kurang dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya hasil kuadrat dan hasil mutlak memiliki auto-korelasi.
+
+### Uji ARCH-LM
 
 ## **3. Engle's ARCH(p) Model**
 
