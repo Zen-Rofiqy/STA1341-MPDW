@@ -530,9 +530,11 @@ Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa dari tahun `2021-2
 
 ### Seasonal
 
-```{r}
-
+```{r, error=TRUE}
+ggseasonplot(nvda.ts)
 ```
+
+Terlihat bahwa data tidak memiliki pola musiman.
 
 ## Data Train vs Test
 
