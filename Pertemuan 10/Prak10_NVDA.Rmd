@@ -1484,6 +1484,22 @@ Terlihat bahwa hasil kuadrat dan hasil mutlak nilai *p-value* nya kurang dari ta
 
 ### Uji ARCH-LM
 
+> $H_0$ : Tidak ada efek ARCH
+>
+> $H_1$ : Ada efek ARCH
+
+```{r}
+ArchTest(Return.nvda)
+
+if (ArchTest(Return.nvda)[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05, Maka Ada efek ARCH")
+} else {
+  cat("Karena p-value > 0.05, Maka Tidak ada efek ARCH")
+}
+```
+
+Uji LM menunjukkan *p-value* kurang dari taraf nyata $5\%$, yang mengindikasikan bahwa $H_0$ **ditolak**. Oleh karena itu, Hasil `NVDA` menunjukkan adanya **efek ARCH**.
+
 ## **3. Engle's ARCH(p) Model**
 
 ARCH, yang merupakan heteroskedastisitas bersyarat, menyatakan bahwa volatilitas tidak konstan, dan berubah hampir sepanjang waktu.
