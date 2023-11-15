@@ -1180,6 +1180,16 @@ model_nvda.drift4 <- NA
 
 ## Model ARCH-GARCH
 
+Sumber : [Volatility Modeling with R : ARCH and GARCH Models](https://blog.devgenius.io/using-r-to-examine-the-stylized-facts-of-financial-returns-39b86ff4fb4b){.uri}
+
+Model-model tipe ARIMA tidak dapat menjelaskan sejumlah fitur penting yang umum terdapat pada sebagian besar deret waktu keuangan. Dalam pos terpisah, saya membahas semua fakta stilisasi dari hasil keuangan.
+
+Ada banyak jenis model deret waktu non-linear yang berbeda. Model-model ARCH atau GARCH, yang digunakan untuk memodelkan dan memprediksi volatilitas, merupakan model keuangan non-linear yang paling banyak digunakan.
+
+Konsep ARCH dikembangkan oleh ekonom Robert F. Engle III pada tahun 1980-an. ARCH secara langsung meningkatkan pemodelan keuangan, sehingga Engle memenangkan Hadiah Nobel Memorial 2003 di Bidang Ilmu Ekonomi.
+
+Robert F. Engle III, seorang ekonom, menciptakan konsep ARCH pada tahun 1980-an. Engle memenangkan Hadiah Nobel Memorial 2003 di Bidang Ilmu Ekonomi sebagai hasil dari perbaikan instan ARCH terhadap pemodelan keuangan.
+
 ## Model Terbaik
 
 ```{r}
