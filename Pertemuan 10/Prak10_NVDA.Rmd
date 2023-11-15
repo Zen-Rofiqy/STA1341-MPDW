@@ -1390,7 +1390,7 @@ atau
 
 > Terapkan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat Sebagai alternatif dari uji ARCH Engle, Anda dapat memeriksa ketergantungan berurutan (efek ARCH) dalam sebuah deret residual dengan melakukan Uji Q Ljung-Box pada m lags pertama dari deretan residual kuadrat.
 
-### Cek keberadaan volatilitas
+### Volatilitas
 
 1.  **Grafik Harga atau Hasil Log:** Melihat perubahan harga atau hasil log dari waktu ke waktu dapat memberikan gambaran tentang tingkat volatilitas. Jika ada variasi besar dalam harga atau hasil log, ini menunjukkan keberadaan volatilitas.
 
@@ -1420,7 +1420,7 @@ plot.zoo(volatility, main="NVDA Daily Returns", col=col.nvda[1], lwd=1.5)
 dev.off() # Menutup file PNG
 ```
 
-### Cek Efek ARCH
+### Auto-korelasi
 
 ```{r fig.align="center", fig.height=3.75, fig.width=11.25, message=FALSE, warning=FALSE, dpi=300}
 # plot autocorrelations of returns, returns^2 and abs(returns)
@@ -1433,7 +1433,7 @@ stats::acf(abs(Return.nvda), main="NVDA abs(Returns)", col=col.nvda[1], lwd=2,
            cex.main=10, ylim=c(-.2,.3))
 ```
 
-Terlihat bahwa baik dari log, kuadrat, dan mutlak memperlihatkan **tidak adanya autokorelasi** yang ditandai oleh plot tidak berpola *tails of slowly*.
+Terlihat bahwa baik dari hasil log, kuadrat, dan mutlak memperlihatkan **tidak adanya auto-korelasi** yang ditandai oleh plot tidak berpola *tails of slowly*. Kita dapat memastikan keberadaan autokorelasi nya dengan melakukan uji Ljung-Box pada hasil.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
@@ -1452,6 +1452,35 @@ stats::acf(abs(Return.nvda), main="NVDA abs(Returns)", col=col.nvda[1], lwd=2,
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
 ```
+
+> $H_0$ : Tidak ada Auto-korelasi
+>
+> $H_1$ : Ada Auto-korelasi
+
+```{r}
+corr <- data.frame(
+  p.value = c(Box.test(coredata(Return.nvda), 
+                       type = "Ljung", lag = 12)[["p.value"]],
+              Box.test(coredata(Return.nvda^2), 
+                       type = "Ljung", lag = 12)[["p.value"]],
+              Box.test(coredata(abs(Return.nvda)), 
+                       type = "Ljung", lag = 12)[["p.value"]]
+              )
+) 
+corr$Keterangan <- ifelse(corr$p.value < 0.05, 
+                              "Ada auto-korelasi", 
+                              "Tidak ada auto-korelasi")
+
+corr$p.value <- ifelse(round(corr$p.value, 2) == 0, 
+                       sprintf("%.2e", corr$p.value),
+                           round(corr$p.value, 2) )
+
+rownames(corr) <- c("NVDA Returns", "NVDA Returns^2", "NVDA abs(Returns)")
+datatable(corr, filter = 'top', 
+          options = list(pageLength = 7))
+```
+
+### Efek ARCH
 
 ## **3. Engle's ARCH(p) Model**
 
