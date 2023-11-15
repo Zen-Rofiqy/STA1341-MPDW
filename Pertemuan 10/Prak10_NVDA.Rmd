@@ -806,8 +806,6 @@ lambda_nvda.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
 sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
-Setelah melalui proses transformasi, gambar di atas mengindikasikan bahwa setiap rangkaian data sekarang mencakup nilai satu dalam selangnya, yang menunjukkan bahwa data tersebut sekarang sudah **stasioner dalam ragam**.
-
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/03_Stas_BoxCox_Trans.png", sep=""),
@@ -840,173 +838,20 @@ rownames(lsk.new) <- c("NVDA")
 datatable(lsk.new, filter = 'none')
 ```
 
-Terlihat bahwa data `AMZN` dan `META` belum stasioner. Sehingga akan dilakukan transformasi ulang dengan $(x^\lambda -1 )/\lambda$ dengan transformasi balik $(\lambda x+1)^{1/\lambda}$.
-
-```{r fig.align="center", fig.height=7.5, fig.width=15, message=FALSE, warning=FALSE, dpi=300}
-#Transformasi
-train_aapl.ts.new <- 1/sqrt(train_aapl.ts)
-train_amzn.ts.new <- (train_amzn.ts^lambda_amzn - 1)/lambda_amzn
-train_goog.ts.new <- sqrt(train_goog.ts)
-train_meta.ts.new <- (train_meta.ts^lambda_meta - 1)/lambda_meta
-train_msft.ts.new <- 1/(train_msft.ts)
-train_nvda.ts.new <- 1/sqrt(train_nvda.ts)
-
-#Plot BoxCox
-par(mfrow=c(2,3))
-index <- seq(1:nrow(train_aapl))
-bc <-boxcox(train_aapl.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("AAPL", cex.main=3)
-lambda_aapl.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_aapl.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_amzn))
-bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("AMZN", cex.main=3)
-lambda_amzn.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_amzn.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_goog))
-bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("GOOG", cex.main=3)
-lambda_goog.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_goog.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_meta))
-bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("META", cex.main=3)
-lambda_meta.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_meta.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_msft))
-bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("MSFT", cex.main=3)
-lambda_msft.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_msft.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_nvda))
-bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("NVDA", cex.main=3)
-lambda_nvda.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-```
-
-Terlihat bahwa data sudah stasioner dalam ragam.
-
-```{r, include=FALSE, echo=FALSE}
-#Export Chart
-png(paste(export.chart, "/99_Stas_BoxCox_Trans2.png", sep=""),
-    height = 7.5*300, width = 15*300, res=300)
-
-# Plot 
-par(mfrow=c(2,3))
-index <- seq(1:nrow(train_aapl))
-bc <-boxcox(train_aapl.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("AAPL", cex.main=3)
-lambda_aapl.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_aapl.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_amzn))
-bc <-boxcox(train_amzn.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("AMZN", cex.main=3)
-lambda_amzn.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_amzn.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_goog))
-bc <-boxcox(train_goog.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("GOOG", cex.main=3)
-lambda_goog.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_goog.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_meta))
-bc <-boxcox(train_meta.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("META", cex.main=3)
-lambda_meta.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_meta.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_msft))
-bc <-boxcox(train_msft.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("MSFT", cex.main=3)
-lambda_msft.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_msft.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-index <- seq(1:nrow(train_nvda))
-bc <-boxcox(train_nvda.ts.new ~index, lambda=seq(-2, 4, by=.01))
-title("NVDA", cex.main=3)
-lambda_nvda.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
-
-# Menyimpan plot sebagai file PNG
-dev.off() # Menutup file PNG
-```
-
-```{r}
-lsk.new <- data.frame(
-  Lambda = c(lambda_aapl.new, lambda_amzn.new, lambda_goog.new, 
-             lambda_meta.new, lambda_msft.new, lambda_nflx,
-             lambda_nvda.new ),
-  Batas.Bawah = c(min(sk_aapl.new), min(sk_amzn.new), min(sk_goog.new), 
-                  min(sk_meta.new), min(sk_msft.new), min(sk_nflx),
-                  min(sk_nvda.new)  ),
-  Batas.Atas = c(max(sk_aapl.new), max(sk_amzn.new), max(sk_goog.new), 
-                 max(sk_meta.new), max(sk_msft.new), max(sk_nflx),
-                 max(sk_nvda.new)  )
-) %>%
-  mutate(across(where(is.numeric), ~round(., 2)))
-
-lsk.new$Keterangan <- apply(lsk.new, 1, function(row) {
-  ifelse(row["Batas.Bawah"] <= 1 && row["Batas.Atas"] >= 1,
-         "Ragam Stasioner",  "Ragam Tidak Stasioner")
-})
-
-rownames(lsk.new) <- c("AAPL", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA")
-
-lsk.new <- cbind(lsk.new, tran[,-1])
-
-lsk.new[which(rownames(lsk.new) %in% c("META", "AMZN")), c("Transformasi",       "Transformasi Balik")] <- list("(x^lamb - 1)/ lamb", "(lamb x + 1)^{1/lamb}")
-
-datatable(lsk.new, filter = 'top', 
-          options = list(pageLength = 7))
-```
-
-Ini juga dibuktikan dengan tabel diatas.
+Setelah melalui proses transformasi, gambar dan tabel di atas mengindikasikan bahwa setiap rangkaian data sekarang mencakup nilai satu dalam selangnya, yang menunjukkan bahwa data tersebut sekarang sudah **stasioner dalam ragam**.
 
 ### Dalam Rataan: Differencing
 
 *Differencing* (diferensiasi) adalah suatu proses statistik yang digunakan untuk mengatasi ketidakstasioneran dalam data rata-rata atau tren data. Tujuannya adalah untuk membuat data menjadi lebih stasioner dengan mengurangi atau menghilangkan tren atau pola waktu yang mungkin ada dalam data tersebut.
 
-```{r dpi=300, fig.height = 8, fig.width = 25, fig.align = "center"}
+```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
 #Diff
-train_aapl.diff <- diff(train_aapl.ts.new, differences = 1) 
-train_amzn.diff <- diff(train_amzn.ts.new, differences = 1) 
-train_goog.diff <- diff(train_goog.ts.new, differences = 1) 
-train_meta.diff <- diff(train_meta.ts.new, differences = 1) 
-train_msft.diff <- diff(train_msft.ts.new, differences = 1) 
-train_nflx.diff <- diff(train_nflx.ts, differences = 1) 
 train_nvda.diff <- diff(train_nvda.ts.new, differences = 1) 
 
 #Plot
-par(mfrow=c(2,4))
-plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "lightskyblue4", lwd = 2,
-        main="AAPL", cex.main = 4)
-plot.ts(train_amzn.diff, lty=1, xlab="Periode (Hari)", 
-        col = "orange2", lwd = 2,
-        main="AMZN", cex.main = 4)
-plot.ts(train_goog.diff, lty=1, xlab="Differencing  (Hari)", 
-        col = "gold3", lwd = 2,
-        main="GOOG", cex.main = 4)
-plot.ts(train_meta.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "dodgerblue3", lwd = 2,
-        main="META", cex.main = 4)
-plot.ts(train_msft.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "deepskyblue2", lwd = 2,
-        main="MSFT", cex.main = 4)
-plot.ts(train_nflx.diff, lty=1, xlab="Periode (Hari)", 
-        col = "firebrick3", lwd = 2,
-        main="NFLX", cex.main = 4)
 plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "green4", lwd = 2,
-        main="NVDA", cex.main = 4)
+        col = col.nvda[1], lwd = 2,
+        main="NVDA", cex.main = 2)
 ```
 
 Berdasarkan plot data deret waktu yang sudah di *Differencing*, terlihat bahwa seluruh data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
@@ -1014,31 +859,12 @@ Berdasarkan plot data deret waktu yang sudah di *Differencing*, terlihat bahwa s
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/99_Stas_Diff.png", sep=""),
-    height = 8*300, width = 25*300, res=300)
+    height = 6*300, width = 12*300, res=300)
 
 # Plot 
-par(mfrow=c(2,4))
-plot.ts(train_aapl.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "lightskyblue4", lwd = 2,
-        main="AAPL", cex.main = 4)
-plot.ts(train_amzn.diff, lty=1, xlab="Periode (Hari)", 
-        col = "orange2", lwd = 2,
-        main="AMZN", cex.main = 4)
-plot.ts(train_goog.diff, lty=1, xlab="Differencing  (Hari)", 
-        col = "gold3", lwd = 2,
-        main="GOOG", cex.main = 4)
-plot.ts(train_meta.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "dodgerblue3", lwd = 2,
-        main="META", cex.main = 4)
-plot.ts(train_msft.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "deepskyblue2", lwd = 2,
-        main="MSFT", cex.main = 4)
-plot.ts(train_nflx.diff, lty=1, xlab="Periode (Hari)", 
-        col = "firebrick3", lwd = 2,
-        main="NFLX", cex.main = 4)
 plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
-        col = "green4", lwd = 2,
-        main="NVDA", cex.main = 4)
+        col = col.nvda[1], lwd = 2,
+        main="NVDA", cex.main = 2)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
