@@ -1532,6 +1532,65 @@ $$ \begin{equation} \begin{aligned} \sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u
 
 > **Dalam kebanyakan kasus, model GARCH(1,1) sudah cukup untuk menangkap pengelompokan volatilitas dalam data, dan jarang sekali model berorde lebih tinggi diestimasi atau bahkan dipertimbangkan dalam literatur keuangan akademis.**
 
+# Model ARCH-GARCH
+
+## **Uji Efek ARCH**
+
+```{r}
+lag <- 30
+arch_effect <- data.frame(p.value = numeric(0), 
+                          Keterangan = character(0))
+for(i in 1:lag){
+  p.value <- ArchTest(sisaan_nvda.da, lags=i, demean=TRUE)[["p.value"]]
+  arch_effect <- rbind(arch_effect, 
+      data.frame(p.value = ifelse(round(p.value, 2) == 0, 
+                                  sprintf("%.2e", p.value),
+                                  round(p.value, 2) ),
+                 Keterangan = ifelse(p.value < 0.05, 
+                                     "Signifikan", "Tidak signifikan")
+                 ) )
+  rownames(arch_effect)[i] <- paste0("Lag ", i)
+}
+datatable(arch_effect, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+> $H_0$ : Lag Tidak signifikan
+>
+> $H_1$ : Lag Signifikan
+
+Terlihat bahwa Lag 2 memiliki *p-value* sebesar $0.08$ yang lebih besar dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya Lag 2 Tidak sinifikan. Selain itu semua lag nya signifikan.
+
+```{r}
+ArchTest(sisaan_nvda.da)
+
+if (ArchTest(sisaan_nvda.da)[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05, Maka Ada efek ARCH")
+} else {
+  cat("Karena p-value > 0.05, Maka Tidak ada efek ARCH")
+}
+```
+
+> $H_0$ : Tidak ada efek ARCH
+>
+> $H_1$ : Ada efek ARCH
+
+Uji LM menunjukkan *p-value* kurang dari taraf nyata $5\%$, yang mengindikasikan bahwa $H_0$ **ditolak**. Oleh karena itu, Hasil `NVDA` menunjukkan adanya **efek ARCH**.
+
+## Model Volatilitas
+
+```{r}
+#Pendugaan model ARCH/GARCH dengan function garch secara simultan
+nvda.arch1 <- tseries::garch(train_nvda.ts, c(0,1)) #ordo ARCH(1)
+summary(nvda.arch1)
+```
+
+### Plot
+
+```{r}
+plot(nvda.arch1, ask=FALSE) 
+```
+
 # **Peramalan**
 
 Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk $h$ hari ke depan. Dengan $h$ adalah banyaknya data test per perusahaan.
