@@ -1587,8 +1587,24 @@ summary(nvda.arch1)
 
 ### Plot
 
-```{r}
+```{r fig.align="center", fig.height=7.5, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 plot(nvda.arch1, ask=FALSE) 
+```
+
+## Model GARCH
+
+```{r}
+#GARCH(1,1)
+garchSpec11 <- ugarchspec(
+  variance.model=list(model="sGARCH",
+                      garchOrder=c(1,1)),
+mean.model=list(armaOrder=c(0,2)) )
+garchFit11 <- ugarchfit(spec=garchSpec11, data=train_nvda.diff)
+coef(garchFit11)
+```
+
+```{r}
+garchFit11
 ```
 
 # **Peramalan**
