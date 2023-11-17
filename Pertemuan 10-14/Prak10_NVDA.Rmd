@@ -1842,19 +1842,35 @@ ggplot() +
   ) +
 
 # Data Ramal
-  geom_segment(aes(x = as.Date(max(data2$Date))-40, 
-                   xend = as.Date(max(data2$Date))-50, 
-                   y = max(nvda$`Adj Close`)* .9, 
-                   yend = max(nvda$`Adj Close`)*.9), 
+  geom_segment(aes(x = as.Date(max(data2$Date))-45, 
+                   xend = as.Date(max(data2$Date))-80, 
+                   y = max(nvda$`Adj Close`)* 1.01, 
+                   yend = max(nvda$`Adj Close`)*1.07), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#D02A49", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(data2$Date))-40, 
-                      y = max(nvda$`Adj Close`)*.9, 
+    data = data.frame(x = as.Date(max(data2$Date))-80, 
+                      y = max(nvda$`Adj Close`)*1.07, 
                       label = "Data Ramal" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#D02A49", box.color = "white", parse = TRUE
-  ) 
+  ) +
+
+#Tangagl akhir
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date)), 
+                   y = -Inf, 
+                   yend = max(nvda$`Adj Close`)*.1), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
+               lineend = "round", color = "#4B75BA", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date)), 
+                      y = max(nvda$`Adj Close`)*.1, 
+                      label = max(data2$Date) ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "#4B75BA", box.color = "white", parse = TRUE
+  )
+
 chart
 #Export Chart
 ggsave("09_banding_ramal.png", chart, path = export.chart,
