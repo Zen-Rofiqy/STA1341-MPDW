@@ -1918,7 +1918,7 @@ datatable(akurasi, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model yang paling sering digunakan. Model dengan kategori *"Sangat baik"* hanya ada di `GOOG` (**ARIMA(4,1,5)**) dan `MSFT` (**ARIMA(4,1,5)**). Di sisi lain, model dengan katergori *"Baik"* ada pada `NFLX` (**ARIMA(6,1,7)**) dan `NVDA` (**ARIMA(0,1,1)**). Sisanya mendapatkan kategori *"Layak".*
+Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** berkatergori *"Baik"* dengan nilai **MAPE** nya sebesar $12.3\%$ (kurang dari $20\%$).
 
 # Penutup
 
@@ -1926,54 +1926,13 @@ Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** Merupakan model yang pal
 #Export Data
 install_load('openxlsx')
 #Model Tentatif 
-write.xlsx(list("AAPL" = model.tentaif_aapl, 
-                "AMZN" = model.tentaif_amzn, 
-                "GOOG" = model.tentaif_goog, 
-                "META" = model.tentaif_meta, 
-                "MSFT" = model.tentaif_msft, 
-                "NFLX" = model.tentaif_nflx, 
-                "NVDA" = model.tentaif_nvda), 
-           file = "Model_Tentatif.xlsx")
-
-# 1. Model Tanpa Intercept dan Tanpa Drift
-write.xlsx(list("AAPL" = drift1_aapl, 
-                "AMZN" = drift1_aapl, 
-                "GOOG" = drift1_aapl, 
-                "META" = drift1_aapl, 
-                "MSFT" = drift1_aapl, 
-                "NFLX" = drift1_aapl, 
-                "NVDA" = drift1_aapl), 
-           file = "Model_Drift1.xlsx")
-
-# 2. Model Dengan Intercept Tanpa Drift 
-write.xlsx(list("AAPL" = drift2_aapl, 
-                "AMZN" = drift2_aapl, 
-                "GOOG" = drift2_aapl, 
-                "META" = drift2_aapl, 
-                "MSFT" = drift2_aapl, 
-                "NFLX" = drift2_aapl, 
-                "NVDA" = drift2_aapl), 
-           file = "Model_Drift2.xlsx")
-
-# 3. Model Tanpa Intercept Dengan Drift
-write.xlsx(list("AAPL" = drift3_aapl, 
-                "AMZN" = drift3_aapl, 
-                "GOOG" = drift3_aapl, 
-                "META" = drift3_aapl, 
-                "MSFT" = drift3_aapl, 
-                "NFLX" = drift3_aapl, 
-                "NVDA" = drift3_aapl), 
-           file = "Model_Drift3.xlsx")
-
-# 4. Model dengan Intercept dan dengan Drift
-write.xlsx(list("AAPL" = drift4_aapl, 
-                "AMZN" = drift4_aapl, 
-                "GOOG" = drift4_aapl, 
-                "META" = drift4_aapl, 
-                "MSFT" = drift4_aapl, 
-                "NFLX" = drift4_aapl, 
-                "NVDA" = drift4_aapl), 
-           file = "Model_Drift4.xlsx")
+write.xlsx(list("Tentatif" = model.tentaif_nvda,
+                "Drift1" = drift1_nvda,
+                "Drift2" = drift2_nvda,
+                "Drift3" = drift3_nvda,
+                "Drift4" = drift4_nvda
+                ), 
+           file = "Model_NVDA.xlsx")
 ```
 
 ## Referensi

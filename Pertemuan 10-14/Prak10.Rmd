@@ -3566,41 +3566,41 @@ write.xlsx(list("AAPL" = model.tentaif_aapl,
 
 # 1. Model Tanpa Intercept dan Tanpa Drift
 write.xlsx(list("AAPL" = drift1_aapl, 
-                "AMZN" = drift1_aapl, 
-                "GOOG" = drift1_aapl, 
-                "META" = drift1_aapl, 
-                "MSFT" = drift1_aapl, 
-                "NFLX" = drift1_aapl, 
-                "NVDA" = drift1_aapl), 
+                "AMZN" = drift1_amzn, 
+                "GOOG" = drift1_goog, 
+                "META" = drift1_meta, 
+                "MSFT" = drift1_msft, 
+                "NFLX" = drift1_nflx, 
+                "NVDA" = drift1_nvda), 
            file = "Model_Drift1.xlsx")
 
 # 2. Model Dengan Intercept Tanpa Drift 
 write.xlsx(list("AAPL" = drift2_aapl, 
-                "AMZN" = drift2_aapl, 
-                "GOOG" = drift2_aapl, 
-                "META" = drift2_aapl, 
-                "MSFT" = drift2_aapl, 
-                "NFLX" = drift2_aapl, 
-                "NVDA" = drift2_aapl), 
+                "AMZN" = drift2_amzn, 
+                "GOOG" = drift2_goog, 
+                "META" = drift2_meta, 
+                "MSFT" = drift2_msft, 
+                "NFLX" = drift2_nflx, 
+                "NVDA" = drift2_nvda), 
            file = "Model_Drift2.xlsx")
 
 # 3. Model Tanpa Intercept Dengan Drift
 write.xlsx(list("AAPL" = drift3_aapl, 
-                "AMZN" = drift3_aapl, 
-                "GOOG" = drift3_aapl, 
-                "META" = drift3_aapl, 
-                "MSFT" = drift3_aapl, 
-                "NFLX" = drift3_aapl, 
-                "NVDA" = drift3_aapl), 
+                "AMZN" = drift3_amzn, 
+                "GOOG" = drift3_goog, 
+                "META" = drift3_meta, 
+                "MSFT" = drift3_msft, 
+                "NFLX" = drift3_nflx, 
+                "NVDA" = drift3_nvda), 
            file = "Model_Drift3.xlsx")
 
 # 4. Model dengan Intercept dan dengan Drift
 write.xlsx(list("AAPL" = drift4_aapl, 
-                "AMZN" = drift4_aapl, 
-                "GOOG" = drift4_aapl, 
-                "META" = drift4_aapl, 
-                "MSFT" = drift4_aapl, 
-                "NFLX" = drift4_aapl, 
-                "NVDA" = drift4_aapl), 
+                "AMZN" = drift4_amzn, 
+                "GOOG" = drift4_goog, 
+                "META" = drift4_meta, 
+                "MSFT" = drift4_msft, 
+                "NFLX" = drift4_nflx, 
+                "NVDA" = drift4_nvda), 
            file = "Model_Drift4.xlsx")
 ```
