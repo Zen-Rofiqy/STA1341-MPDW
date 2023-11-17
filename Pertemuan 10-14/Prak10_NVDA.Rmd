@@ -56,7 +56,7 @@ path <- function(){
 
 ```{r}
 #Export chart
-export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 10/Chart2"
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Pertemuan 10-14/Chart2"
 ```
 
 # Pendahuluan
@@ -1605,6 +1605,12 @@ coef(garchFit11)
 
 ```{r}
 garchFit11
+```
+
+```{r}
+res <- garchFit11@fit$residuals
+res.ts <- ts(res)
+plot.ts(res.ts)
 ```
 
 # **Peramalan**
