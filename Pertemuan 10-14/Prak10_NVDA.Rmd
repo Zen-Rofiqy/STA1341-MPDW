@@ -80,7 +80,7 @@ Kami akan menggunakan peubah `Adj Close (Adjusted Close)`, Karena sesuai dengan 
 
 ## NVIDIA
 
-![](images/loxyp6hzr4dufbf8qr_NVDA saham as.png)
+![](images/loxyp6hzr4dufbf8qr_NVDA%20saham%20as.png)
 
 Sumber : [finance.yahoo.com](https://finance.yahoo.com/quote/NVDA?p=NVDA){.uri}
 
@@ -1753,6 +1753,10 @@ colnames(ramal) <- c("Date", "Adj Close", "Name")
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
 chart <- 
 ggplot() +
+# Akhir data
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date( max(data2$Date) )), 
+             linetype = "dotted", color = "red") +
   #Label Data Asli 
   annotate( "rect", alpha=.1, fill="#4EC2C1",
             xmin=as.Date(min(data2$Date)), 
@@ -1860,12 +1864,12 @@ ggplot() +
   geom_segment(aes(x = as.Date(max(data2$Date)), 
                    xend = as.Date(max(data2$Date)), 
                    y = -Inf, 
-                   yend = max(nvda$`Adj Close`)*.1), 
+                   yend = max(nvda$`Adj Close`)*.15), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#4B75BA", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)), 
-                      y = max(nvda$`Adj Close`)*.1, 
+                      y = max(nvda$`Adj Close`)*.15, 
                       label = max(data2$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
@@ -1879,75 +1883,7 @@ ggsave("09_banding_ramal.png", chart, path = export.chart,
 
 Dapat dilihat bahwa rata-rata harga saham Amazon diramalkan akan cenderung sedikit menurun setiap periodenya. Di sisi lain, saham NVIDIA diramalkan akan menaik pesat setiap periodenya. Sedangkan harga saham lainnya cenderung naik sedikit.
 
-## Perbandingan Data Aktual dengan Data Ramal {.tabset}
-
-### AAPL
-
-```{r}
-perbandingan_aapl.da <- matrix(data=c(head(test_aapl.ts, n=nrow(test_aapl)), 
-                                      ramal_aapl[-1]),
-                     nrow = nrow(test_aapl), ncol = 2)
-colnames(perbandingan_aapl.da) <- c("Aktual","Ramal")
-datatable(perbandingan_aapl.da, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-### AMZN
-
-```{r}
-perbandingan_amzn.da <- matrix(data=c(head(test_amzn.ts, n=nrow(test_amzn)), 
-                                      ramal_amzn[-1]),
-                     nrow = nrow(test_amzn), ncol = 2)
-colnames(perbandingan_amzn.da) <- c("Aktual","Ramal")
-datatable(perbandingan_amzn.da, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-### GOOG
-
-```{r}
-perbandingan_goog.da <- matrix(data=c(head(test_goog.ts, n=nrow(test_goog)), 
-                                      ramal_goog[-1]),
-                     nrow = nrow(test_goog), ncol = 2)
-colnames(perbandingan_goog.da) <- c("Aktual","Ramal")
-datatable(perbandingan_goog.da, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-### META
-
-```{r}
-perbandingan_meta.da <- matrix(data=c(head(test_meta.ts, n=nrow(test_meta)), 
-                                      ramal_meta[-1]),
-                     nrow = nrow(test_meta), ncol = 2)
-colnames(perbandingan_meta.da) <- c("Aktual","Ramal")
-datatable(perbandingan_meta.da, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-### MSFT
-
-```{r}
-perbandingan_msft.da <- matrix(data=c(head(test_msft.ts, n=nrow(test_msft)), 
-                                      ramal_msft[-1]),
-                     nrow = nrow(test_msft), ncol = 2)
-colnames(perbandingan_msft.da) <- c("Aktual","Ramal")
-datatable(perbandingan_msft.da, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-### NFLX
-
-```{r}
-perbandingan_nflx.da <- matrix(data=c(head(test_nflx.ts, n=nrow(test_nflx)), 
-                                      ramal_nflx[-1]),
-                     nrow = nrow(test_nflx), ncol = 2)
-colnames(perbandingan_nflx.da) <- c("Aktual","Ramal")
-datatable(perbandingan_nflx.da, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-### NVDA
+## Perbandingan Data Aktual dengan Data Ramal
 
 ```{r}
 perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=nrow(test_nvda)), 
@@ -1961,48 +1897,6 @@ datatable(perbandingan_nvda.da, filter = 'top',
 ## Akurasi
 
 ```{r}
-akurasi.aapl <- accuracy(ts(ramal_aapl[-1]), 
-                         head(test_aapl.ts, n=nrow(test_aapl) )) %>%
-  as.data.frame() %>%
-  cbind(Model = ramalan_aapl.da[["method"]]) %>% 
-  relocate(Model, .before = 1)
-row.names(akurasi.aapl) <- "AAPL"
-
-akurasi.amzn <- accuracy(ts(ramal_amzn[-1]), 
-                         head(test_amzn.ts, n=nrow(test_amzn) )) %>%
-  as.data.frame() %>%
-  cbind(Model = ramalan_amzn.da[["method"]]) %>% 
-  relocate(Model, .before = 1)
-row.names(akurasi.amzn) <- "AMZN"
-
-akurasi.goog <- accuracy(ts(ramal_goog[-1]), 
-                         head(test_goog.ts, n=nrow(test_goog) )) %>%
-  as.data.frame() %>%
-  cbind(Model = ramalan_goog.da[["method"]]) %>% 
-  relocate(Model, .before = 1)
-row.names(akurasi.goog) <- "GOOG"
-
-akurasi.meta <- accuracy(ts(ramal_meta[-1]), 
-                         head(test_meta.ts, n=nrow(test_meta) )) %>%
-  as.data.frame() %>%
-  cbind(Model = ramalan_meta.da[["method"]]) %>% 
-  relocate(Model, .before = 1)
-row.names(akurasi.meta) <- "META"
-
-akurasi.msft <- accuracy(ts(ramal_msft[-1]), 
-                         head(test_msft.ts, n=nrow(test_msft) )) %>%
-  as.data.frame() %>%
-  cbind(Model = ramalan_msft.da[["method"]]) %>% 
-  relocate(Model, .before = 1)
-row.names(akurasi.msft) <- "MSFT"
-
-akurasi.nflx <- accuracy(ts(ramal_nflx[-1]), 
-                         head(test_nflx.ts, n=nrow(test_nflx) )) %>%
-  as.data.frame() %>%
-  cbind(Model = ramalan_nflx.da[["method"]]) %>% 
-  relocate(Model, .before = 1)
-row.names(akurasi.nflx) <- "NFLX"
-
 akurasi.nvda <- accuracy(ts(ramal_nvda[-1]), 
                          head(test_nvda.ts, n=nrow(test_nvda) )) %>%
   as.data.frame() %>%
@@ -2012,8 +1906,7 @@ row.names(akurasi.nvda) <- "NVDA"
 ```
 
 ```{r}
-akurasi <- rbind(akurasi.aapl, akurasi.amzn, akurasi.goog, akurasi.meta,
-                 akurasi.msft, akurasi.nflx, akurasi.nvda) %>%
+akurasi <- rbind(akurasi.nvda) %>%
   mutate(Keterangan = case_when(
     MAPE < 10 ~ "Sangat Baik",
     MAPE >= 10 & MAPE <= 20 ~ "Baik",
