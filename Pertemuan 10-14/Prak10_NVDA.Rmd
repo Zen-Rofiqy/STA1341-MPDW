@@ -1712,6 +1712,45 @@ summary(nvda.garch12)
 plot(nvda.garch12, ask=FALSE) 
 ```
 
+### **Model GARCH(1,2)**
+
+```{r}
+# GARCH(1,2)
+m.12 = garch(train_nvda.diff, order=c(1,2), trace =FALSE)
+summary(m.12)
+```
+
+### **MODEL ARIMA(0,1,2)-GARCH(1,2)**
+
+```{r fig.align="center", fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
+#ARIMA(0,1,2)+GARCH(1,2)
+model12<-ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1,2)), 
+                  mean.model = list(armaOrder = c(0, 2), include.mean = TRUE), 
+                  distribution.model = "norm")
+                  
+m.12<-ugarchfit(spec=model12,data=train_nvda.diff, out.sample = 100)
+plot(m.12,which="all")
+```
+
+```{r}
+m.12
+```
+
+diperoleh mean model yaitu ARIMA(0,1,2) dan varian model yaitu GARCH(1,2) terbaik untuk digunakan dalam peralaman, terlihat pada uji dignostik model pada plot QQ-norm terlihat bahwa sebaran residual mengikuti garis lurus sehingga dapat disimpulkan bahwa residual menyebar normal, lalu untuk uji autokorelasi dapat dilihat plot ACF squared residual telah terlihat bahwa setiap lag berada dibawah batas, sehingga dapat dikatakan bahwa tidak ada autokorelasi antar residual, diperkuat dengan nilai p-value pada uji L-jung Box yang lebih besar dari alpha=0.05.
+
+## **Peramalan dengan Model ARIMA(0,1,2)-GARCH(1,2)**
+
+```{r}
+forc = ugarchforecast(m.12, data = train_nvda.diff, n.ahead = 10, n.roll =10)
+print(forc)
+```
+
+```{r fig.align="center", fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
+plot(forc, which= "all")
+```
+
+pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilihat pada plot diatas menunjukkan bahwa hasil ramalan bernilai sama sehingga membentuk garis lurus.
+
 # Akurasi
 
 Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk $h$ hari ke depan. Dengan $h$ adalah banyaknya data test per perusahaan.
@@ -1934,6 +1973,20 @@ write.xlsx(list("Tentatif" = model.tentaif_nvda,
                 ), 
            file = "Model_NVDA.xlsx")
 ```
+
+## Kesimpulan
+
+karena dengan jika menggunakan model ARCH lag hingga 5 masih signifikan, lalu, dicobakan pada beberapa model GARCH dan dibandingkan nilai-nilai seperti AIC dan signifikansi parameter, maka akan digunakan model GARCH(1,2) yang memiliki nilai AIC kecil dan parameter yang hampir semua signifikan. Sehingga diperoleh model Mean yaitu ARIMA(0,1,2) dan model Varian yaitu GARCH(1,2).Dengan persamaan sebagai berikut :
+
+*Mean Model* ARIMA(0,1,2)
+
+Yt=0.0771+et−0.0192et−1−0.0460et−2��=0.0771+��−0.0192��−1−0.0460��−2
+
+*Varian Model*
+
+GARCH(1,2)
+
+σ2t=0.0829+0.0708ϵ2t−1+0.0057σ2t−1+0.9224σ2t−2
 
 ## Referensi
 
