@@ -1750,9 +1750,9 @@ ramal <- data.frame(
 colnames(ramal) <- c("Date", "Adj Close", "Name")
 ```
 
-```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=TRUE, message = FALSE}
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
 chart <- 
-ggplot(ramal, aes(x = Date, y = `Adj Close`, color = Name)) +
+ggplot() +
   #Label Data Asli 
   annotate( "rect", alpha=.1, fill="#4EC2C1",
             xmin=as.Date(min(data2$Date)), 
@@ -1779,7 +1779,7 @@ ggplot(ramal, aes(x = Date, y = `Adj Close`, color = Name)) +
   annotate( "text", color="violetred",
             x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * .95, 
-    label = "Data Uji", size=10) +
+    label = "Data Ramal", size=10) +
   annotate( "text", color="violetred",
             x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * .85, 
@@ -1792,7 +1792,7 @@ ggplot(ramal, aes(x = Date, y = `Adj Close`, color = Name)) +
              linetype = "dotted", color = "black", linewidth = 2) +
 
 #NVDA
-  geom_line(data = train_nvda, linewidth=2,
+  geom_line(data = ramal, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "NVDA")) +
   geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
@@ -1807,22 +1807,39 @@ ggplot(ramal, aes(x = Date, y = `Adj Close`, color = Name)) +
   #Axis
     coord_cartesian(clip = "off"
   ) +
-    scale_x_date( #Sumbu x
-    date_breaks = "1 year",  # Menampilkan label setiap tahun
-    date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date(min(ramal$Date)), 
-               as.Date(max(ramal$Date)) + 60)
-  ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
-    annotate( #Buat nandain batas data
-    "text", x = as.Date(max(data2$Date)), y = 50, 
-    label = max(data2$Date), size=6
+  
+#Bagi Data Train & Test
+  geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
+                   xend = as.Date(max(train_nvda$Date)), 
+                   y = max(nvda$`Adj Close`)* .58, 
+                   yend = max(nvda$`Adj Close`)*.7), 
+               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
+               lineend = "round", color = "#4B75BA", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(train_nvda$Date)), 
+                      y = max(nvda$`Adj Close`)*.7, 
+                      label = max(train_nvda$Date) ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
-  geom_vline( #Buat garis batas data
-    xintercept = as.numeric(as.Date( max(data2$Date) )), 
-             linetype = "dotted", color = "red") 
+
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date)), 
+                   y = max(nvda$`Adj Close`)* .95, 
+                   yend = max(nvda$`Adj Close`)*1.01), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
+               lineend = "round", color = "#D02A49", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date))-20, 
+                      y = max(nvda$`Adj Close`)*.75, 
+                      label = "Data Uji" ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "#D02A49", box.color = "white", parse = TRUE
+  )
+  
 chart
 #Export Chart
 ggsave("09_banding_ramal.png", chart, path = export.chart,
