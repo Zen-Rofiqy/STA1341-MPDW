@@ -65,7 +65,7 @@ export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Met
 
 ![](https://miro.medium.com/v2/resize:fit:1400/1*2Yt3-zcGKc6MYuXCxgCL0A.jpeg)
 
-Dataset yang saya gunakan merupakan koleksi data harga saham historis periode Juli 2018 hingga Juli 2023 dari tujuh raksasa teknologi paling berpengaruh di dunia: Microsoft, Apple, Amazon, Nvidia, Google, Netflix, dan Meta (sebelumnya dikenal sebagai Facebook). Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.
+Dataset yang saya gunakan merupakan koleksi data harga saham historis periode 1 Januari 2018 hingga 10 November 2023 dari tujuh raksasa teknologi paling berpengaruh di dunia: Microsoft, Apple, Amazon, Nvidia, Google, Netflix, dan Meta (sebelumnya dikenal sebagai Facebook). Dataset ini menjadi sumber daya berharga bagi analis keuangan, ilmuwan data, dan penggemar pasar saham yang ingin menganalisis dan memahami tren harga perusahaan-perusahaan terkemuka di industri ini.
 
 Dataset ini memilki data :
 
@@ -79,6 +79,8 @@ Dataset ini memilki data :
 Kami akan menggunakan peubah `Adj Close (Adjusted Close)`, Karena sesuai dengan penjelasan diatas, peubah `Adj Close` adalah yang paling sesuai untuk dianalisis dibandingkan peubah lainnya.
 
 ## NVIDIA
+
+![](images/loxyp6hzr4dufbf8qr_NVDA saham as.png)
 
 Sumber : [finance.yahoo.com](https://finance.yahoo.com/quote/NVDA?p=NVDA){.uri}
 
@@ -457,6 +459,7 @@ summary(nvda.ts)
 ```
 
 ```{r fig.align=, fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300}
+install_load('ggtext')
 min_value <- min(nvda$`Adj Close`)
 min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
 min_perc <- (which.min(nvda$`Adj Close`) / nrow(nvda)) * 100
@@ -531,6 +534,7 @@ Berdasarkan grafik deret waktu yang disajikan, terlihat bahwa dari tahun `2021-2
 ### Seasonal
 
 ```{r, error=TRUE}
+install_load("forecast")
 ggseasonplot(nvda.ts)
 ```
 
@@ -1240,8 +1244,8 @@ plot(c(1:length(sisaan_nvda.da)), sisaan_nvda.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
-pacf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+stats::acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_nvda.da, ylim=c(-.1,.1)) 
 ```
 
 Berdasarkan plot kuantil-kuantil normal, secara eksplorasi ditunjukkan sisaan menyebar **tidak normal** ditandai dengan tititk-titiknya cenderung tidak mengikuti garis $45^{\circ}$. Kemudian dapat dilihat juga lebar pita sisaan yang cenderung sama menandakan bahwa sisaan memiliki **ragam yang homogen**. Plot ACF dan PACF sisaan `ARIMA(0,1,1)` juga tidak signifikan pada 20 lag awal yang menandakan **saling bebas**. Kondisi ini akan diuji lebih lanjut dengan uji formal.
@@ -1263,8 +1267,8 @@ plot(c(1:length(sisaan_nvda.da)), sisaan_nvda.da,
      ylab = "Nilai Sisaan")
 abline(h = 0, col = "firebrick2", lty = 2, lwd=2.5)
 #Plot ACF dan PACF
-acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
-pacf(sisaan_nvda.da, ylim=c(-.1,.1))
+stats::acf(sisaan_nvda.da, ylim=c(-.1,.1)) 
+stats::pacf(sisaan_nvda.da, ylim=c(-.1,.1))
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -1607,10 +1611,70 @@ coef(garchFit11)
 garchFit11
 ```
 
-```{r}
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 res <- garchFit11@fit$residuals
 res.ts <- ts(res)
-plot.ts(res.ts)
+plot.ts(res.ts, col=col.nvda[1])
+```
+
+```{r}
+#GARCH(1,2)
+garchSpec12 <- ugarchspec(
+  variance.model=list(model="sGARCH",
+                      garchOrder=c(1,2)),
+mean.model=list(armaOrder=c(0,2)))
+garchFit12 <- ugarchfit(spec=garchSpec12, data=train_nvda.diff)
+coef(garchFit12)
+```
+
+```{r}
+garchFit12
+```
+
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+res2<-garchFit12@fit$residuals
+res2.ts<-ts(res2)
+plot.ts(res2.ts, col=col.nvda[1])
+```
+
+```{r}
+#GARCH(1,3)
+garchSpec13 <- ugarchspec(
+  variance.model=list(model="sGARCH",
+                      garchOrder=c(1,3)),
+mean.model=list(armaOrder=c(0,2)))
+garchFit13 <- ugarchfit(spec=garchSpec13, data=train_nvda.diff)
+coef(garchFit13)
+```
+
+```{r}
+garchFit13
+```
+
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+res3<-garchFit13@fit$residuals
+res3.ts<-ts(res3)
+plot.ts(res3.ts, col=col.nvda[1])
+```
+
+```{r}
+#GARCH(1,4)
+garchSpec14 <- ugarchspec(
+  variance.model=list(model="sGARCH",
+                      garchOrder=c(1,4)),
+mean.model=list(armaOrder=c(0,2)))
+garchFit14 <- ugarchfit(spec=garchSpec14, data=train_nvda.diff)
+coef(garchFit14)
+```
+
+```{r}
+garchFit14
+```
+
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+res4<-garchFit14@fit$residuals
+res4.ts<-ts(res4)
+plot.ts(res4.ts, col=col.nvda[1])
 ```
 
 # **Peramalan**
