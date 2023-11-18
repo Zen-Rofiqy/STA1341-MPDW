@@ -1595,7 +1595,10 @@ byd.arch <- dynlm(ehatsq ~ L(ehatsq), data = ehatsq)
 summary(byd.arch)
 ```
 
+Kita dapat memeriksa efek ARCH dengan menggunakan fungsi `ArchTest()` dari paket `FinTS`. Kita akan menggunakan tingkat signifikansi $\alpha=0.05$ untuk uji hipotesis nol kita.
+
 ```{r}
+install_load('FinTS')
 lag <- 12
 arch_effect <- data.frame(p.value = numeric(0), 
                           Keterangan = character(0))
@@ -1614,27 +1617,7 @@ datatable(arch_effect, filter = 'top',
           options = list(pageLength = 6))
 ```
 
-> $H_0$ : Lag Tidak signifikan
->
-> $H_1$ : Lag Signifikan
-
 Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* sebesar $0.08$ yang lebih besar dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya Lag 2 Tidak sinifikan, selain itu semua lag nya signifikan. Karena pada saat Lag 2 saja sudah tidak signifikan maka **tidak perlu** dilakukan model GARCH.
-
-```{r}
-ArchTest(sisaan_nvda.da)
-
-if (ArchTest(sisaan_nvda.da)[["p.value"]] < 0.05) {
-  cat("Karena p-value < 0.05, Maka Ada efek ARCH")
-} else {
-  cat("Karena p-value > 0.05, Maka Tidak ada efek ARCH")
-}
-```
-
-> $H_0$ : Tidak ada efek ARCH
->
-> $H_1$ : Ada efek ARCH
-
-Uji LM menunjukkan *p-value* kurang dari taraf nyata $5\%$, yang mengindikasikan bahwa $H_0$ **ditolak**. Oleh karena itu, Hasil `NVDA` menunjukkan adanya **efek ARCH**. Jadi walaupun Lag 2 tidak signifikan, namun Lag lainnya signifikan dan menurut uji ini juga menunjukkan adanya efek ARCH. Maka bisa dilanjutkan ke model GARCH.
 
 ### Model ARCH
 
