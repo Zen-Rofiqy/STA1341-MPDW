@@ -1629,12 +1629,32 @@ summary(arch.fit)
 arch.model <- data.frame(Model = character(0),
                          Signif = numeric(0),
                          AIC = numeric(0),
-                         Keterangan = character(0) )
+                         Sig.par = character(0),
+                         Non_Sig.par = character(0))
 for(i in 1:lag){
   arch.fit <- garchFit(~garch(i,0), data = train_nvda.diff, trace = F)
   aic <- summary(arch.fit)[["ics"]][["AIC"]]
   
 }
+          coef <- coef(arch.fit)
+          # jika lebih kecil dari alpha, maka signifikan
+          sig.param <- 
+            rownames(coef)[coef[, "Pr(>|t|)"] < .05]  
+          
+          # jika lebih besar dari alpha, maka tidak signifikan
+          non_sig.param <- 
+            rownames(coef)[coef[, "Pr(>|t|)"] > .05]  
+          
+          # Keterangan signifikansi
+            Sig.par <- paste(sig.param, collapse = ", ")
+            Non_Sig.par <- paste(non_sig.param, collapse = ", ")
+            
+  arch.model <- rbind(arch.model, 
+      data.frame(Model = ,
+                 Signif = , 
+                 Keterangan = ifelse(p.value < 0.05, 
+                                     "Signifikan", "Tidak signifikan")
+                 ) )
 ```
 
 ## Model GARCH
