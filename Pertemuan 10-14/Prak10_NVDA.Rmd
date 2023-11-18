@@ -1563,7 +1563,8 @@ plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)",
 
 Seperti yang dapat Anda lihat, nilai dari deret ini berubah dengan cepat dari periode ke periode dalam suatu cara yang tampaknya tidak dapat diprediksi, yang dapat kita sebut sebagai volatil. Selain itu, ada periode-periode ketika perubahan besar diikuti oleh perubahan besar berikutnya dan periode di mana perubahan kecil diikuti oleh perubahan kecil berikutnya, merupakan bukti lain dari volatilitas.
 
-**Uji Efek ARCH**
+### Uji Efek ARCH
+
 Uji Langrange multiplier (LM) sering digunakan untuk menguji keberadaan efek ARCH.
 
 Untuk melakukan uji efek ARCH, kita harus
@@ -1628,6 +1629,9 @@ arch.model <- data.frame(Model = character(0),
                          AIC = numeric(0),
                          Sig.par = character(0),
                          Non_Sig.par = character(0))
+best_model <- NULL
+best_sig <- -Inf
+best_aic <- Inf
 for(i in 1:lag){
   formula <- as.formula(paste("~ garch(", i, ",0)", sep = ""))
   arch.fit <- garchFit(formula, data = train_nvda.diff, trace = FALSE)
@@ -1644,13 +1648,23 @@ for(i in 1:lag){
                           (1 - pt(abs(arch.fit@fit[["tval"]]), df)) < 0.05])
     non_sig.param <- names(arch.fit@fit[["tval"]][2 * 
                           (1 - pt(abs(arch.fit@fit[["tval"]]), df)) >= 0.05])
+    model <- paste0("ARCH(",i,")")
   arch.model <- rbind(arch.model, 
-      data.frame(Model = paste0("ARCH(",i,")"),
+      data.frame(Model = model,
                  Signif = sig, 
                  AIC = aic,
                  Sig.par = paste(sig.param, collapse = ", "),
                  Non_Sig.par = paste(non_sig.param, collapse = ", ")
                  ) )
+  
+  #Identifikasi best model
+  if (sig > best_sig) {
+      if (aic < best_aic) {
+        best_model <- model
+        best_sig <- sig
+        best_aic <- aic
+    }
+  }
 }
 ```
 
@@ -1659,7 +1673,13 @@ datatable(arch.model, filter = 'top',
           options = list(pageLength = 6))
 ```
 
-## Model GARCH
+```{r}
+cat("Model terbaik adalah", best_model)
+```
+
+Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya dapat menghasilkan 2 (artinya sisanya menghasilkan NaN) model yakni, **ARCH(1)** dan **ARCH(2)**. Dan diperoleh bahwa **model terbaik** yakni model **ARCH(1)** karena memiliki parameter yang signifikan paling banyak (berdasarkan persentasenya) dan juga nilai AIC yang terkecil.
+
+## GARCH
 
 Untuk **ARIMA(0,1,1)**.
 
