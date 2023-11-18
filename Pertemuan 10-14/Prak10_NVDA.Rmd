@@ -1617,14 +1617,14 @@ datatable(arch_effect, filter = 'top',
           options = list(pageLength = 6))
 ```
 
-Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* sebesar $0.08$ yang lebih besar dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya Lag 2 Tidak sinifikan, selain itu semua lag nya signifikan. Karena pada saat Lag 2 saja sudah tidak signifikan maka **tidak perlu** dilakukan model GARCH.
+Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* sebesar $0.08$ yang lebih besar dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya Lag 2 Tidak sinifikan atau tidak ada efek **ARCH(2)**. Selain Lag 2, Lag nya signifikan. Karena pada saat Lag 2 saja sudah tidak signifikan maka **tidak perlu** dilakukan model GARCH.
 
 ### Model ARCH
 
-Ya untuk berjaga-jaga dan kami ingin membandingkan mana hasil yang terbaik, kami juga mencobakan model ARCH nya.
-
-```{r}
-
+```{r, echo=FALSE}}
+install_load('fGarch')
+arch.fit <- garchFit(~garch(1,0), data = train_nvda.diff, trace = F)
+summary(arch.fit)
 ```
 
 ## Model GARCH
