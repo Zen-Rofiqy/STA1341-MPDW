@@ -1583,7 +1583,7 @@ if (ArchTest(sisaan_nvda.da)[["p.value"]] < 0.05) {
 >
 > $H_1$ : Ada efek ARCH
 
-Uji LM menunjukkan *p-value* kurang dari taraf nyata $5\%$, yang mengindikasikan bahwa $H_0$ **ditolak**. Oleh karena itu, Hasil `NVDA` menunjukkan adanya **efek ARCH**.
+Uji LM menunjukkan *p-value* kurang dari taraf nyata $5\%$, yang mengindikasikan bahwa $H_0$ **ditolak**. Oleh karena itu, Hasil `NVDA` menunjukkan adanya **efek ARCH**. Jadi walaupun Lag 2 tidak signifikan, namun Lag lainnya signifikan dan menurut uji ini juga menunjukkan adanya efek ARCH. Maka akan dilanjutkan ke model GARCH.
 
 ## Model Volatilitas
 
@@ -1591,12 +1591,6 @@ Uji LM menunjukkan *p-value* kurang dari taraf nyata $5\%$, yang mengindikasikan
 #Pendugaan model ARCH/GARCH dengan function garch secara simultan
 nvda.arch1 <- tseries::garch(train_nvda.ts, c(0,1)) #ordo ARCH(1)
 summary(nvda.arch1)
-```
-
-### Plot
-
-```{r fig.align="center", fig.height=7.5, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
-plot(nvda.arch1, ask=FALSE) 
 ```
 
 ## Model GARCH
