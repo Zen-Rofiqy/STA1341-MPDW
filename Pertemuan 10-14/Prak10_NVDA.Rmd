@@ -1637,21 +1637,20 @@ for(i in 1:lag){
   
 }
           coef <- coef(arch.fit)
-          # jika lebih kecil dari alpha, maka signifikan
-          sig.param <- 
-            rownames(coef)[coef[, "Pr(>|t|)"] < .05]  
-          
-          # jika lebih besar dari alpha, maka tidak signifikan
-          non_sig.param <- 
-            rownames(coef)[coef[, "Pr(>|t|)"] > .05]  
-          
-          # Keterangan signifikansi
+          sig.param = 0
+          for(j in 1:(length(coef))){
+            p.value <- 2 * (1 - pt(abs(arch.fit@fit[["tval"]][[j]]), df))
+            if(p.value < .05){
+              sig.param <- sig.param+1
+            } 
+          }
+          sig.param <- sig.param/length(coef)
             Sig.par <- paste(sig.param, collapse = ", ")
             Non_Sig.par <- paste(non_sig.param, collapse = ", ")
             
   arch.model <- rbind(arch.model, 
       data.frame(Model = ,
-                 Signif = , 
+                 Signif = sig.param, 
                  Keterangan = ifelse(p.value < 0.05, 
                                      "Signifikan", "Tidak signifikan")
                  ) )
