@@ -1560,7 +1560,7 @@ for(i in 1:lag){
   rownames(arch_effect)[i] <- paste0("Lag ", i)
 }
 datatable(arch_effect, filter = 'top', 
-          options = list(pageLength = 5))
+          options = list(pageLength = 6))
 ```
 
 > $H_0$ : Lag Tidak signifikan
