@@ -1538,9 +1538,21 @@ $$ \begin{equation} \begin{aligned} \sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u
 
 # Model ARCH-GARCH
 
-Sumber : [Determining The Best Arch/Garch Model And Comparing Jkse With Stock Index In Developed Countries](https://media.neliti.com/media/publications/164845-EN-determining-the-best-archgarch-model-and.pdf){.uri}
+Referensi : [Measuring Volatility Using the ARCH Model](https://rpubs.com/cyobero/arch){.uri}
 
 ## ARCH
+
+**ARCH** merupakan singkatan dari ***A**uto-**R**egressive **C**onditional **T**eteroskedasticity*.
+
+1.  **AutoRegressive (AR):** Ini merujuk pada ide bahwa variansi (**volatilitas**) suatu variabel bergantung pada nilai-nilai **sebelumnya** dalam deret waktu. Dengan kata lain, variabilitas saat ini dipengaruhi oleh nilai-nilai sebelumnya.
+2.  **Conditional (Conditional):** Ini menunjukkan bahwa perhitungan volatilitas dilakukan secara kondisional terhadap informasi sebelumnya dalam deret waktu. Dengan kata lain, variabilitas diukur dengan mempertimbangkan informasi kondisional terkini.
+3.  **Heteroskedasticity:** Ini merujuk pada sifat ketidakseragaman dalam variabilitas. Dalam konteks ARCH, heteroskedasticity menunjukkan bahwa variabilitas suatu variabel tidak konstan, tetapi bervariasi sepanjang waktu berdasarkan informasi kondisional.
+
+Jadi, AutoRegressive Conditional Heteroskedasticity (ARCH) adalah model statistik yang digunakan untuk mengukur dan memodelkan volatilitas dalam deret waktu finansial atau ekonometrik. Model ini mengasumsikan bahwa variabilitas harga atau hasil suatu variabel dapat bervariasi seiring waktu dan dipengaruhi oleh nilai-nilai sebelumnya dalam deret waktu.
+
+**Volatilitas** sendiri merujuk pada tingkat fluktuasi atau variasi harga atau hasil suatu variabel dalam periode waktu tertentu. Volatilitas tinggi menunjukkan fluktuasi yang besar dalam nilai-nilai variabel tersebut, sementara volatilitas rendah menunjukkan fluktuasi yang lebih terbatas. Dalam konteks finansial, volatilitas sering kali dianggap sebagai ukuran risiko, karena fluktuasi harga yang besar dapat menunjukkan ketidakpastian atau risiko yang tinggi.
+
+Untuk memahami model ARCH, mari kita mulai dengan mendiskusikan konsep rata-rata dan varians kondisional dan tak bersyarat dari istilah kesalahan dalam data deret waktu. Pertama, pertimbangkan model auto-regresif **AR(1)**.
 
 ### **Uji Efek ARCH**
 
