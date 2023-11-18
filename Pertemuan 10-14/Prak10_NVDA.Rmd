@@ -1568,7 +1568,7 @@ Uji Langrange multiplier (LM) sering digunakan untuk menguji keberadaan efek ARC
 
 Untuk melakukan uji efek ARCH, kita harus
 
-1.  Mengestimasi persamaan rata-rata yang, dalam contoh ini, adalah $r_t=\beta_0 + e_t$, dimana $r$ =
+1.  Mengestimasi persamaan rata-rata yang, dalam contoh ini, adalah $r_t=\beta_0 + e_t$, dimana $r$ = `train_nvda.diff`
 
 2.  Mendapatkan residual yang diestimasi $e^t$
 
@@ -1581,10 +1581,10 @@ Untuk melakukan uji efek ARCH, kita harus
 >
 > $H_1$ : $\gamma_1 \ne0$ (Ada efek ARCH)
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 install_load('dynlm')
-# Langkah 1: Mengestimasi persamaan rata-rata r = beta + kesalahan
-byd.mean <- dynlm(r ~ 1, data = byd)
+# Langkah 1: Mengestimasi persamaan rata-rata r = beta + error
+byd.mean <- dynlm(train_nvda.diff ~ 1)
 
 # Langkah 2: Mengambil residual dari model sebelumnya dan mengkuadratkannya
 ehatsq <- ts(resid(byd.mean)^2)
