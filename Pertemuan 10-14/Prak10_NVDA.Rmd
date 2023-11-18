@@ -1540,7 +1540,9 @@ $$ \begin{equation} \begin{aligned} \sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u
 
 Sumber : [Determining The Best Arch/Garch Model And Comparing Jkse With Stock Index In Developed Countries](https://media.neliti.com/media/publications/164845-EN-determining-the-best-archgarch-model-and.pdf){.uri}
 
-## **Uji Efek ARCH**
+## ARCH
+
+### **Uji Efek ARCH**
 
 ```{r}
 lag <- 12
@@ -1565,7 +1567,7 @@ datatable(arch_effect, filter = 'top',
 >
 > $H_1$ : Lag Signifikan
 
-Dari Lag 1 sampai Lag 2 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* sebesar $0.08$ yang lebih besar dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya Lag 2 Tidak sinifikan, selain itu semua lag nya signifikan. Karena pada saat Lag 2 saja sudah tidak signifikan maka **tidak perlu** dilakukan model GARCH.
+Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* sebesar $0.08$ yang lebih besar dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya Lag 2 Tidak sinifikan, selain itu semua lag nya signifikan. Karena pada saat Lag 2 saja sudah tidak signifikan maka **tidak perlu** dilakukan model GARCH.
 
 ```{r}
 ArchTest(sisaan_nvda.da)
