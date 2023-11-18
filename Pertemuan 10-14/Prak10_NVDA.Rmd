@@ -1545,16 +1545,55 @@ Referensi : [Measuring Volatility Using the ARCH Model](https://rpubs.com/cyober
 **ARCH** merupakan singkatan dari ***A**uto-**R**egressive **C**onditional **T**eteroskedasticity*.
 
 1.  **AutoRegressive (AR):** Ini merujuk pada ide bahwa variansi (**volatilitas**) suatu variabel bergantung pada nilai-nilai **sebelumnya** dalam deret waktu. Dengan kata lain, variabilitas saat ini dipengaruhi oleh nilai-nilai sebelumnya.
-2.  **Conditional (Conditional):** Ini menunjukkan bahwa perhitungan volatilitas dilakukan secara kondisional terhadap informasi sebelumnya dalam deret waktu. Dengan kata lain, variabilitas diukur dengan mempertimbangkan informasi kondisional terkini.
-3.  **Heteroskedasticity:** Ini merujuk pada sifat ketidakseragaman dalam variabilitas. Dalam konteks ARCH, heteroskedasticity menunjukkan bahwa variabilitas suatu variabel tidak konstan, tetapi bervariasi sepanjang waktu berdasarkan informasi kondisional.
+2.  **Conditional (Conditional):** Ini menunjukkan bahwa perhitungan volatilitas dilakukan secara kondisional terhadap informasi sebelumnya dalam deret waktu. Dengan kata lain, variabilitas diukur dengan mempertimbangkan **informasi kondisional terkini**.
+3.  **Heteroskedasticity:** Ini merujuk pada sifat **ketidakseragaman** (Heterogen/Tidak Homogen) dalam variabilitas. Dalam konteks ARCH, heteroskedasticity menunjukkan bahwa variabilitas suatu variabel tidak konstan, tetapi bervariasi sepanjang waktu berdasarkan informasi kondisional.
 
-Jadi, AutoRegressive Conditional Heteroskedasticity (ARCH) adalah model statistik yang digunakan untuk mengukur dan memodelkan volatilitas dalam deret waktu finansial atau ekonometrik. Model ini mengasumsikan bahwa variabilitas harga atau hasil suatu variabel dapat bervariasi seiring waktu dan dipengaruhi oleh nilai-nilai sebelumnya dalam deret waktu.
+Jadi, AutoRegressive Conditional Heteroskedasticity (ARCH) adalah model statistik yang digunakan untuk **mengukur dan memodelkan volatilitas dalam deret waktu finansial atau ekonometrik**. Model ini mengasumsikan bahwa variabilitas harga atau hasil suatu variabel dapat bervariasi seiring waktu dan dipengaruhi oleh nilai-nilai sebelumnya dalam deret waktu.
 
-**Volatilitas** sendiri merujuk pada tingkat fluktuasi atau variasi harga atau hasil suatu variabel dalam periode waktu tertentu. Volatilitas tinggi menunjukkan fluktuasi yang besar dalam nilai-nilai variabel tersebut, sementara volatilitas rendah menunjukkan fluktuasi yang lebih terbatas. Dalam konteks finansial, volatilitas sering kali dianggap sebagai ukuran risiko, karena fluktuasi harga yang besar dapat menunjukkan ketidakpastian atau risiko yang tinggi.
+> **Volatilitas** sendiri merujuk pada **tingkat fluktuasi** atau variasi harga atau hasil suatu variabel dalam periode waktu tertentu. Volatilitas tinggi menunjukkan fluktuasi yang besar dalam nilai-nilai variabel tersebut, sementara volatilitas rendah menunjukkan fluktuasi yang lebih terbatas. Dalam konteks finansial, volatilitas sering kali dianggap sebagai ukuran risiko, karena fluktuasi harga yang besar dapat menunjukkan ketidakpastian atau risiko yang tinggi.
 
-Untuk memahami model ARCH, mari kita mulai dengan mendiskusikan konsep rata-rata dan varians kondisional dan tak bersyarat dari istilah kesalahan dalam data deret waktu. Pertama, pertimbangkan model auto-regresif **AR(1)**.
+Model ARCH adalah model yang populer karena spesifikasi variansnya dapat menangkap fitur umum dari deret waktu variabel keuangan. Model ini berguna untuk memodelkan **volatilitas** dan khususnya perubahan volatilitas seiring waktu. Mari kita lihat kembali pada plot `NVDA` untuk mengevaluasi volatilitasnya.
 
-### **Uji Efek ARCH**
+```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
+#Plot
+plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
+        col = col.nvda[1], lwd = 2,
+        main="NVDA", cex.main = 2)
+```
+
+Seperti yang dapat Anda lihat, nilai dari deret ini berubah dengan cepat dari periode ke periode dalam suatu cara yang tampaknya tidak dapat diprediksi, yang dapat kita sebut sebagai volatil. Selain itu, ada periode-periode ketika perubahan besar diikuti oleh perubahan besar berikutnya dan periode di mana perubahan kecil diikuti oleh perubahan kecil berikutnya, merupakan bukti lain dari volatilitas.
+
+**Uji Efek ARCH**
+Uji Langrange multiplier (LM) sering digunakan untuk menguji keberadaan efek ARCH.
+
+Untuk melakukan uji efek ARCH, kita harus
+
+1.  Mengestimasi persamaan rata-rata yang, dalam contoh ini, adalah $r_t=\beta_0 + e_t$, dimana $r$ =
+
+2.  Mendapatkan residual yang diestimasi $e^t$
+
+3.  Mengestimasi $\hat{e}^2_t = \gamma_0 + \gamma_1 \hat{e}^2_{t-1} + vt$\
+    dimana $vt$ adalah suatu error acak.
+
+**Hipotesis**
+
+> $H_0$ : $\gamma_1=0$ (Tidak ada efek ARCH)
+>
+> $H_1$ : $\gamma_1 \ne0$ (Ada efek ARCH)
+
+```{r}
+install_load('dynlm')
+# Langkah 1: Mengestimasi persamaan rata-rata r = beta + kesalahan
+byd.mean <- dynlm(r ~ 1, data = byd)
+
+# Langkah 2: Mengambil residual dari model sebelumnya dan mengkuadratkannya
+ehatsq <- ts(resid(byd.mean)^2)
+
+# Langkah 3: Regresikan residual kuadrat pada residual kuadrat yang tertinggal satu lag
+byd.arch <- dynlm(ehatsq ~ L(ehatsq), data = ehatsq)
+
+summary(byd.arch)
+```
 
 ```{r}
 lag <- 12
