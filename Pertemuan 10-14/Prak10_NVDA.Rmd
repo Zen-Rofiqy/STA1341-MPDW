@@ -1595,25 +1595,25 @@ byd.arch <- dynlm(ehatsq ~ L(ehatsq), data = ehatsq)
 summary(byd.arch)
 ```
 
-Kita dapat memeriksa efek ARCH dengan menggunakan fungsi `ArchTest()` dari paket `FinTS`. Kita akan menggunakan tingkat signifikansi $\alpha=0.05$ untuk uji hipotesis nol kita.
+Kita dapat memeriksa efek ARCH dengan menggunakan fungsi `ArchTest()` dari paket `FinTS`. Kita akan menggunakan tingkat signifikansi $\alpha=0.05$ untuk uji hipotesis nol kita. Perlu diperhatikan bahwa `ArchTest()` memiliki default `lags=12`.
 
 ```{r}
 install_load('FinTS')
 lag <- 12
-arch_effect <- data.frame(p.value = numeric(0), 
+arch.effect <- data.frame(p.value = numeric(0), 
                           Keterangan = character(0))
 for(i in 1:lag){
   p.value <- ArchTest(sisaan_nvda.da, lags=i, demean=TRUE)[["p.value"]]
-  arch_effect <- rbind(arch_effect, 
+  arch.effect <- rbind(arch.effect, 
       data.frame(p.value = ifelse(round(p.value, 2) == 0, 
                                   sprintf("%.2e", p.value),
                                   round(p.value, 2) ),
                  Keterangan = ifelse(p.value < 0.05, 
                                      "Signifikan", "Tidak signifikan")
                  ) )
-  rownames(arch_effect)[i] <- paste0("Lag ", i)
+  rownames(arch.effect)[i] <- paste0("Lag ", i)
 }
-datatable(arch_effect, filter = 'top', 
+datatable(arch.effect, filter = 'top', 
           options = list(pageLength = 6))
 ```
 
@@ -1625,6 +1625,16 @@ Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* se
 install_load('fGarch')
 arch.fit <- garchFit(~garch(1,0), data = train_nvda.diff, trace = F)
 summary(arch.fit)
+
+arch.model <- data.frame(Model = character(0),
+                         Signif = numeric(0),
+                         AIC = numeric(0),
+                         Keterangan = character(0) )
+for(i in 1:lag){
+  arch.fit <- garchFit(~garch(i,0), data = train_nvda.diff, trace = F)
+  aic <- summary(arch.fit)[["ics"]][["AIC"]]
+  
+}
 ```
 
 ## Model GARCH
