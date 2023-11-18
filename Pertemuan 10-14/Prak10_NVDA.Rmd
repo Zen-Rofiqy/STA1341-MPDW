@@ -1538,10 +1538,12 @@ $$ \begin{equation} \begin{aligned} \sigma^2_t = &\text{ } \alpha_0 + \alpha_1 u
 
 # Model ARCH-GARCH
 
+Sumber : [Determining The Best Arch/Garch Model And Comparing Jkse With Stock Index In Developed Countries](https://media.neliti.com/media/publications/164845-EN-determining-the-best-archgarch-model-and.pdf){.uri}
+
 ## **Uji Efek ARCH**
 
 ```{r}
-lag <- 30
+lag <- 12
 arch_effect <- data.frame(p.value = numeric(0), 
                           Keterangan = character(0))
 for(i in 1:lag){
@@ -1563,7 +1565,7 @@ datatable(arch_effect, filter = 'top',
 >
 > $H_1$ : Lag Signifikan
 
-Terlihat bahwa Lag 2 memiliki *p-value* sebesar $0.08$ yang lebih besar dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya Lag 2 Tidak sinifikan. Selain itu semua lag nya signifikan.
+Dari Lag 1 sampai Lag 2 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* sebesar $0.08$ yang lebih besar dari taraf nyata $5\%$, sehingga **tolak** $H_0$. Artinya Lag 2 Tidak sinifikan, selain itu semua lag nya signifikan. Karena pada saat Lag 2 saja sudah tidak signifikan maka **tidak perlu** dilakukan model GARCH.
 
 ```{r}
 ArchTest(sisaan_nvda.da)
@@ -1602,11 +1604,14 @@ Untuk **ARIMA(0,1,1)**.
 ```{r}
 #GARCH(1,1)
 garchSpec11 <- ugarchspec(
-  variance.model=list(model="sGARCH",
-                      garchOrder=c(1,1)),
-mean.model=list(armaOrder=c(0,1,1)) )
+  variance.model=list(model="sGARCH", garchOrder=c(1,1)),
+  mean.model=list(armaOrder=c(0,1,1)) )
 garchFit11 <- ugarchfit(spec=garchSpec11, data=train_nvda.diff)
 coef(garchFit11)
+```
+
+```{r}
+AIC(garchFit11)
 ```
 
 ```{r}
