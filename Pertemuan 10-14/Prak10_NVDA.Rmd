@@ -1642,12 +1642,11 @@ for(i in 1:lag){
   aic <- summary(arch.fit)[["ics"]][["AIC"]]
     # persentase banyaknya param yang signif
     coef <- coef(arch.fit)
-    sig <- sum(2 * (1 - pt(abs(arch.fit@fit[["tval"]]), df)) < .05) / length(coef)
+    sig <- sum(arch.fit@fit$matcoef[,4] < .05) / length(coef)
   
-    sig.param <- names(arch.fit@fit[["tval"]][2 * 
-                          (1 - pt(abs(arch.fit@fit[["tval"]]), df)) < 0.05])
-    non_sig.param <- names(arch.fit@fit[["tval"]][2 * 
-                          (1 - pt(abs(arch.fit@fit[["tval"]]), df)) >= 0.05])
+    sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] < 0.05])
+    non_sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] >= 0.05])
+    
     model <- paste0("ARCH(",i,")")
   arch.model <- rbind(arch.model, 
       data.frame(Model = model,
@@ -1723,7 +1722,7 @@ coef(garchFit11)
 ```
 
 ```{r}
-infocriteria(garchFit11)[[1]]
+infocriteria(garchFit11)[[1]] #AIC
 ```
 
 ```{r}
