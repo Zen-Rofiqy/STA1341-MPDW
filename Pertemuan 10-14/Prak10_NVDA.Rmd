@@ -1252,6 +1252,16 @@ datatable(model.tentaif_nvda, filter = 'top',
 
 Terlihat bahwa model `ARIMA(0,1,2)` memiliki **AIC** yang lebih besar dan tidak semua parameternya signifikan. Sehingga tetap model terbaiknya adalah `ARIMA(0,1,1)`.
 
+```{r}
+arima.best_model_nvda <- model_nvda.da
+
+arima.order <- c(
+  arima.best_model_nvda[["call"]][["order"]][[2]],
+  arima.best_model_nvda[["call"]][["order"]][[3]],
+  arima.best_model_nvda[["call"]][["order"]][[4]]
+)
+```
+
 # **Analisis Sisaan**
 
 Model terbaik hasil identifikasi kemudian dicek asumsi sisaannya. Sisaan model ARIMA harus memenuhi asumsi normalitas, kebebasan sisaan, dan kehomogenan ragam. Diagnostik model dilakukan secara eksplorasi dan uji formal.
@@ -1652,6 +1662,10 @@ Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* se
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results = FALSE}
 install_load('fGarch')
+
+arch.garc <- function(data, pp, qq=0, arima.order=c(0,0,0) ){
+  
+}
 arch.model <- data.frame(Model = character(0),
                          Signif = numeric(0),
                          AIC = numeric(0),
@@ -1660,6 +1674,9 @@ arch.model <- data.frame(Model = character(0),
 best_model <- NULL
 best_sig <- -Inf
 best_aic <- Inf
+
+
+
 for(i in 1:lag){
   formula <- as.formula(paste("~ garch(", i, ",0)", sep = ""))
   arch.fit <- garchFit(formula, data = train_nvda.diff, trace = FALSE)
@@ -1695,6 +1712,98 @@ for(i in 1:lag){
     }
   }
 }
+```
+
+```{r}
+library(rugarch)
+
+arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
+  arch.model <- data.frame(Model = character(0),
+                            Signif = numeric(0),
+                            AIC = numeric(0),
+                            Sig.par = character(0),
+                            Non_Sig.par = character(0))
+  
+  best_model <- NULL
+  best_sig <- -Inf
+  best_aic <- Inf
+  
+  create_spec <- function(i, j) {
+    return(ugarchspec(
+      variance.model = list(model = "sGARCH", garchOrder = c(i, j)),
+      mean.model = list(armaOrder = arima.order)
+    ))
+  }
+  
+  for (i in 1:pp) {
+    if (qq == 0) {
+      # ARCH model
+      formula <- as.formula(paste("~ garch(", i, ",0)", sep = ""))
+      archSpec <- create_spec(i, 0)
+    } else {
+      for (j in 1:qq) {
+        # GARCH model
+        formula <- as.formula(paste("~ garch(", i, ",", j, ")", sep = ""))
+        archSpec <- create_spec(i, j)
+      }
+    }
+    
+    archFit <- ugarchfit(spec = archSpec, data = data, solver = "hybrid")
+    
+    if (anyNA(coef(archFit)) || anyNA(archFit@fit[["tval"]])) {
+      break
+    }
+    
+    aic <- summary(archFit)[["ics"]][["AIC"]]
+    
+    # persentase banyaknya param yang signif
+    coef_values <- coef(archFit)
+    
+    # Cek Pvalue yang < 0.05
+    sig <- sum(archFit@fit$matcoef[, 4] < 0.05) / length(coef_values)
+    
+    sig_param <- names(archFit@fit[["tval"]][archFit@fit$matcoef[, 4] < 0.05])
+    non_sig_param <- names(archFit@fit[["tval"]][archFit@fit$matcoef[, 4] >= 0.05])
+    
+    model <- ifelse(qq == 0, paste0("ARCH(", i, ")"), paste0("GARCH(", i, ",", j, ")"))
+    
+    arch.model <- rbind(
+      arch.model,
+      data.frame(
+        Model = model,
+        Signif = sig,
+        AIC = aic,
+        Sig.par = paste(sig_param, collapse = ", "),
+        Non_Sig.par = paste(non_sig_param, collapse = ", ")
+      )
+    )
+    
+    # Identifikasi best model
+    if (sig > best_sig) {
+      if (aic < best_aic) {
+        best_model <- model
+        best_sig <- sig
+        best_aic <- aic
+      }
+    }
+  }
+  
+  if (qq == 0) {
+    return(list(arch.model = arch.model, best_model = best_model))
+  } else {
+    return(list(arch.model = arch.model))
+  }
+}
+
+
+
+```
+
+```{r}
+# Contoh penggunaan
+result <- arch.garch(data = train_nvda.diff, pp = 3, qq = 2, arima.order = c(0, 1, 1))
+print(result$arch.model)
+print(paste("Best Model:", result$best_model))
 ```
 
 ```{r}
@@ -1746,7 +1855,7 @@ Ya walaupun diatas sudah dijelaskan "tidak usah melanjutkan ke garch", tapi kami
 #GARCH(1,1)
 garchSpec11 <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,0)),
-  mean.model=list(armaOrder=c(0,1,1)) )
+  mean.model=list(armaOrder = arima.order) )
 garchFit11 <- ugarchfit(spec=garchSpec11, data=train_nvda.diff)
 coef(garchFit11)
 ```
