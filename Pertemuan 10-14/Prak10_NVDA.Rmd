@@ -1014,7 +1014,7 @@ Berdasarkan plot tersebut, terlihat bahwa plot ACF cut off pada lag 0. Sedangkan
 
 Referensi : [[University of South Carolina] Chapter 6: Model Specification for Time Series](https://people.stat.sc.edu/hitchcock/stat520ch6slides.pdf){.uri}
 
-> Mengutip dari referensi diatas, Identifikasi model menggunakan Tabel EACF (Extended Autocorrelation Function) untuk proses ARMA(p, q) seharusnya secara teoritis memiliki **pola segitiga nol**, dengan nol di sudut kiri atas muncul pada baris ke-p dan kolom ke-q (dengan label baris dan kolom dimulai dari 0).
+> Mengutip dari referensi diatas, Identifikasi model menggunakan Tabel EACF (Extended Autocorrelation Function) untuk proses ARMA(p, q) seharusnya secara teoritis memiliki **pola segitiga nol**, dengan nol di sudut kiri atas muncul pada baris ke-p dan kolom ke-q (dengan label baris dan kolom dimulai dari 0). Pola segitiga ini merupakan pola segitiga pertama dari setiap baris.
 
 Sebagai contoh :
 
@@ -1022,7 +1022,7 @@ Sebagai contoh :
 
 Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
-Pemilihan model ARIMA terbaik dilakukan ketika memiliki nilai **AIC** yang terkecil, **Semua Parameter Signifikan**, dan **Tidak ada Parameter NA**.
+Pemilihan model ARIMA terbaik dilakukan ketika memiliki nilai **AIC** yang terkecil, **Semua Parameter Signifikan**, dan **Tidak ada Parameter NA**. Kami akan mencoba untuk menggunakan function pemodelam model ARIMA berdasarkan tabel EACF. Namun dengan melakukan 2 pemodelan perbaris AR(p) nya, agar sekalian overfitting.
 
 ```{r message=FALSE, warning=FALSE}
 install_load('TSA', 'forecast')
@@ -1038,6 +1038,7 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
                        Keterangan = character(0))
   
   for (p in 0:p_max) {
+    overfit <- 0
     for (q in 1:q_max) {
       #Pola Matriks segitiga bawah
       if (!is.na(eacf_result$symbol[p + 1, q ]) && 
@@ -1088,7 +1089,9 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
                 best_aic <- aic
             }
           }
-          break #jika model ditemukan pada baris p. Maka lanjut ke p+1
+          #jika model ditemukan pada baris p. Maka lanjut ke p+1
+          if(overfit >= 1) break
+          overfit = overfit + 1
         }
       }
     }
@@ -1109,6 +1112,10 @@ datatable(model.tentaif_nvda, filter = 'top',
 ```
 
 Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-8917.35$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+
+```{r}
+model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
+```
 
 ## Model ARIMA dengan Drift
 
@@ -1223,6 +1230,14 @@ datatable(best_model, filter = 'top',
 ```
 
 Terlihat bahwa model paling terbaik adalah model tentatif tanpa kombinasi drift. Sangat disayangkan, dari 4 kombinasi drift yang ada, hanya kombinasi 1 yang memiliki kategori model terbaik. Sehingga model yang akan digunakan adalah `model_nvda.da`.
+
+## Overfitting
+
+Overfitting dilakukan dilakukan dengan menaikkan orde **AR(p)** dan **MA(q)** dari model terpilih `ARIMA(0,1,1)` untuk melihat apakah terdapat model lain yang lebih baik dari model saat ini. Kandidat model overfitting adalah `ARIMA(1,1,1)` dan `ARIMA(0,1,2)`.
+
+```{r}
+
+```
 
 # **Analisis Sisaan**
 
@@ -1717,7 +1732,7 @@ Ya walaupun diatas sudah dijelaskan "tidak usah melanjutkan ke garch", tapi kami
 ```{r message=FALSE, warning=FALSE}
 #GARCH(1,1)
 garchSpec11 <- ugarchspec(
-  variance.model=list(model="sGARCH", garchOrder=c(1,1)),
+  variance.model=list(model="sGARCH", garchOrder=c(1,0)),
   mean.model=list(armaOrder=c(0,1,1)) )
 garchFit11 <- ugarchfit(spec=garchSpec11, data=train_nvda.diff)
 coef(garchFit11)
