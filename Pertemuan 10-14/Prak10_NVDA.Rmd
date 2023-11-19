@@ -1713,7 +1713,7 @@ Referensi : [GARCH models with R programming : a practical example with TESLA st
 
 Untuk **ARIMA(0,1,1)**.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 #GARCH(1,1)
 garchSpec11 <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,1)),
