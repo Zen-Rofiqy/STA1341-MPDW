@@ -1712,7 +1712,7 @@ dev.off() # Menutup file PNG
 
 Referensi : [GARCH models with R programming : a practical example with TESLA stock](https://www.idrisstsafack.com/post/garch-models-with-r-programming-a-practical-example-with-tesla-stock){.uri}
 
-Model terbaik dari **GARCH(p,q)** ditentukan dari banyaknya paramter yang signifikan dan AIC nya yang terkecil.
+Ya walaupun diatas sudah dijelaskan "tidak usah melanjutkan ke garch", tapi kami hanya ingin mencoba. "Apa yang terjadi jika kita tetap melakukan model GARCH?". Model terbaik dari **GARCH(p,q)** ditentukan dari banyaknya paramter yang signifikan dan AIC nya yang terkecil.
 
 ```{r message=FALSE, warning=FALSE}
 #GARCH(1,1)
