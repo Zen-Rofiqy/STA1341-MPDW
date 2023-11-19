@@ -1235,9 +1235,22 @@ Terlihat bahwa model paling terbaik adalah model tentatif tanpa kombinasi drift.
 
 Overfitting dilakukan dilakukan dengan menaikkan orde **AR(p)** dan **MA(q)** dari model terpilih `ARIMA(0,1,1)` untuk melihat apakah terdapat model lain yang lebih baik dari model saat ini. Kandidat model overfitting adalah `ARIMA(1,1,1)` dan `ARIMA(0,1,2)`.
 
-```{r}
+Perlu diingat bahwa sebelumnya saya menjelaskan bahwa fungsi `model_tentatif` yang kami buat itu sudah sekaligus overfitting, dan itu juga sudah membandingkan mana model terbaiknya. Sehingga sebenarnya tidak perlu dilakukan overfitting. Namun saya akan tunjukkan kembali.
 
+Sebelum itu, kita perlu melihat pula tabel EACF nya. "Apakah overfitting bisa dilakukan berdasarkan tabel EACF?".
+
+```{r}
+eacf(train_nvda.diff)
 ```
+
+Berdasarkan tabel EACF, model `ARIMA(1,1,1)` tidak dapat dilakukan. Sehingga overfitting yang dapat dilakukan hanya `ARIMA(0,1,2)` . Dan berdasarkan hasil dari fungsi `model_tentatif` sebelumnya sudah ditunjukkan bahwa model `ARIMA(0,1,2)` tidak jauh lebih baik daripada `ARIMA(0,1,1)`. Berikut saya tunjukkan kembali.
+
+```{r}
+datatable(model.tentaif_nvda, filter = 'top', 
+          options = list(pageLength = 2))
+```
+
+Terlihat bahwa model `ARIMA(0,1,2)` memiliki **AIC** yang lebih besar dan tidak semua parameternya signifikan. Sehingga tetap model terbaiknya adalah `ARIMA(0,1,1)`.
 
 # **Analisis Sisaan**
 
