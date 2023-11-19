@@ -1598,7 +1598,7 @@ summary(byd.arch)
 
 Kita dapat memeriksa efek ARCH dengan menggunakan fungsi `ArchTest()` dari paket `FinTS`. Kita akan menggunakan tingkat signifikansi $\alpha=0.05$ untuk uji hipotesis nol kita. Perlu diperhatikan bahwa `ArchTest()` memiliki default `lags=12`.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 install_load('FinTS')
 lag <- 12
 arch.effect <- data.frame(p.value = numeric(0), 
@@ -1640,8 +1640,10 @@ for(i in 1:lag){
     break
   }
   aic <- summary(arch.fit)[["ics"]][["AIC"]]
+  
     # persentase banyaknya param yang signif
     coef <- coef(arch.fit)
+    #Cek Pvalue yang < 0.05
     sig <- sum(arch.fit@fit$matcoef[,4] < .05) / length(coef)
   
     sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] < 0.05])
@@ -1710,7 +1712,7 @@ dev.off() # Menutup file PNG
 
 Referensi : [GARCH models with R programming : a practical example with TESLA stock](https://www.idrisstsafack.com/post/garch-models-with-r-programming-a-practical-example-with-tesla-stock){.uri}
 
-Untuk **ARIMA(0,1,1)**.
+Model terbaik dari **GARCH(p,q)** ditentukan dari banyaknya paramter yang signifikan dan AIC nya yang terkecil.
 
 ```{r message=FALSE, warning=FALSE}
 #GARCH(1,1)
@@ -1721,8 +1723,58 @@ garchFit11 <- ugarchfit(spec=garchSpec11, data=train_nvda.diff)
 coef(garchFit11)
 ```
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE, results = FALSE}
 infocriteria(garchFit11)[[1]] #AIC
+garchFit11@fit$robust.matcoef[,4] #P.Value
+
+garch.model <- data.frame(Model = character(0),
+                          Signif = numeric(0),
+                          AIC = numeric(0),
+                          Sig.par = character(0),
+                          Non_Sig.par = character(0))
+best_model <- NULL
+best_sig <- -Inf
+best_aic <- Inf
+for(i in 1:lag){
+  formula <- as.formula(paste("~ garch(", i, ",0)", sep = ""))
+  arch.fit <- garchFit(formula, data = train_nvda.diff, trace = FALSE)
+  
+garchSpec <- ugarchspec(
+  variance.model=list(model="sGARCH", garchOrder=c(1,1)),
+  mean.model=list(armaOrder=c(0,1,1)) )
+garchFit <- ugarchfit(spec=garchSpec, data=train_nvda.diff)
+  
+  if (anyNA(coef(arch.fit)) || anyNA(arch.fit@fit[["tval"]])) {
+    break
+  }
+  aic <- summary(arch.fit)[["ics"]][["AIC"]]
+  
+    # persentase banyaknya param yang signif
+    coef <- coef(arch.fit)
+    #Cek Pvalue yang < 0.05
+    sig <- sum(arch.fit@fit$matcoef[,4] < .05) / length(coef)
+  
+    sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] < 0.05])
+    non_sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] >= 0.05])
+    
+    model <- paste0("ARCH(",i,")")
+  garch.model <- rbind(arch.model, 
+      data.frame(Model = model,
+                 Signif = sig, 
+                 AIC = aic,
+                 Sig.par = paste(sig.param, collapse = ", "),
+                 Non_Sig.par = paste(non_sig.param, collapse = ", ")
+                 ) )
+  
+  #Identifikasi best model
+  if (sig > best_sig) {
+      if (aic < best_aic) {
+        best_model <- model
+        best_sig <- sig
+        best_aic <- aic
+    }
+  }
+}
 ```
 
 ```{r}
