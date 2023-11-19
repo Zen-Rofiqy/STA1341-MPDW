@@ -1709,6 +1709,8 @@ dev.off() # Menutup file PNG
 
 ## GARCH
 
+Referensi : [GARCH models with R programming : a practical example with TESLA stock](https://www.idrisstsafack.com/post/garch-models-with-r-programming-a-practical-example-with-tesla-stock){.uri}
+
 Untuk **ARIMA(0,1,1)**.
 
 ```{r}
