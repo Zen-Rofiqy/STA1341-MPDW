@@ -1723,7 +1723,7 @@ coef(garchFit11)
 ```
 
 ```{r}
-AIC(garchFit11)
+infocriteria(garchFit11)[[1]]
 ```
 
 ```{r}
