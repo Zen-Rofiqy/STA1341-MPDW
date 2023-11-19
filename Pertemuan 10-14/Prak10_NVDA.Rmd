@@ -1735,43 +1735,45 @@ garch.model <- data.frame(Model = character(0),
 best_model <- NULL
 best_sig <- -Inf
 best_aic <- Inf
-for(i in 1:lag){
-  formula <- as.formula(paste("~ garch(", i, ",0)", sep = ""))
-  arch.fit <- garchFit(formula, data = train_nvda.diff, trace = FALSE)
-  
-garchSpec <- ugarchspec(
-  variance.model=list(model="sGARCH", garchOrder=c(1,1)),
-  mean.model=list(armaOrder=c(0,1,1)) )
-garchFit <- ugarchfit(spec=garchSpec, data=train_nvda.diff)
-  
-  if (anyNA(coef(arch.fit)) || anyNA(arch.fit@fit[["tval"]])) {
-    break
-  }
-  aic <- summary(arch.fit)[["ics"]][["AIC"]]
-  
-    # persentase banyaknya param yang signif
-    coef <- coef(arch.fit)
-    #Cek Pvalue yang < 0.05
-    sig <- sum(arch.fit@fit$matcoef[,4] < .05) / length(coef)
-  
-    sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] < 0.05])
-    non_sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] >= 0.05])
+for(p in 1:lag){
+  for(q in 1:lag){
+    formula <- as.formula(paste("~ garch(", p, ",0)", sep = ""))
+    arch.fit <- garchFit(formula, data = train_nvda.diff, trace = FALSE)
     
-    model <- paste0("ARCH(",i,")")
-  garch.model <- rbind(arch.model, 
-      data.frame(Model = model,
-                 Signif = sig, 
-                 AIC = aic,
-                 Sig.par = paste(sig.param, collapse = ", "),
-                 Non_Sig.par = paste(non_sig.param, collapse = ", ")
-                 ) )
-  
-  #Identifikasi best model
-  if (sig > best_sig) {
-      if (aic < best_aic) {
-        best_model <- model
-        best_sig <- sig
-        best_aic <- aic
+    garchSpec <- ugarchspec(
+      variance.model=list(model="sGARCH", garchOrder=c(p,q)),
+      mean.model=list(armaOrder=c(0,1,1)) )
+    garchFit <- ugarchfit(spec=garchSpec, data=train_nvda.diff)
+    
+    if (anyNA(coef(arch.fit)) || anyNA(arch.fit@fit[["tval"]])) {
+      break
+    }
+    aic <- summary(arch.fit)[["ics"]][["AIC"]]
+    
+      # persentase banyaknya param yang signif
+      coef <- coef(arch.fit)
+      #Cek Pvalue yang < 0.05
+      sig <- sum(arch.fit@fit$matcoef[,4] < .05) / length(coef)
+    
+      sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] < 0.05])
+      non_sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] >= 0.05])
+      
+      model <- paste0("ARCH(",p,")")
+    garch.model <- rbind(arch.model, 
+        data.frame(Model = model,
+                   Signif = sig, 
+                   AIC = aic,
+                   Sig.par = paste(sig.param, collapse = ", "),
+                   Non_Sig.par = paste(non_sig.param, collapse = ", ")
+                   ) )
+    
+    #Identifikasi best model
+    if (sig > best_sig) {
+        if (aic < best_aic) {
+          best_model <- model
+          best_sig <- sig
+          best_aic <- aic
+      }
     }
   }
 }
