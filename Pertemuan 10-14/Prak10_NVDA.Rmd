@@ -861,7 +861,7 @@ Setelah melalui proses transformasi, gambar dan tabel di atas mengindikasikan ba
 train_nvda.diff <- diff(train_nvda.ts.new, differences = 1) 
 
 #Plot
-plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
+plot.ts(train_nvda.diff, lty=1, xlab="Periode (Hari)", 
         col = col.nvda[1], lwd = 2,
         main="NVDA", cex.main = 2)
 ```
@@ -874,7 +874,7 @@ png(paste(export.chart, "/03_Stas_4_Diff.png", sep=""),
     height = 6*300, width = 12*300, res=300)
 
 # Plot 
-plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
+plot.ts(train_nvda.diff, lty=1, xlab="Periode (Hari)", 
         col = col.nvda[1], lwd = 2,
         main="NVDA", cex.main = 2)
 
@@ -1556,7 +1556,7 @@ Model ARCH adalah model yang populer karena spesifikasi variansnya dapat menangk
 
 ```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
 #Plot
-plot.ts(train_nvda.diff, lty=1, xlab="Periode (Tahun)", 
+plot.ts(train_nvda.diff, lty=1, xlab="Periode (Hari)", 
         col = col.nvda[1], lwd = 2,
         main="NVDA", cex.main = 2)
 ```
@@ -1678,6 +1678,34 @@ cat("Model terbaik adalah", best_model)
 ```
 
 Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya dapat menghasilkan 2 (artinya sisanya menghasilkan NaN) model yakni, **ARCH(1)** dan **ARCH(2)**. Dan diperoleh bahwa **model terbaik** yakni model **ARCH(1)** karena memiliki parameter yang signifikan paling banyak (berdasarkan persentasenya) dan juga nilai AIC yang terkecil.
+
+```{r}
+model.arch_nvda <- garchFit(~garch(1,0), data = train_nvda.diff, trace = F)
+```
+
+### Plot
+
+```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
+plot.ts(model.arch_nvda@h.t, lty=1, xlab="Periode (Hari)", ylab="Conditional Variance",
+        col = col.nvda[1], lwd = 2,
+        main="ARCH(1) NVDA", cex.main = 2)
+```
+
+Terlihat bahwa ada periode-periode yang volatilitas nya tinggi.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/05_Arch(1)_NVDA.png", sep=""),
+    height = 6*300, width = 12*300, res=300)
+
+# Plot 
+plot.ts(model.arch_nvda@h.t, lty=1, xlab="Periode (Hari)", ylab="Conditional Variance",
+        col = col.nvda[1], lwd = 2,
+        main="ARCH(1) NVDA", cex.main = 2)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
 
 ## GARCH
 
