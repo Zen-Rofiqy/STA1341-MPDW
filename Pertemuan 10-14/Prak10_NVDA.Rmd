@@ -1818,27 +1818,29 @@ Diperoleh mean model yaitu **ARIMA(0,1,1)** dan varian model yaitu **ARCH(1)** u
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/05_Arch_NVDA.png", sep=""),
-    height = 6*300, width = 12*300, res=300)
+png(paste(export.chart, "/05_Arch-All_NVDA.png", sep=""),
+    height = 9*300, width = 16*300, res=300)
 
 # Plot 
-plot.ts(ts(model.arch_nvda@fit$residuals), col=col.nvda[1], lty=1, 
-        xlab="Periode (Hari)", ylab="Conditional Variance",
-        lwd = 2, main="ARIMA(0,1,1)-ARCH(1) NVDA", cex.main = 1.5)
+plot(model.arch_nvda, which="all")
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
 ```
 
-## **Peramalan dengan Model ARIMA(0,1,2)-GARCH(1,2)**
+## **Peramalan dengan Model ARIMA(0,1,1)+ARCH(1)**
 
 ```{r}
-forc = ugarchforecast(m.12, data = train_nvda.diff, n.ahead = 10, n.roll =10)
-print(forc)
+forc = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
+                      n.ahead = nrow(test_nvda))
 ```
 
-```{r fig.align="center", fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
-plot(forc, which= "all")
+```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
+plot(forc, which= 1)
+```
+
+```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
+plot.ts(y = forc@forecast[["sigmaFor"]], x = forc@forecast[["seriesFor"]])
 ```
 
 pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilihat pada plot diatas menunjukkan bahwa hasil ramalan bernilai sama sehingga membentuk garis lurus.
@@ -1848,8 +1850,10 @@ pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilih
 Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk $h$ hari ke depan. Dengan $h$ adalah banyaknya data test per perusahaan.
 
 ```{r}
-#---FORECAST---#
+#Ramal ARIMA
 ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = nrow(test_nvda)) 
+#Ramal ARIMA ARCH
+ramalan_nvda.da <- forecast::forecast(model.arch_nvda, h = nrow(test_nvda)) 
 ```
 
 ## Plot Ramalan
