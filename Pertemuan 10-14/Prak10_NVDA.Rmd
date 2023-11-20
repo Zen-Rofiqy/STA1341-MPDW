@@ -1806,78 +1806,8 @@ cat("Best Model:", model.garch$best_model)
 
 Terlihat bahwa memang data tidak cocok untuk model **GARCH(p,q)** karena dari rentang lag 1 sampai 12 yang dihasilkan model terbaiknya adalah **GARCH(12,12).** Namun jika pada modelnya, hanya persentase signifikannya sangat kecil. Sehingga tidak mungin untuk dijadikan model terbaik.
 
-```{r}
-garchFit13
-```
 
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
-res3<-garchFit13@fit$residuals
-res3.ts<-ts(res3)
-plot.ts(res3.ts, col=col.nvda[1])
-```
 
-```{r}
-#GARCH(1,4)
-garchSpec14 <- ugarchspec(
-  variance.model=list(model="sGARCH",
-                      garchOrder=c(1,4)),
-mean.model=list(armaOrder=c(0,2)))
-garchFit14 <- ugarchfit(spec=garchSpec14, data=train_nvda.diff)
-coef(garchFit14)
-```
-
-```{r}
-garchFit14
-```
-
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
-res4<-garchFit14@fit$residuals
-res4.ts<-ts(res4)
-plot.ts(res4.ts, col=col.nvda[1])
-```
-
-```{r}
-#GARCH(2,1)
-garchSpec21 <- ugarchspec(
-  variance.model=list(model="sGARCH",
-                      garchOrder=c(2,1)),
-mean.model=list(armaOrder=c(0,2)))
-garchFit21 <- ugarchfit(spec=garchSpec21, data=train_nvda.diff)
-coef(garchFit21)
-```
-
-```{r}
-garchFit21
-```
-
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
-res21<-garchFit21@fit$residuals
-res21.ts<-ts(res21)
-plot.ts(res21.ts, col=col.nvda[1])
-```
-
-### UJI DIAGNOSTIK GARCH(1,2)
-
-```{r message=FALSE, warning=FALSE}
-nvda.garch12 <- garch(train_nvda.ts, c(1,2)) #ordo ARCH(1)
-```
-
-```{r}
-summary(nvda.garch12)
-```
-
-```{r fig.align="center", fig.height=7.5, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
-#str(sbydarch)
-plot(nvda.garch12, ask=FALSE) 
-```
-
-### **Model GARCH(1,2)**
-
-```{r}
-# GARCH(1,2)
-m.12 = garch(train_nvda.diff, order=c(1,2), trace =FALSE)
-summary(m.12)
-```
 
 ### **MODEL ARIMA(0,1,2)-GARCH(1,2)**
 
