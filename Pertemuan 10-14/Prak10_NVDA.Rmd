@@ -1257,7 +1257,6 @@ arima.best_model_nvda <- model_nvda.da
 
 arima.order <- c(
   arima.best_model_nvda[["call"]][["order"]][[2]],
-  arima.best_model_nvda[["call"]][["order"]][[3]],
   arima.best_model_nvda[["call"]][["order"]][[4]]
 )
 ```
@@ -1660,67 +1659,13 @@ Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* se
 
 ### Model ARCH
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results = FALSE}
-install_load('fGarch')
+```{r message=FALSE, warning=FALSE}
+install_load('rugarch')
 
-arch.garc <- function(data, pp, qq=0, arima.order=c(0,0,0) ){
-  
-}
-arch.model <- data.frame(Model = character(0),
-                         Signif = numeric(0),
-                         AIC = numeric(0),
-                         Sig.par = character(0),
-                         Non_Sig.par = character(0))
-best_model <- NULL
-best_sig <- -Inf
-best_aic <- Inf
-
-
-
-for(i in 1:lag){
-  formula <- as.formula(paste("~ garch(", i, ",0)", sep = ""))
-  arch.fit <- garchFit(formula, data = train_nvda.diff, trace = FALSE)
-  
-  if (anyNA(coef(arch.fit)) || anyNA(arch.fit@fit[["tval"]])) {
-    break
-  }
-  aic <- summary(arch.fit)[["ics"]][["AIC"]]
-  
-    # persentase banyaknya param yang signif
-    coef <- coef(arch.fit)
-    #Cek Pvalue yang < 0.05
-    sig <- sum(arch.fit@fit$matcoef[,4] < .05) / length(coef)
-  
-    sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] < 0.05])
-    non_sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] >= 0.05])
-    
-    model <- paste0("ARCH(",i,")")
-  arch.model <- rbind(arch.model, 
-      data.frame(Model = model,
-                 Signif = sig, 
-                 AIC = aic,
-                 Sig.par = paste(sig.param, collapse = ", "),
-                 Non_Sig.par = paste(non_sig.param, collapse = ", ")
-                 ) )
-  
-  #Identifikasi best model
-  if (sig > best_sig) {
-      if (aic < best_aic) {
-        best_model <- model
-        best_sig <- sig
-        best_aic <- aic
-    }
-  }
-}
-```
-
-```{r}
-library(rugarch)
-
-create_spec <- function(i, j, arima_order) {
+create_spec <- function(i, j, arma_order) {
   return(ugarchspec(
     variance.model = list(model = "sGARCH", garchOrder = c(i, j)),
-    mean.model = list(armaOrder = arima_order, 
+    mean.model = list(armaOrder = arma_order, 
               #model tidak harus memasukkan komponen rata-rata (intercept)
                       include.mean = FALSE)
   ))
@@ -1802,7 +1747,7 @@ arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
 
 ```{r}
 # Contoh penggunaan
-model.arch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arima.order = c(0, 1, 1))
+model.arch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arma.order = c(0, 1))
 datatable(model.arch$arch.model, filter = 'top', 
           options = list(pageLength = 6))
 ```
@@ -1811,7 +1756,7 @@ datatable(model.arch$arch.model, filter = 'top',
 cat("Best Model:", model.arch$best_model)
 ```
 
-Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya dapat menghasilkan 2 (artinya sisanya menghasilkan NaN) model yakni, **ARCH(1)** dan **ARCH(2)**. Dan diperoleh bahwa **model terbaik** yakni model **ARCH(1)** karena memiliki parameter yang signifikan paling banyak (berdasarkan persentasenya) dan juga nilai AIC yang terkecil.
+Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model yang semua parameternya signifikan yakni **ARCH(1).** Karena itu tidak perlu membandingkan nilai **AIC**. Sehingga model terbaik adalah **ARIMA(0,1,1)-ARCH(1).**
 
 ```{r}
 model.arch_nvda <- garchFit(~garch(1,0), data = train_nvda.diff, trace = F)
