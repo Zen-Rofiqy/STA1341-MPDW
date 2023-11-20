@@ -1481,76 +1481,6 @@ Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* se
 
 ```{r message=FALSE, warning=FALSE}
 install_load('rugarch')
-arch.garch <- function(data, pp, qq = 0, arma.order = c(0, 0)) {
-  arch.model <- data.frame(Model = character(0),
-                            Signif = numeric(0),
-                            AIC = numeric(0),
-                            Sig.par = character(0),
-                            Non_Sig.par = character(0))
-  best_model <- NULL
-
-  for (i in 1:pp) {
-    for (j in 0:qq) {
-      # Buat spesifikasi model GARCH
-      spec <- ugarchspec(
-        variance.model = list(model = "sGARCH", garchOrder = ifelse(j == 0, c(i, 0), c(i, j))),
-        mean.model = list(armaOrder = arma.order)
-      )
-
-      # Buat model GARCH
-      archFit <- ugarchfit(spec = spec, data = data, solver = "hybrid")
-
-      if (anyNA(coef(archFit)) || anyNA(archFit@fit[["tval"]])) {
-        next
-      }
-
-      # Perhitungan AIC
-      aic <- infocriteria(archFit)[[1]]
-      # P-value
-      p_values <- archFit@fit$robust.matcoef[, 4]
-      # Persentase banyaknya parameter yang signifikan
-      sig <- sum(p_values < 0.05) / length(p_values)
-
-      sig_param <- names(p_values[p_values < 0.05])
-      non_sig_param <- names(p_values[p_values >= 0.05])
-
-      # Model name
-      model <- if (j == 0) {
-        paste0("ARCH(", i, ")")
-      } else {
-        paste0("GARCH(", i, ",", j, ")")
-      }
-
-      # Masukkan ke data frame
-      arch.model <- rbind(
-        arch.model,
-        data.frame(
-          Model = model,
-          Signif = sig,
-          AIC = aic,
-          Sig.par = paste(sig_param, collapse = ", "),
-          Non_Sig.par = paste(non_sig_param, collapse = ", ")
-        )
-      )
-
-      # Identifikasi best model
-      if (is.null(best_model) || sig > arch.model$Signif[best_model] || (sig == arch.model$Signif[best_model] && aic < arch.model$AIC[best_model])) {
-        best_model <- nrow(arch.model)
-      }
-    }
-  }
-
-  result <- list(
-    arch.model = arch.model,
-    best_model = arch.model$Model[best_model]
-  )
-  return(result)
-}
-
-```
-
-```{r message=FALSE, warning=FALSE}
-install_load('rugarch')
 
 create_spec <- function(i, j, arma_order) {
   return(ugarchspec(
@@ -1646,7 +1576,7 @@ Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model
 ```{r}
 archSpec <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,0)),
-  mean.model=list(armaOrder = arma.order) )
+  mean.model=list(armaOrder = arma.order, include.mean = TRUE) )
 model.arch_nvda <- ugarchfit(spec=archSpec, data=train_nvda.diff, solver = "hybrid")
 coef(model.arch_nvda)
 ```
