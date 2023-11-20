@@ -1647,6 +1647,10 @@ plot(model.arch_nvda, which="all")
 dev.off() # Menutup file PNG
 ```
 
+```{r}
+Box.test((sisaan_nvda.da)^2, type = "Ljung")
+```
+
 # Akurasi
 
 Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk $h$ hari ke depan. Dengan $h$ adalah banyaknya data test per perusahaan.
@@ -1781,6 +1785,12 @@ ggplot() +
   #Axis
     coord_cartesian(clip = "off"
   ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(ramal$Date)), 
+               as.Date(max(ramal$Date)) + 60)
+  ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
@@ -1825,7 +1835,7 @@ ggplot() +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date))-80, 
                       y = max(nvda$`Adj Close`)*1.07, 
-                      label = "Data Ramal" ),
+                      label = "ARIMA" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#D02A49", box.color = "white", parse = TRUE
   ) +
