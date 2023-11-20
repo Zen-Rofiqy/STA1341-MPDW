@@ -1886,9 +1886,9 @@ Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dil
   data.ramalan_nvda.da <- ramalan_nvda.da$mean
   
   #ARCH
-  ramal_nvda.arch = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
+  ramalan_nvda.arch = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
                         n.ahead = nrow(test_nvda))
-  data.ramal_nvda.arch <- ramal_nvda.arch@forecast[["seriesFor"]]
+  data.ramal_nvda.arch <- ramalan_nvda.arch@forecast[["seriesFor"]]
 ```
 
 ## Plot Ramalan
@@ -2087,16 +2087,25 @@ datatable(perbandingan_nvda.da, filter = 'top',
 ## Akurasi
 
 ```{r}
+#Akurasi Model ARIMA
 akurasi.nvda <- accuracy(ts(ramal_nvda[-1]), 
                          head(test_nvda.ts, n=nrow(test_nvda) )) %>%
   as.data.frame() %>%
   cbind(Model = ramalan_nvda.da[["method"]]) %>% 
   relocate(Model, .before = 1)
-row.names(akurasi.nvda) <- "NVDA"
+row.names(akurasi.nvda) <- "ARIMA"
+
+#Akurasi Model ARCH
+akurasi.nvda.arch <- accuracy(ts(ramal_nvda.arch[-1]), 
+                         head(test_nvda.ts, n=nrow(test_nvda) )) %>%
+  as.data.frame() %>%
+  cbind(Model = model.arch$best_model) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.nvda.arch) <- "ARCH"
 ```
 
 ```{r}
-akurasi <- rbind(akurasi.nvda) %>%
+akurasi <- rbind(akurasi.nvda, akurasi.nvda.arch) %>%
   mutate(Keterangan = case_when(
     MAPE < 10 ~ "Sangat Baik",
     MAPE >= 10 & MAPE <= 20 ~ "Baik",
