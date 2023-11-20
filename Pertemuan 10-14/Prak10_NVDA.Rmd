@@ -1980,6 +1980,19 @@ Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** berkatergori *"Baik"* de
 
 # Ramalan
 
+```{r}
+#Model
+archSpec <- ugarchspec(
+  variance.model=list(model="sGARCH", garchOrder=c(1,0)),
+  mean.model=list(armaOrder = arma.order, include.mean = TRUE) )
+model.ramal <- ugarchfit(spec=archSpec, data=nvda.ts, solver="hybrid")
+
+#--Forecast--
+model.ramal = ugarchforecast(model.arch_nvda1, data = train_nvda.diff, 
+                      n.ahead = nrow(test_nvda))
+data.model.ramal <- model.ramal@forecast[["seriesFor"]]
+```
+
 # Penutup
 
 ```{r, warning=FALSE, message = FALSE}
