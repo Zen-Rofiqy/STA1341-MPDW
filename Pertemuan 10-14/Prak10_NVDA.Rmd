@@ -1865,6 +1865,20 @@ ramal <- data.frame(
 colnames(ramal) <- c("Date", "Adj Close", "Name")
 ```
 
+```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
+plot(forc, which= 1)
+```
+
+```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
+plot.ts(y = forc@forecast[["sigmaFor"]], x = forc@forecast[["seriesFor"]])
+```
+
+pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilihat pada plot diatas menunjukkan bahwa hasil ramalan bernilai sama sehingga membentuk garis lurus.
+
+# Akurasi
+
+Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk $h$ hari ke depan. Dengan $h$ adalah banyaknya data test per perusahaan.
+
 ```{r}
 #--Forecast--
   #ARIMA
@@ -1875,7 +1889,19 @@ colnames(ramal) <- c("Date", "Adj Close", "Name")
   ramal_nvda.arch = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
                         n.ahead = nrow(test_nvda))
   data.ramal_nvda.arch <- ramal_nvda.arch@forecast[["seriesFor"]]
+```
 
+## Plot Ramalan
+
+```{r dpi=300, fig.height = 7.5, fig.width = 15, fig.align = "center"}
+#Plot
+plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4, 
+     lwd=2.5, col = "green4")
+```
+
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
+
+```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #--Diff inv--
   #ARIMA
   ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
@@ -1901,65 +1927,6 @@ ramal <- data.frame(
               each = nrow(train_nvda) + nrow(test_nvda) )
 )
 colnames(ramal) <- c("Date", "ARIMA", "ARCH", "Name")
-
-
-#Perbandingan
-perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=nrow(test_nvda)), 
-                                      ramal_nvda[-1],
-                                      ramal_nvda.arch[-1]),
-                               nrow = nrow(test_nvda), ncol = 3)
-colnames(perbandingan_nvda.da) <- c("Aktual","Forecast ARIMA", "Forecast ARCH")
-datatable(perbandingan_nvda.da, filter = 'top', 
-          options = list(pageLength = 5))
-```
-
-```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
-plot(forc, which= 1)
-```
-
-```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
-plot.ts(y = forc@forecast[["sigmaFor"]], x = forc@forecast[["seriesFor"]])
-```
-
-pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilihat pada plot diatas menunjukkan bahwa hasil ramalan bernilai sama sehingga membentuk garis lurus.
-
-# Akurasi
-
-Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dilakukan menggunakan fungsi `forecast()` . Contoh peramalan berikut ini dilakukan untuk $h$ hari ke depan. Dengan $h$ adalah banyaknya data test per perusahaan.
-
-```{r}
-#Ramal ARIMA
-ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = nrow(test_nvda)) 
-#Ramal ARIMA ARCH
-ramalan_nvda.da <- forecast::forecast(model.arch_nvda, h = nrow(test_nvda)) 
-```
-
-## Plot Ramalan
-
-```{r dpi=300, fig.height = 7.5, fig.width = 15, fig.align = "center"}
-#Plot
-plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4, 
-     lwd=2.5, col = "green4")
-```
-
-Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
-
-```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
-data.ramalan_nvda.da <- ramalan_nvda.da$mean
-#Diff inv
-ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
-  train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
-
-#Transformasi Balik
-ramal_nvda <- 1/(ramal_nvda)^2
-
-ramal <- data.frame(
-  Date = data2 %>% dplyr::select(Date)  ,
-  `Adj Close` = c(as.vector(train_nvda.ts), ramal_nvda[-1] ),
-  Name = rep(c("NVDA"), 
-              each = nrow(train_nvda) + nrow(test_nvda) )
-)
-colnames(ramal) <- c("Date", "Adj Close", "Name")
 ```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
@@ -2104,19 +2071,15 @@ ggsave("09_banding_ramal_ARIMA-ARCH.png", chart, path = export.chart,
 
 Dapat dilihat bahwa rata-rata harga saham Amazon diramalkan akan cenderung sedikit menurun setiap periodenya. Di sisi lain, saham NVIDIA diramalkan akan menaik pesat setiap periodenya. Sedangkan harga saham lainnya cenderung naik sedikit.
 
-```{r}
-ggplot() +
-    geom_line(data = ramal[nrow(train_nvda):nrow(ramal),], linewidth=2,
-            aes(x = Date, y = `ARCH`, col = "NVDA")) 
-```
-
 ## Perbandingan Data Aktual dengan Data Ramal
 
 ```{r}
+#Perbandingan
 perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=nrow(test_nvda)), 
-                                      ramal_nvda[-1]),
-                               nrow = nrow(test_nvda), ncol = 2)
-colnames(perbandingan_nvda.da) <- c("Aktual","Hasil Forecast")
+                                      ramal_nvda[-1],
+                                      ramal_nvda.arch[-1]),
+                               nrow = nrow(test_nvda), ncol = 3)
+colnames(perbandingan_nvda.da) <- c("Aktual","Forecast ARIMA", "Forecast ARCH")
 datatable(perbandingan_nvda.da, filter = 'top', 
           options = list(pageLength = 5))
 ```
