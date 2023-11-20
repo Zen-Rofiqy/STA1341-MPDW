@@ -888,7 +888,7 @@ Akan dilakukan uji ulang untuk mengecek kestasioneran data dalam rataan.
 
 ### Plot ACF
 
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=5.625, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 stats::acf(train_nvda.diff, main="", col=col.nvda[1], lwd=2, ylim=c(-.1,.1))
 mtext("NVDA", side=3, line=1, cex=2, font=2)
 ```
@@ -898,7 +898,7 @@ Berdasarkan ketujuh plot ACF tersebut, dapat dilihat bahwa lag nya sudah tidak *
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/03_Stas_5_ACF.png", sep=""),
-    height = 3.75*300, width = 7.5*300, res=300)
+    height = 5.625*300, width = 7.5*300, res=300)
 
 # Plot 
 stats::acf(train_nvda.diff, main="", col=col.nvda[1], lwd=2, ylim=c(-.1,.1))
