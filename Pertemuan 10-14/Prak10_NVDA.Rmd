@@ -1807,8 +1807,8 @@ ggplot() +
   scale_colour_manual(values = cols) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Ramalan Saham MAANG",
-       subtitle = "Peramalan Saham MAANG Selama 115 Hari Kedepan\n") +
+       title = "Ramalan Saham NVDA",
+       subtitle = "Peramalan Saham NVDA Selama 115 Hari Kedepan\n") +
   #Axis
     coord_cartesian(clip = "off"
   ) +
@@ -1828,13 +1828,13 @@ ggplot() +
                    y = max(nvda$`Adj Close`)* .58, 
                    yend = max(nvda$`Adj Close`)*.7), 
                arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
-               lineend = "round", color = "gray40", size=1.5) +
+               lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(train_nvda$Date)), 
                       y = max(nvda$`Adj Close`)*.7, 
                       label = max(train_nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
-    fill = "gray40", box.color = "white", parse = TRUE
+    fill = "gray60", box.color = "white", parse = TRUE
   ) +
 
 #Data Uji
@@ -1843,13 +1843,13 @@ ggplot() +
                    y = nvda$`Adj Close`[nrow(nvda)], 
                    yend = nvda$`Adj Close`[nrow(nvda)]), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
-               lineend = "round", color = "#EDB64E", size=1.5) +
+               lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date))+60, 
                       y = nvda$`Adj Close`[nrow(nvda)], 
-                      label = "Data Uji" ),
+                      label = "Data Asli" ),
     aes(x, y, label = label), size = 8, color = "white", 
-    fill = "#EDB64E", box.color = "white", parse = TRUE
+    fill = "gray60", box.color = "white", parse = TRUE
   ) +
 
 # Data Ramal ARIMA
@@ -1867,7 +1867,7 @@ ggplot() +
     fill = "#D02A49", box.color = "white", parse = TRUE
   ) +
   
-# Data Ramal ARCH Intersep
+# Data Ramal ARCH + Intersep
   geom_segment(aes(x = as.Date(max(data2$Date)), 
                    xend = as.Date(max(data2$Date)) + 70, 
                    y = max(ramal$`ARCH+Intersep`), 
@@ -1882,19 +1882,19 @@ ggplot() +
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
   
-# Data Ramal ARCH Intersep
+# Data Ramal ARCH - Intersep
   geom_segment(aes(x = as.Date(max(data2$Date)), 
                    xend = as.Date(max(data2$Date)) + 70, 
-                   y = max(ramal$`ARCH-Intersep`), 
-                   yend = max(ramal$`ARCH-Intersep`)), 
+                   y = ramal$`ARCH-Intersep`[nrow(nvda)], 
+                   yend = ramal$`ARCH-Intersep`[nrow(nvda)]), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
-               lineend = "round", color = "#4B75BA", size=1.5) +
+               lineend = "round", color = "#DC4F26", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)) +70, 
-                      y = max(ramal$`ARCH-Intersep`), 
+                      y = ramal$`ARCH-Intersep`[nrow(nvda)], 
                       label = "ARCH - Intersep" ),
     aes(x, y, label = label), size = 8, color = "white", 
-    fill = "#4B75BA", box.color = "white", parse = TRUE
+    fill = "#DC4F26", box.color = "white", parse = TRUE
   ) +
 
 #Tanggal akhir
@@ -1903,18 +1903,18 @@ ggplot() +
                    y = -Inf, 
                    yend = max(nvda$`Adj Close`)*.15), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
-               lineend = "round", color = "gray40", size=1.5) +
+               lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)), 
                       y = max(nvda$`Adj Close`)*.15, 
                       label = max(data2$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
-    fill = "gray40", box.color = "white", parse = TRUE
+    fill = "gray60", box.color = "white", parse = TRUE
   )
 
 chart
 #Export Chart
-ggsave("09_banding_ramal_ARIMA-ARCH.png", chart, path = export.chart,
+ggsave("06_Akurasi_model.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
@@ -1926,9 +1926,11 @@ Dapat dilihat bahwa rata-rata harga saham Amazon diramalkan akan cenderung sedik
 #Perbandingan
 perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=nrow(test_nvda)), 
                                       ramal_nvda[-1],
-                                      ramal_nvda.arch[-1]),
-                               nrow = nrow(test_nvda), ncol = 3)
-colnames(perbandingan_nvda.da) <- c("Aktual","Forecast ARIMA", "Forecast ARCH")
+                                      ramal_nvda.arch1[-1],
+                                      ramal_nvda.arch2[-1]),
+                               nrow = nrow(test_nvda), ncol = 4)
+colnames(perbandingan_nvda.da) <- c("Aktual","ARIMA", 
+                                    "ARCH+Intersep","ARCH-Intersep")
 datatable(perbandingan_nvda.da, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -1944,17 +1946,25 @@ akurasi.nvda <- accuracy(ts(ramal_nvda[-1]),
   relocate(Model, .before = 1)
 row.names(akurasi.nvda) <- "ARIMA"
 
-#Akurasi Model ARCH
-akurasi.nvda.arch <- accuracy(ts(ramal_nvda.arch[-1]), 
+#Akurasi Model ARCH + Intersep
+akurasi.nvda.arch1 <- accuracy(ts(ramal_nvda.arch1[-1]), 
                          head(test_nvda.ts, n=nrow(test_nvda) )) %>%
   as.data.frame() %>%
   cbind(Model = model.arch$best_model) %>% 
   relocate(Model, .before = 1)
-row.names(akurasi.nvda.arch) <- "ARCH"
+row.names(akurasi.nvda.arch1) <- "ARCH+Intersep"
+
+#Akurasi Model ARCH - Intersep
+akurasi.nvda.arch2 <- accuracy(ts(ramal_nvda.arch2[-1]), 
+                         head(test_nvda.ts, n=nrow(test_nvda) )) %>%
+  as.data.frame() %>%
+  cbind(Model = model.arch$best_model) %>% 
+  relocate(Model, .before = 1)
+row.names(akurasi.nvda.arch2) <- "ARCH-Intersep"
 ```
 
 ```{r}
-akurasi <- rbind(akurasi.nvda, akurasi.nvda.arch) %>%
+akurasi <- rbind(akurasi.nvda, akurasi.nvda.arch1, akurasi.nvda.arch2) %>%
   mutate(Keterangan = case_when(
     MAPE < 10 ~ "Sangat Baik",
     MAPE >= 10 & MAPE <= 20 ~ "Baik",
@@ -1967,6 +1977,8 @@ datatable(akurasi, filter = 'top',
 ```
 
 Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** berkatergori *"Baik"* dengan nilai **MAPE** nya sebesar $12.3\%$ (kurang dari $20\%$).
+
+# Ramalan
 
 # Penutup
 
