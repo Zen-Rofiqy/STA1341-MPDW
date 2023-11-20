@@ -1720,9 +1720,12 @@ library(rugarch)
 create_spec <- function(i, j, arima_order) {
   return(ugarchspec(
     variance.model = list(model = "sGARCH", garchOrder = c(i, j)),
-    mean.model = list(armaOrder = arima_order)
+    mean.model = list(armaOrder = arima_order, 
+              #model tidak harus memasukkan komponen rata-rata (intercept)
+                      include.mean = FALSE)
   ))
 }
+
 
 arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
   arch.model <- data.frame(Model = character(0),
@@ -1799,18 +1802,13 @@ arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
 
 ```{r}
 # Contoh penggunaan
-result <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arima.order = c(0, 1, 1))
-datatable(result$arch.model)
-print(paste("Best Model:", result$best_model))
-```
-
-```{r}
-datatable(arch.model, filter = 'top', 
+model.arch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arima.order = c(0, 1, 1))
+datatable(model.arch$arch.model, filter = 'top', 
           options = list(pageLength = 6))
 ```
 
 ```{r}
-cat("Model terbaik adalah", best_model)
+cat("Best Model:", model.arch$best_model)
 ```
 
 Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya dapat menghasilkan 2 (artinya sisanya menghasilkan NaN) model yakni, **ARCH(1)** dan **ARCH(2)**. Dan diperoleh bahwa **model terbaik** yakni model **ARCH(1)** karena memiliki parameter yang signifikan paling banyak (berdasarkan persentasenya) dan juga nilai AIC yang terkecil.
