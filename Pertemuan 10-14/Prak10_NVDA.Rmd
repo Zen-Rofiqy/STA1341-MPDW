@@ -1753,8 +1753,13 @@ arch.garch <- function(data, pp, qq = 0, arma.order = c(0, 0)) {
   best_sig <- -Inf
   best_aic <- Inf
   
+  if(qq == 0){
+    n <- 0
+  } else{
+    n <- 1
+  }
   for (i in 1:pp) {
-    for (j in 0:qq) {
+    for (j in n:qq) {
         # GARCH model
         formula <- as.formula(paste("~ garch(", i, ",", j, ")", sep = ""))
         archSpec <- create_spec(i, j, arma.order)
@@ -1861,7 +1866,7 @@ Ya walaupun diatas sudah dijelaskan "tidak usah melanjutkan ke garch", tapi kami
 ```{r message=FALSE, warning=FALSE}
 model.garch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 12, arma.order = arma.order)
 datatable(model.garch$arch.model, filter = 'top', 
-          options = list(pageLength = 3))
+          options = list(pageLength = 15))
 ```
 
 ```{r}
@@ -1890,47 +1895,6 @@ plot(model.arch_nvda, which="all")
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
-```
-
-## **Peramalan dengan Model ARIMA(0,1,1)+ARCH(1)**
-
-```{r}
-forecast3 <- ugarchforecast(garch7afold3, ihsg.dif3, 8)
-forecast3
-
-plot(forecast3, which= 1)
-
-pt_3 <- ihsg.train3[254]
-
-hasil.forc.Diff3 <- forecast3@forecast[["seriesFor"]]
-hasil3 <- diffinv(hasil.forc.Diff3, differences = 1) + pt_3
-
-perbandingan3 <- data.frame("Aktual"= ihsg.test3[1:8],
-                            "Ramalan" = hasil3[-1],
-                            "Tanggal" = tanggal.fold3)
-
-forecast::accuracy(ts(hasil3[-1]),ts(ihsg.test3[1:8]))
-
-```
-
-```{r}
-#Diff inv
-
-
-#Transformasi Balik
-
-
-ramal <- data.frame(
-  Date = data2 %>% dplyr::select(Date)  ,
-  `Adj Close` = c(as.vector(train_nvda.ts), ramal_nvda[-1] ),
-  Name = rep(c("NVDA"), 
-              each = nrow(train_nvda) + nrow(test_nvda) )
-)
-colnames(ramal) <- c("Date", "Adj Close", "Name")
-```
-
-```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
-plot(forc, which= 1)
 ```
 
 pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilihat pada plot diatas menunjukkan bahwa hasil ramalan bernilai sama sehingga membentuk garis lurus.
@@ -1963,7 +1927,13 @@ plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4,
 
 Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
 
-> Model
+> Model **ARIMA(0,1,1)+ARCH(1)**
+
+```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
+plot(ramalan_nvda.arch, which= 1)
+```
+
+Pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilihat pada plot diatas menunjukkan bahwa hasil ramalan bernilai sama sehingga membentuk garis lurus.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #--Diff inv--
