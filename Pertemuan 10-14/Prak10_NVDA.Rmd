@@ -1980,6 +1980,8 @@ Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** berkatergori *"Baik"* de
 
 # Ramalan
 
+## Data
+
 ```{r}
 #Model
 archSpec <- ugarchspec(
@@ -1991,6 +1993,188 @@ model.ramal <- ugarchfit(spec=archSpec, data=nvda.ts, solver="hybrid")
 model.ramal = ugarchforecast(model.arch_nvda1, data = train_nvda.diff, 
                       n.ahead = nrow(test_nvda))
 data.model.ramal <- model.ramal@forecast[["seriesFor"]]
+```
+
+## Plot
+
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
+chart <- 
+ggplot() +
+# Akhir data
+  geom_vline( #Buat garis batas data
+    xintercept = as.numeric(as.Date( max(data2$Date) )), 
+             linetype = "dotted", color = "red") +
+  #Label Data Asli 
+  annotate( "rect", alpha=.1, fill="#4EC2C1",
+            xmin=as.Date(min(data2$Date)), 
+            xmax=as.Date(data2$Date[nrow(train_nvda)]),
+            ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
+  
+  annotate( "text", color="#4EC2C1",
+            x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
+            y = max(data2$`Adj Close`) * .95, 
+    label = "Data Latih", size=10) + 
+  annotate( "text", color="#4EC2C1",
+            x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
+            y = max(data2$`Adj Close`) * .85, 
+    label = paste0(nrow(train_nvda)," Hari (", 
+                   round(nrow(train_nvda)/nrow(nvda)*100, 1), 
+                   "%)"), size=10) + 
+  
+  #Label Data Ramal
+  annotate( "rect", alpha=.1, fill="violetred",
+            xmin=as.Date(data2$Date[nrow(train_nvda)]), 
+            xmax=as.Date(max(data2$Date)),
+            ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
+  
+  annotate( "text", color="violetred",
+            x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
+            y = max(data2$`Adj Close`) * .95, 
+    label = "Data Ramal", size=10) +
+  annotate( "text", color="violetred",
+            x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
+            y = max(data2$`Adj Close`) * .85, 
+    label = paste0(nrow(test_nvda)," Hari (", 
+                   round(nrow(test_nvda)/nrow(nvda)*100, 1), 
+                   "%)"), size=10) +
+  
+  geom_vline( #Buat garis batas data
+    xintercept = as.Date(data2$Date[nrow(train_nvda)]) , 
+             linetype = "dotted", color = "black", linewidth = 2) +
+
+#Time Series
+  #Data RAMAL ARIMA
+    #Dari data asli & ramal
+  geom_line(data = ramal, linewidth=2,
+            aes(x = Date, y = `ARIMA`, col = "NVDA")) +
+  #Data Ramal ARCH + Intersep
+    #Dari data ramal saja
+  geom_line(data = ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
+            aes(x = Date, y = `ARCH+Intersep`, col = "GOOG")) +
+  #Data Ramal ARCH - Intersep
+    #Dari data ramal saja
+  geom_line(data = ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
+            aes(x = Date, y = `ARCH-Intersep`, col = "MSFT")) +
+  #Data Test
+  geom_line(data = test_nvda, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
+  
+  #Penanda
+  geom_point(data = tail(train_nvda, 1), alpha = .5, 
+             aes(x = Date, y = `Adj Close`), stroke=2,
+             size = 15, shape = 21, color = "black", fill="violetred") +
+  scale_colour_manual(values = cols) +
+  theme.ts + #THeme
+  labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
+       title = "Ramalan Saham NVDA",
+       subtitle = "Peramalan Saham NVDA Selama 115 Hari Kedepan\n") +
+  #Axis
+    coord_cartesian(clip = "off"
+  ) +
+    scale_x_date( #Sumbu x
+    date_breaks = "1 year",  # Menampilkan label setiap tahun
+    date_labels = "%Y",  # Format label tahun
+    limits = c(as.Date(min(ramal$Date)), 
+               as.Date(max(ramal$Date)) + 80)
+  ) +
+    scale_y_continuous( #Sumbu y
+    labels = scales::dollar_format(prefix = "$") #tambahin dolar
+  ) +
+  
+#Bagi Data Train & Test
+  geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
+                   xend = as.Date(max(train_nvda$Date)), 
+                   y = max(nvda$`Adj Close`)* .58, 
+                   yend = max(nvda$`Adj Close`)*.7), 
+               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
+               lineend = "round", color = "gray60", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(train_nvda$Date)), 
+                      y = max(nvda$`Adj Close`)*.7, 
+                      label = max(train_nvda$Date) ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "gray60", box.color = "white", parse = TRUE
+  ) +
+
+#Data Uji
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date))+60, 
+                   y = nvda$`Adj Close`[nrow(nvda)], 
+                   yend = nvda$`Adj Close`[nrow(nvda)]), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
+               lineend = "round", color = "gray60", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date))+60, 
+                      y = nvda$`Adj Close`[nrow(nvda)], 
+                      label = "Data Asli" ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "gray60", box.color = "white", parse = TRUE
+  ) +
+
+# Data Ramal ARIMA
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date)) + 60, 
+                   y = max(ramal$`ARIMA`), 
+                   yend = max(ramal$`ARIMA`)), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
+               lineend = "round", color = "#D02A49", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date)) +60, 
+                      y = max(ramal$`ARIMA`), 
+                      label = "ARIMA" ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "#D02A49", box.color = "white", parse = TRUE
+  ) +
+  
+# Data Ramal ARCH + Intersep
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date)) + 70, 
+                   y = max(ramal$`ARCH+Intersep`), 
+                   yend = max(ramal$`ARCH+Intersep`)), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
+               lineend = "round", color = "#4B75BA", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date)) +70, 
+                      y = max(ramal$`ARCH+Intersep`), 
+                      label = "ARCH + Intersep" ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "#4B75BA", box.color = "white", parse = TRUE
+  ) +
+  
+# Data Ramal ARCH - Intersep
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date)) + 70, 
+                   y = ramal$`ARCH-Intersep`[nrow(nvda)], 
+                   yend = ramal$`ARCH-Intersep`[nrow(nvda)]), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
+               lineend = "round", color = "#DC4F26", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date)) +70, 
+                      y = ramal$`ARCH-Intersep`[nrow(nvda)], 
+                      label = "ARCH - Intersep" ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "#DC4F26", box.color = "white", parse = TRUE
+  ) +
+
+#Tanggal akhir
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date)), 
+                   y = -Inf, 
+                   yend = max(nvda$`Adj Close`)*.15), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
+               lineend = "round", color = "gray60", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date)), 
+                      y = max(nvda$`Adj Close`)*.15, 
+                      label = max(data2$Date) ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "gray60", box.color = "white", parse = TRUE
+  )
+
+chart
+#Export Chart
+ggsave("06_Akurasi_model.png", chart, path = export.chart,
+        dpi = 300, height = 12, width = 27)
 ```
 
 # Penutup
