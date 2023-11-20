@@ -1866,7 +1866,7 @@ Ya walaupun diatas sudah dijelaskan "tidak usah melanjutkan ke garch", tapi kami
 ```{r message=FALSE, warning=FALSE}
 model.garch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 12, arma.order = arma.order)
 datatable(model.garch$arch.model, filter = 'top', 
-          options = list(pageLength = 15))
+          options = list(pageLength = 6))
 ```
 
 ```{r}
@@ -1896,8 +1896,6 @@ plot(model.arch_nvda, which="all")
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
 ```
-
-pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilihat pada plot diatas menunjukkan bahwa hasil ramalan bernilai sama sehingga membentuk garis lurus.
 
 # Akurasi
 
@@ -1933,7 +1931,7 @@ Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cender
 plot(ramalan_nvda.arch, which= 1)
 ```
 
-Pada hasil ramalan untuk data saham amazon untuk ke 10 waktu kedepan dapat dilihat pada plot diatas menunjukkan bahwa hasil ramalan bernilai sama sehingga membentuk garis lurus.
+Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
 #--Diff inv--
