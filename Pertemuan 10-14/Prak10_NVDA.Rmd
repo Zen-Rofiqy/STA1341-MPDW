@@ -1717,6 +1717,13 @@ for(i in 1:lag){
 ```{r}
 library(rugarch)
 
+create_spec <- function(i, j, arima_order) {
+  return(ugarchspec(
+    variance.model = list(model = "sGARCH", garchOrder = c(i, j)),
+    mean.model = list(armaOrder = arima_order)
+  ))
+}
+
 arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
   arch.model <- data.frame(Model = character(0),
                             Signif = numeric(0),
@@ -1728,45 +1735,40 @@ arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
   best_sig <- -Inf
   best_aic <- Inf
   
-  create_spec <- function(i, j) {
-    return(ugarchspec(
-      variance.model = list(model = "sGARCH", garchOrder = c(i, j)),
-      mean.model = list(armaOrder = arima.order)
-    ))
-  }
-  
   for (i in 1:pp) {
     if (qq == 0) {
       # ARCH model
       formula <- as.formula(paste("~ garch(", i, ",0)", sep = ""))
-      archSpec <- create_spec(i, 0)
+      archSpec <- create_spec(i, 0, arima.order)
     } else {
       for (j in 1:qq) {
         # GARCH model
         formula <- as.formula(paste("~ garch(", i, ",", j, ")", sep = ""))
-        archSpec <- create_spec(i, j)
+        archSpec <- create_spec(i, j, arima.order)
       }
     }
-    
+
     archFit <- ugarchfit(spec = archSpec, data = data, solver = "hybrid")
-    
+
     if (anyNA(coef(archFit)) || anyNA(archFit@fit[["tval"]])) {
       break
     }
-    
-    aic <- summary(archFit)[["ics"]][["AIC"]]
+
+    aic <- infocriteria(archFit)[[1]] # AIC
+    p_values <- archFit@fit$robust.matcoef[, 4] # P-value
     
     # persentase banyaknya param yang signif
-    coef_values <- coef(archFit)
-    
-    # Cek Pvalue yang < 0.05
-    sig <- sum(archFit@fit$matcoef[, 4] < 0.05) / length(coef_values)
-    
-    sig_param <- names(archFit@fit[["tval"]][archFit@fit$matcoef[, 4] < 0.05])
-    non_sig_param <- names(archFit@fit[["tval"]][archFit@fit$matcoef[, 4] >= 0.05])
-    
-    model <- ifelse(qq == 0, paste0("ARCH(", i, ")"), paste0("GARCH(", i, ",", j, ")"))
-    
+    sig <- sum(p_values < 0.05) / length(p_values)
+
+    sig_param <- names(p_values[p_values < 0.05])
+    non_sig_param <- names(p_values[p_values >= 0.05])
+
+    model <- if (qq == 0) {
+      paste0("ARCH(", i, ")")
+    } else {
+      paste0("GARCH(", i, ",", j, ")")
+    }
+
     arch.model <- rbind(
       arch.model,
       data.frame(
@@ -1777,7 +1779,7 @@ arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
         Non_Sig.par = paste(non_sig_param, collapse = ", ")
       )
     )
-    
+
     # Identifikasi best model
     if (sig > best_sig) {
       if (aic < best_aic) {
@@ -1788,11 +1790,7 @@ arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
     }
   }
   
-  if (qq == 0) {
-    return(list(arch.model = arch.model, best_model = best_model))
-  } else {
-    return(list(arch.model = arch.model))
-  }
+  return(list(arch.model = arch.model, best_model = best_model))
 }
 
 
@@ -1801,8 +1799,8 @@ arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
 
 ```{r}
 # Contoh penggunaan
-result <- arch.garch(data = train_nvda.diff, pp = 3, qq = 2, arima.order = c(0, 1, 1))
-print(result$arch.model)
+result <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arima.order = c(0, 1, 1))
+datatable(result$arch.model)
 print(paste("Best Model:", result$best_model))
 ```
 
