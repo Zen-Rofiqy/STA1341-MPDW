@@ -1770,20 +1770,20 @@ Model yang dihasilkan adalah seperti diatas.
 ```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
 plot.ts(ts(model.arch_nvda@fit$residuals), col=col.nvda[1], lty=1, 
         xlab="Periode (Hari)", ylab="Conditional Variance",
-        lwd = 2, main="ARCH(1) NVDA", cex.main = 2)
+        lwd = 2, main="ARIMA(0,1,1)-ARCH(1) NVDA", cex.main = 1.5)
 ```
 
 Terlihat bahwa ada periode-periode yang volatilitas nya tinggi.
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
-png(paste(export.chart, "/05_Arch(1)_NVDA.png", sep=""),
+png(paste(export.chart, "/05_Arch_NVDA.png", sep=""),
     height = 6*300, width = 12*300, res=300)
 
 # Plot 
-plot.ts(model.arch_nvda@h.t, lty=1, xlab="Periode (Hari)", ylab="Conditional Variance",
-        col = col.nvda[1], lwd = 2,
-        main="ARCH(1) NVDA", cex.main = 2)
+plot.ts(ts(model.arch_nvda@fit$residuals), col=col.nvda[1], lty=1, 
+        xlab="Periode (Hari)", ylab="Conditional Variance",
+        lwd = 2, main="ARIMA(0,1,1)-ARCH(1) NVDA", cex.main = 1.5)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
