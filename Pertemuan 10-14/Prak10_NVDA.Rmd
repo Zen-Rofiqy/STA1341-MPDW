@@ -1676,7 +1676,7 @@ Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dil
                         n.ahead = nrow(test_nvda))
   data.ramal_nvda.arch1 <- ramalan_nvda.arch1@forecast[["seriesFor"]]
   
-  #ARCH  -Intersep
+  #ARCH - Intersep
   ramalan_nvda.arch2 = ugarchforecast(model.arch_nvda2, data = train_nvda.diff, 
                         n.ahead = nrow(test_nvda))
   data.ramal_nvda.arch2 <- ramalan_nvda.arch2@forecast[["seriesFor"]]
@@ -1709,29 +1709,33 @@ Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cender
     train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
   
   #ARCH + Intersep
-  ramal_nvda.arch <- diffinv(data.ramal_nvda.arch, differences=1) +
+  ramal_nvda.arch1 <- diffinv(data.ramal_nvda.arch1, differences=1) +
     train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
   
   #ARCH - Intersep
-  ramal_nvda.arch <- diffinv(data.ramal_nvda.arch, differences=1) +
+  ramal_nvda.arch2 <- diffinv(data.ramal_nvda.arch2, differences=1) +
     train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
 
 #--Transformasi Balik--
   #ARIMA
   ramal_nvda <- 1/(ramal_nvda)^2
   
-  #ARCH
-  ramal_nvda.arch <- 1/(ramal_nvda.arch)^2
+  #ARCH + Intersep
+  ramal_nvda.arch1 <- 1/(ramal_nvda.arch1)^2
+
+  #ARCH - Intersep
+  ramal_nvda.arch2 <- 1/(ramal_nvda.arch2)^2
 
 #Data Frame
 ramal <- data.frame(
   Date = data2 %>% dplyr::select(Date)  ,
   `ARIMA` = c(as.vector(train_nvda.ts), ramal_nvda[-1] ),
-  `ARCH` = c(as.vector(train_nvda.ts), ramal_nvda.arch[-1] ),
+  `ARCH+Intersep` = c(as.vector(train_nvda.ts), ramal_nvda.arch1[-1] ),
+  `ARCH-Intersep` = c(as.vector(train_nvda.ts), ramal_nvda.arch2[-1] ),
   Name = rep(c("NVDA"), 
               each = nrow(train_nvda) + nrow(test_nvda) )
 )
-colnames(ramal) <- c("Date", "ARIMA", "ARCH", "Name")
+colnames(ramal) <- c("Date", "ARIMA", "ARCH+Intersep", "ARCH-Intersep", "Name")
 ```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
@@ -1784,10 +1788,14 @@ ggplot() +
     #Dari data asli & ramal
   geom_line(data = ramal, linewidth=2,
             aes(x = Date, y = `ARIMA`, col = "NVDA")) +
-  #Data Ramal ARCH
+  #Data Ramal ARCH + Intersep
     #Dari data ramal saja
   geom_line(data = ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
-            aes(x = Date, y = `ARCH`, col = "GOOG")) +
+            aes(x = Date, y = `ARCH+Intersep`, col = "GOOG")) +
+  #Data Ramal ARCH - Intersep
+    #Dari data ramal saja
+  geom_line(data = ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
+            aes(x = Date, y = `ARCH-Intersep`, col = "MSFT")) +
   #Data Test
   geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
@@ -1862,14 +1870,29 @@ ggplot() +
 # Data Ramal ARCH Intersep
   geom_segment(aes(x = as.Date(max(data2$Date)), 
                    xend = as.Date(max(data2$Date)) + 70, 
-                   y = max(ramal$`ARCH`), 
-                   yend = max(ramal$`ARCH`)), 
+                   y = max(ramal$`ARCH+Intersep`), 
+                   yend = max(ramal$`ARCH+Intersep`)), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#4B75BA", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)) +70, 
-                      y = max(ramal$`ARCH`), 
-                      label = "ARCH+\nIntersep" ),
+                      y = max(ramal$`ARCH+Intersep`), 
+                      label = "ARCH + Intersep" ),
+    aes(x, y, label = label), size = 8, color = "white", 
+    fill = "#4B75BA", box.color = "white", parse = TRUE
+  ) +
+  
+# Data Ramal ARCH Intersep
+  geom_segment(aes(x = as.Date(max(data2$Date)), 
+                   xend = as.Date(max(data2$Date)) + 70, 
+                   y = max(ramal$`ARCH-Intersep`), 
+                   yend = max(ramal$`ARCH-Intersep`)), 
+               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
+               lineend = "round", color = "#4B75BA", size=1.5) +
+  geom_richtext(
+    data = data.frame(x = as.Date(max(data2$Date)) +70, 
+                      y = max(ramal$`ARCH-Intersep`), 
+                      label = "ARCH - Intersep" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
