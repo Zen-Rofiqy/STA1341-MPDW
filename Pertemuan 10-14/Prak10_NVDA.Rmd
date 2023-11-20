@@ -1807,46 +1807,6 @@ cat("Best Model:", model.garch$best_model)
 Terlihat bahwa memang data tidak cocok untuk model **GARCH(p,q)** karena dari rentang lag 1 sampai 12 yang dihasilkan model terbaiknya adalah **GARCH(12,12).** Namun jika pada modelnya, hanya persentase signifikannya sangat kecil. Sehingga tidak mungin untuk dijadikan model terbaik.
 
 ```{r}
-garchFit11
-```
-
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
-res <- garchFit11@fit$residuals
-res.ts <- ts(res)
-plot.ts(res.ts, col=col.nvda[1])
-```
-
-```{r}
-#GARCH(1,2)
-garchSpec12 <- ugarchspec(
-  variance.model=list(model="sGARCH",
-                      garchOrder=c(1,2)),
-mean.model=list(armaOrder=c(0,2)))
-garchFit12 <- ugarchfit(spec=garchSpec12, data=train_nvda.diff)
-coef(garchFit12)
-```
-
-```{r}
-garchFit12
-```
-
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
-res2<-garchFit12@fit$residuals
-res2.ts<-ts(res2)
-plot.ts(res2.ts, col=col.nvda[1])
-```
-
-```{r}
-#GARCH(1,3)
-garchSpec13 <- ugarchspec(
-  variance.model=list(model="sGARCH",
-                      garchOrder=c(1,3)),
-mean.model=list(armaOrder=c(0,2)))
-garchFit13 <- ugarchfit(spec=garchSpec13, data=train_nvda.diff)
-coef(garchFit13)
-```
-
-```{r}
 garchFit13
 ```
 
