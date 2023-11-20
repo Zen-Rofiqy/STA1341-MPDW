@@ -1255,7 +1255,7 @@ Terlihat bahwa model `ARIMA(0,1,2)` memiliki **AIC** yang lebih besar dan tidak 
 ```{r}
 arima.best_model_nvda <- model_nvda.da
 
-arima.order <- c(
+arma.order <- c(
   arima.best_model_nvda[["call"]][["order"]][[2]],
   arima.best_model_nvda[["call"]][["order"]][[4]]
 )
@@ -1672,7 +1672,7 @@ create_spec <- function(i, j, arma_order) {
 }
 
 
-arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
+arch.garch <- function(data, pp, qq = 0, arma.order = c(0, 0)) {
   arch.model <- data.frame(Model = character(0),
                             Signif = numeric(0),
                             AIC = numeric(0),
@@ -1687,12 +1687,12 @@ arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
     if (qq == 0) {
       # ARCH model
       formula <- as.formula(paste("~ garch(", i, ",0)", sep = ""))
-      archSpec <- create_spec(i, 0, arima.order)
+      archSpec <- create_spec(i, 0, arma.order)
     } else {
       for (j in 1:qq) {
         # GARCH model
         formula <- as.formula(paste("~ garch(", i, ",", j, ")", sep = ""))
-        archSpec <- create_spec(i, j, arima.order)
+        archSpec <- create_spec(i, j, arma.order)
       }
     }
 
@@ -1740,14 +1740,11 @@ arch.garch <- function(data, pp, qq = 0, arima.order = c(0, 0, 0)) {
   
   return(list(arch.model = arch.model, best_model = best_model))
 }
-
-
-
 ```
 
 ```{r}
 # Contoh penggunaan
-model.arch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arma.order = c(0, 1))
+model.arch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arma.order = arma.order)
 datatable(model.arch$arch.model, filter = 'top', 
           options = list(pageLength = 6))
 ```
@@ -1759,15 +1756,21 @@ cat("Best Model:", model.arch$best_model)
 Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model yang semua parameternya signifikan yakni **ARCH(1).** Karena itu tidak perlu membandingkan nilai **AIC**. Sehingga model terbaik adalah **ARIMA(0,1,1)-ARCH(1).**
 
 ```{r}
-model.arch_nvda <- garchFit(~garch(1,0), data = train_nvda.diff, trace = F)
+archSpec <- ugarchspec(
+  variance.model=list(model="sGARCH", garchOrder=c(1,0)),
+  mean.model=list(armaOrder = arma.order, include.mean = FALSE) )
+model.arch_nvda <- ugarchfit(spec=archSpec, data=train_nvda.diff, solver = "hybrid")
+coef(model.arch_nvda)
 ```
+
+Model yang dihasilkan adalah seperti diatas.
 
 ### Plot
 
 ```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
-plot.ts(model.arch_nvda@h.t, lty=1, xlab="Periode (Hari)", ylab="Conditional Variance",
-        col = col.nvda[1], lwd = 2,
-        main="ARCH(1) NVDA", cex.main = 2)
+plot.ts(ts(model.arch_nvda@fit$residuals), col=col.nvda[1], lty=1, 
+        xlab="Periode (Hari)", ylab="Conditional Variance",
+        lwd = 2, main="ARCH(1) NVDA", cex.main = 2)
 ```
 
 Terlihat bahwa ada periode-periode yang volatilitas nya tinggi.
