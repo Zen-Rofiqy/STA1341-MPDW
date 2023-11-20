@@ -1752,7 +1752,7 @@ datatable(model.arch$arch.model, filter = 'top',
 cat("Best Model:", model.arch$best_model)
 ```
 
-Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model yang semua parameternya signifikan yakni **ARCH(1).** Karena itu tidak perlu membandingkan nilai **AIC**. Sehingga model terbaik adalah **ARIMA(0,1,1)-ARCH(1).**
+Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model yang semua parameternya signifikan yakni **ARCH(1).** Karena itu tidak perlu membandingkan nilai **AIC**. Sehingga model terbaik adalah **ARIMA(0,1,1)+ARCH(1).**
 
 ```{r}
 archSpec <- ugarchspec(
@@ -1806,23 +1806,12 @@ cat("Best Model:", model.garch$best_model)
 
 Terlihat bahwa memang data tidak cocok untuk model **GARCH(p,q)** karena dari rentang lag 1 sampai 12 yang dihasilkan model terbaiknya adalah **GARCH(12,12).** Namun jika pada modelnya, hanya persentase signifikannya sangat kecil. Sehingga tidak mungin untuk dijadikan model terbaik.
 
+## Model Terbaik
 
-
-
-### **MODEL ARIMA(0,1,2)-GARCH(1,2)**
+Sehingga diperoleh model terbaik yakni **ARIMA(0,1,1)+ARCH(1)**.
 
 ```{r fig.align="center", fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
-#ARIMA(0,1,2)+GARCH(1,2)
-model12<-ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1,2)), 
-                  mean.model = list(armaOrder = c(0, 2), include.mean = TRUE), 
-                  distribution.model = "norm")
-                  
-m.12<-ugarchfit(spec=model12,data=train_nvda.diff, out.sample = 100)
-plot(m.12,which="all")
-```
-
-```{r}
-m.12
+plot(model.arch_nvda, which="all")
 ```
 
 diperoleh mean model yaitu ARIMA(0,1,2) dan varian model yaitu GARCH(1,2) terbaik untuk digunakan dalam peralaman, terlihat pada uji dignostik model pada plot QQ-norm terlihat bahwa sebaran residual mengikuti garis lurus sehingga dapat disimpulkan bahwa residual menyebar normal, lalu untuk uji autokorelasi dapat dilihat plot ACF squared residual telah terlihat bahwa setiap lag berada dibawah batas, sehingga dapat dikatakan bahwa tidak ada autokorelasi antar residual, diperkuat dengan nilai p-value pada uji L-jung Box yang lebih besar dari alpha=0.05.
