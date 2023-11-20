@@ -1846,11 +1846,62 @@ perbandingan3 <- data.frame("Aktual"= ihsg.test3[1:8],
                             "Tanggal" = tanggal.fold3)
 
 forecast::accuracy(ts(hasil3[-1]),ts(ihsg.test3[1:8]))
+
 ```
 
 ```{r}
-forc = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
+#Diff inv
+ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
+  train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
+
+#Transformasi Balik
+ramal_nvda <- 1/(ramal_nvda)^2
+
+ramal <- data.frame(
+  Date = data2 %>% dplyr::select(Date)  ,
+  `Adj Close` = c(as.vector(train_nvda.ts), ramal_nvda[-1] ),
+  Name = rep(c("NVDA"), 
+              each = nrow(train_nvda) + nrow(test_nvda) )
+)
+colnames(ramal) <- c("Date", "Adj Close", "Name")
+```
+
+```{r}
+#Ramal ARIMA
+ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = nrow(test_nvda)) 
+
+#Ramal ARCH
+ramal_nvda.arch = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
                       n.ahead = nrow(test_nvda))
+ramal_nvda.arch <- ramal_nvda.arch@forecast[["seriesFor"]]
+
+#--Diff inv--
+#ARIMA
+
+
+#ARCH
+ramal_nvda.arch <- diffinv(data.ramalan_nvda.da, differences=1) +
+  train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
+
+#Transformasi Balik
+ramal_nvda.arch <- 1/(ramal_nvda.arch)^2
+
+ramal <- data.frame(
+  Date = data2 %>% dplyr::select(Date)  ,
+  `Arch` = c(as.vector(train_nvda.ts), ramal_nvda.arch[-1] ),
+  Name = rep(c("NVDA"), 
+              each = nrow(train_nvda) + nrow(test_nvda) )
+)
+colnames(ramal) <- c("Date", "Arch", "Name")
+
+
+
+perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=nrow(test_nvda)), 
+                                      ramal_nvda[-1]),
+                               nrow = nrow(test_nvda), ncol = 2)
+colnames(perbandingan_nvda.da) <- c("Aktual","Hasil Forecast")
+datatable(perbandingan_nvda.da, filter = 'top', 
+          options = list(pageLength = 5))
 ```
 
 ```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
