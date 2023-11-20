@@ -1903,11 +1903,12 @@ ramal <- data.frame(
 colnames(ramal) <- c("Date", "ARIMA", "ARCH", "Name")
 
 
-
+#Perbandingan
 perbandingan_nvda.da <- matrix(data=c(head(test_nvda.ts, n=nrow(test_nvda)), 
-                                      ramal_nvda[-1]),
-                               nrow = nrow(test_nvda), ncol = 2)
-colnames(perbandingan_nvda.da) <- c("Aktual","Hasil Forecast")
+                                      ramal_nvda[-1],
+                                      ramal_nvda.arch[-1]),
+                               nrow = nrow(test_nvda), ncol = 3)
+colnames(perbandingan_nvda.da) <- c("Aktual","Forecast ARIMA", "Forecast ARCH")
 datatable(perbandingan_nvda.da, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -2006,11 +2007,20 @@ ggplot() +
     xintercept = as.Date(data2$Date[nrow(train_nvda)]) , 
              linetype = "dotted", color = "black", linewidth = 2) +
 
-#NVDA
+#Time Series
+  #Data RAMAL ARIMA
+    #Dari data asli & ramal
   geom_line(data = ramal, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "NVDA")) +
+            aes(x = Date, y = `ARIMA`, col = "NVDA")) +
+  #Data Ramal ARCH
+    #Dari data ramal saja
+  geom_line(data = ramal$Date[1:nrow(train_nvda)], linewidth=2,
+            aes(x = Date, y = `ARCH`, col = "NVDA")) +
+  #Data Test
   geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
+  
+  #Penanda
   geom_point(data = tail(train_nvda, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
              size = 15, shape = 21, color = "black", fill="violetred") +
@@ -2088,7 +2098,7 @@ ggplot() +
 
 chart
 #Export Chart
-ggsave("09_banding_ramal.png", chart, path = export.chart,
+ggsave("09_banding_ramal_ARIMA-ARCH.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
