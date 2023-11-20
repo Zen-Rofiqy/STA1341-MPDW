@@ -1851,11 +1851,10 @@ forecast::accuracy(ts(hasil3[-1]),ts(ihsg.test3[1:8]))
 
 ```{r}
 #Diff inv
-ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
-  train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
+
 
 #Transformasi Balik
-ramal_nvda <- 1/(ramal_nvda)^2
+
 
 ramal <- data.frame(
   Date = data2 %>% dplyr::select(Date)  ,
@@ -1867,32 +1866,41 @@ colnames(ramal) <- c("Date", "Adj Close", "Name")
 ```
 
 ```{r}
-#Ramal ARIMA
-ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = nrow(test_nvda)) 
-
-#Ramal ARCH
-ramal_nvda.arch = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
-                      n.ahead = nrow(test_nvda))
-ramal_nvda.arch <- ramal_nvda.arch@forecast[["seriesFor"]]
+#--Forecast--
+  #ARIMA
+  ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = nrow(test_nvda)) 
+  data.ramalan_nvda.da <- ramalan_nvda.da$mean
+  
+  #ARCH
+  ramal_nvda.arch = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
+                        n.ahead = nrow(test_nvda))
+  data.ramal_nvda.arch <- ramal_nvda.arch@forecast[["seriesFor"]]
 
 #--Diff inv--
-#ARIMA
+  #ARIMA
+  ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
+    train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
+  
+  #ARCH
+  ramal_nvda.arch <- diffinv(data.ramal_nvda.arch, differences=1) +
+    train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
 
+#--Transformasi Balik--
+  #ARIMA
+  ramal_nvda <- 1/(ramal_nvda)^2
+  
+  #ARCH
+  ramal_nvda.arch <- 1/(ramal_nvda.arch)^2
 
-#ARCH
-ramal_nvda.arch <- diffinv(data.ramalan_nvda.da, differences=1) +
-  train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
-
-#Transformasi Balik
-ramal_nvda.arch <- 1/(ramal_nvda.arch)^2
-
+#Data Frame
 ramal <- data.frame(
   Date = data2 %>% dplyr::select(Date)  ,
-  `Arch` = c(as.vector(train_nvda.ts), ramal_nvda.arch[-1] ),
+  `ARIMA` = c(as.vector(train_nvda.ts), ramal_nvda[-1] ),
+  `ARCH` = c(as.vector(train_nvda.ts), ramal_nvda.arch[-1] ),
   Name = rep(c("NVDA"), 
               each = nrow(train_nvda) + nrow(test_nvda) )
 )
-colnames(ramal) <- c("Date", "Arch", "Name")
+colnames(ramal) <- c("Date", "ARIMA", "ARCH", "Name")
 
 
 
@@ -1928,8 +1936,6 @@ ramalan_nvda.da <- forecast::forecast(model.arch_nvda, h = nrow(test_nvda))
 ## Plot Ramalan
 
 ```{r dpi=300, fig.height = 7.5, fig.width = 15, fig.align = "center"}
-data.ramalan_nvda.da <- ramalan_nvda.da$mean
-
 #Plot
 plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4, 
      lwd=2.5, col = "green4")
@@ -1938,6 +1944,7 @@ plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4,
 Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
 
 ```{r dpi=300, fig.height = 7, fig.width = 12, fig.align = "center"}
+data.ramalan_nvda.da <- ramalan_nvda.da$mean
 #Diff inv
 ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
   train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
