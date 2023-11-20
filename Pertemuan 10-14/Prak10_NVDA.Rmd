@@ -2014,8 +2014,8 @@ ggplot() +
             aes(x = Date, y = `ARIMA`, col = "NVDA")) +
   #Data Ramal ARCH
     #Dari data ramal saja
-  geom_line(data = ramal$Date[1:nrow(train_nvda)], linewidth=2,
-            aes(x = Date, y = `ARCH`, col = "NVDA")) +
+  geom_line(data = ramal[nrow(train_nvda):nrow(ramal),], linewidth=2,
+            aes(x = Date, y = `ARCH`, col = "NVDA")) 
   #Data Test
   geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
@@ -2103,6 +2103,12 @@ ggsave("09_banding_ramal_ARIMA-ARCH.png", chart, path = export.chart,
 ```
 
 Dapat dilihat bahwa rata-rata harga saham Amazon diramalkan akan cenderung sedikit menurun setiap periodenya. Di sisi lain, saham NVIDIA diramalkan akan menaik pesat setiap periodenya. Sedangkan harga saham lainnya cenderung naik sedikit.
+
+```{r}
+ggplot() +
+    geom_line(data = ramal[nrow(train_nvda):nrow(ramal),], linewidth=2,
+            aes(x = Date, y = `ARCH`, col = "NVDA")) 
+```
 
 ## Perbandingan Data Aktual dengan Data Ramal
 
