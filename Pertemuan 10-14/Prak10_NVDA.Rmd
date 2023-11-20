@@ -654,7 +654,7 @@ Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terli
 
 ### Plot ACF
 
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=5.625, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 install_load('tsibble','tseries')
 acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
 mtext("NVDA", side=3, line=1, cex=2, font=2)
@@ -665,7 +665,7 @@ Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/03_Stas_1_ACF.png", sep=""),
-    height = 3.75*300, width = 7.5*300, res=300)
+    height = 5.625*300, width = 7.5*300, res=300)
 
 # Plot 
 acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
@@ -863,7 +863,7 @@ train_nvda.diff <- diff(train_nvda.ts.new, differences = 1)
 #Plot
 plot.ts(train_nvda.diff, lty=1, xlab="Periode (Hari)", 
         col = col.nvda[1], lwd = 2,
-        main="NVDA", cex.main = 2)
+        main="Plot Differencing", cex.main = 2)
 ```
 
 Berdasarkan plot data deret waktu yang sudah di *Differencing*, terlihat bahwa seluruh data sudah stasioner dalam rataan ditandai dengan data bergerak pada nilai tengah tertentu (tidak terdapat trend ataupun musiman pada data).
@@ -876,7 +876,7 @@ png(paste(export.chart, "/03_Stas_4_Diff.png", sep=""),
 # Plot 
 plot.ts(train_nvda.diff, lty=1, xlab="Periode (Hari)", 
         col = col.nvda[1], lwd = 2,
-        main="NVDA", cex.main = 2)
+        main="Plot Differencing", cex.main = 2)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
