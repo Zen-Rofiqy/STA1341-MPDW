@@ -1757,7 +1757,7 @@ Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model
 ```{r}
 archSpec <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,0)),
-  mean.model=list(armaOrder = arma.order, include.mean = FALSE) )
+  mean.model=list(armaOrder = arma.order) )
 model.arch_nvda <- ugarchfit(spec=archSpec, data=train_nvda.diff, solver = "hybrid")
 coef(model.arch_nvda)
 ```
