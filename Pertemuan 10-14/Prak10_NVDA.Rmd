@@ -2015,7 +2015,7 @@ ggplot() +
   #Data Ramal ARCH
     #Dari data ramal saja
   geom_line(data = ramal[nrow(train_nvda):nrow(ramal),], linewidth=2,
-            aes(x = Date, y = `ARCH`, col = "NVDA")) 
+            aes(x = Date, y = `ARCH`, col = "NVDA")) +
   #Data Test
   geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
