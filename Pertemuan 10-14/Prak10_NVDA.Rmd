@@ -1831,6 +1831,24 @@ dev.off() # Menutup file PNG
 ## **Peramalan dengan Model ARIMA(0,1,1)+ARCH(1)**
 
 ```{r}
+forecast3 <- ugarchforecast(garch7afold3, ihsg.dif3, 8)
+forecast3
+
+plot(forecast3, which= 1)
+
+pt_3 <- ihsg.train3[254]
+
+hasil.forc.Diff3 <- forecast3@forecast[["seriesFor"]]
+hasil3 <- diffinv(hasil.forc.Diff3, differences = 1) + pt_3
+
+perbandingan3 <- data.frame("Aktual"= ihsg.test3[1:8],
+                            "Ramalan" = hasil3[-1],
+                            "Tanggal" = tanggal.fold3)
+
+forecast::accuracy(ts(hasil3[-1]),ts(ihsg.test3[1:8]))
+```
+
+```{r}
 forc = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
                       n.ahead = nrow(test_nvda))
 ```
