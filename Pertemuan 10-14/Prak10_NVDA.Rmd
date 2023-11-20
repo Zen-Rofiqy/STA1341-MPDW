@@ -1814,7 +1814,21 @@ Sehingga diperoleh model terbaik yakni **ARIMA(0,1,1)+ARCH(1)**.
 plot(model.arch_nvda, which="all")
 ```
 
-diperoleh mean model yaitu ARIMA(0,1,2) dan varian model yaitu GARCH(1,2) terbaik untuk digunakan dalam peralaman, terlihat pada uji dignostik model pada plot QQ-norm terlihat bahwa sebaran residual mengikuti garis lurus sehingga dapat disimpulkan bahwa residual menyebar normal, lalu untuk uji autokorelasi dapat dilihat plot ACF squared residual telah terlihat bahwa setiap lag berada dibawah batas, sehingga dapat dikatakan bahwa tidak ada autokorelasi antar residual, diperkuat dengan nilai p-value pada uji L-jung Box yang lebih besar dari alpha=0.05.
+Diperoleh mean model yaitu **ARIMA(0,1,1)** dan varian model yaitu **ARCH(1)** untuk digunakan dalam peralaman, pada uji dignostik model pada plot QQ-norm terlihat bahwa sebaran residual tidak mengikuti garis lurus sehingga dapat disimpulkan bahwa **residual tidak menyebar normal,** lalu untuk uji autokorelasi dapat dilihat plot ACF squared residual telah terlihat bahwa setiap lag berada dibawah batas, sehingga dapat dikatakan bahwa tidak ada autokorelasi antar residual, diperkuat dengan nilai p-value pada uji L-jung Box yang lebih besar dari alpha=0.05.
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/05_Arch_NVDA.png", sep=""),
+    height = 6*300, width = 12*300, res=300)
+
+# Plot 
+plot.ts(ts(model.arch_nvda@fit$residuals), col=col.nvda[1], lty=1, 
+        xlab="Periode (Hari)", ylab="Conditional Variance",
+        lwd = 2, main="ARIMA(0,1,1)-ARCH(1) NVDA", cex.main = 1.5)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
 
 ## **Peramalan dengan Model ARIMA(0,1,2)-GARCH(1,2)**
 
