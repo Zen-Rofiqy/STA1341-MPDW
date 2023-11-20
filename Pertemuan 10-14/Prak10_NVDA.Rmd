@@ -1743,7 +1743,6 @@ arch.garch <- function(data, pp, qq = 0, arma.order = c(0, 0)) {
 ```
 
 ```{r}
-# Contoh penggunaan
 model.arch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arma.order = arma.order)
 datatable(model.arch$arch.model, filter = 'top', 
           options = list(pageLength = 6))
@@ -1796,69 +1795,16 @@ Referensi : [GARCH models with R programming : a practical example with TESLA st
 Ya walaupun diatas sudah dijelaskan "tidak usah melanjutkan ke garch", tapi kami hanya ingin mencoba. "Apa yang terjadi jika kita tetap melakukan model GARCH?". Model terbaik dari **GARCH(p,q)** ditentukan dari banyaknya paramter yang signifikan dan AIC nya yang terkecil.
 
 ```{r message=FALSE, warning=FALSE}
-#GARCH(1,1)
-garchSpec11 <- ugarchspec(
-  variance.model=list(model="sGARCH", garchOrder=c(1,0)),
-  mean.model=list(armaOrder = arima.order) )
-garchFit11 <- ugarchfit(spec=garchSpec11, data=train_nvda.diff)
-coef(garchFit11)
+model.garch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 12, arma.order = arma.order)
+datatable(model.garch$arch.model, filter = 'top', 
+          options = list(pageLength = 3))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results = FALSE}
-infocriteria(garchFit11)[[1]] #AIC
-garchFit11@fit$robust.matcoef[,4] #P.Value
-
-garch.model <- data.frame(Model = character(0),
-                          Signif = numeric(0),
-                          AIC = numeric(0),
-                          Sig.par = character(0),
-                          Non_Sig.par = character(0))
-best_model <- NULL
-best_sig <- -Inf
-best_aic <- Inf
-for(p in 1:lag){
-  for(q in 1:lag){
-    formula <- as.formula(paste("~ garch(", p, ",0)", sep = ""))
-    arch.fit <- garchFit(formula, data = train_nvda.diff, trace = FALSE)
-    
-    garchSpec <- ugarchspec(
-      variance.model=list(model="sGARCH", garchOrder=c(p,q)),
-      mean.model=list(armaOrder=c(0,1,1)) )
-    garchFit <- ugarchfit(spec=garchSpec, data=train_nvda.diff)
-    
-    if (anyNA(coef(arch.fit)) || anyNA(arch.fit@fit[["tval"]])) {
-      break
-    }
-    aic <- summary(arch.fit)[["ics"]][["AIC"]]
-    
-      # persentase banyaknya param yang signif
-      coef <- coef(arch.fit)
-      #Cek Pvalue yang < 0.05
-      sig <- sum(arch.fit@fit$matcoef[,4] < .05) / length(coef)
-    
-      sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] < 0.05])
-      non_sig.param <- names(arch.fit@fit[["tval"]][arch.fit@fit$matcoef[,4] >= 0.05])
-      
-      model <- paste0("ARCH(",p,")")
-    garch.model <- rbind(arch.model, 
-        data.frame(Model = model,
-                   Signif = sig, 
-                   AIC = aic,
-                   Sig.par = paste(sig.param, collapse = ", "),
-                   Non_Sig.par = paste(non_sig.param, collapse = ", ")
-                   ) )
-    
-    #Identifikasi best model
-    if (sig > best_sig) {
-        if (aic < best_aic) {
-          best_model <- model
-          best_sig <- sig
-          best_aic <- aic
-      }
-    }
-  }
-}
+```{r}
+cat("Best Model:", model.garch$best_model)
 ```
+
+Terlihat bahwa memang data tidak cocok untuk model **GARCH(p,q)** karena dari rentang lag 1 sampai 12 yang dihasilkan model terbaiknya adalah **GARCH(12,12).** Namun jika pada modelnya, hanya persentase signifikannya sangat kecil. Sehingga tidak mungin untuk dijadikan model terbaik.
 
 ```{r}
 garchFit11
