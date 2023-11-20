@@ -1574,11 +1574,21 @@ cat("Best Model:", model.arch$best_model)
 Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model yang semua parameternya signifikan yakni **ARCH(1).** Karena itu tidak perlu membandingkan nilai **AIC**. Sehingga model terbaik adalah **ARIMA(0,1,1)+ARCH(1).**
 
 ```{r}
+#Model dengan intersep
 archSpec <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,0)),
   mean.model=list(armaOrder = arma.order, include.mean = TRUE) )
-model.arch_nvda <- ugarchfit(spec=archSpec, data=train_nvda.diff, solver = "hybrid")
-coef(model.arch_nvda)
+model.arch_nvda1 <- ugarchfit(spec=archSpec, data=train_nvda.diff, solver="hybrid")
+coef(model.arch_nvda1)
+```
+
+```{r}
+#Model tanpa intersep
+archSpec <- ugarchspec(
+  variance.model=list(model="sGARCH", garchOrder=c(1,0)),
+  mean.model=list(armaOrder = arma.order, include.mean = FALSE) )
+model.arch_nvda2 <- ugarchfit(spec=archSpec, data=train_nvda.diff, solver="hybrid")
+coef(model.arch_nvda2)
 ```
 
 Model yang dihasilkan adalah seperti diatas.
@@ -1586,7 +1596,7 @@ Model yang dihasilkan adalah seperti diatas.
 ### Plot
 
 ```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
-plot.ts(ts(model.arch_nvda@fit$residuals), col=col.nvda[1], lty=1, 
+plot.ts(ts(model.arch_nvda1@fit$residuals), col=col.nvda[1], lty=1, 
         xlab="Periode (Hari)", ylab="Conditional Variance",
         lwd = 2, main="ARIMA(0,1,1)-ARCH(1) NVDA", cex.main = 1.5)
 ```
@@ -1661,10 +1671,15 @@ Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dil
   ramalan_nvda.da <- forecast::forecast(model_nvda.da, h = nrow(test_nvda)) 
   data.ramalan_nvda.da <- ramalan_nvda.da$mean
   
-  #ARCH
-  ramalan_nvda.arch = ugarchforecast(model.arch_nvda, data = train_nvda.diff, 
+  #ARCH + Intersep
+  ramalan_nvda.arch1 = ugarchforecast(model.arch_nvda1, data = train_nvda.diff, 
                         n.ahead = nrow(test_nvda))
-  data.ramal_nvda.arch <- ramalan_nvda.arch@forecast[["seriesFor"]]
+  data.ramal_nvda.arch1 <- ramalan_nvda.arch1@forecast[["seriesFor"]]
+  
+  #ARCH  -Intersep
+  ramalan_nvda.arch2 = ugarchforecast(model.arch_nvda2, data = train_nvda.diff, 
+                        n.ahead = nrow(test_nvda))
+  data.ramal_nvda.arch2 <- ramalan_nvda.arch2@forecast[["seriesFor"]]
 ```
 
 ## Plot Ramalan
@@ -1693,7 +1708,11 @@ Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cender
   ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
     train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
   
-  #ARCH
+  #ARCH + Intersep
+  ramal_nvda.arch <- diffinv(data.ramal_nvda.arch, differences=1) +
+    train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
+  
+  #ARCH - Intersep
   ramal_nvda.arch <- diffinv(data.ramal_nvda.arch, differences=1) +
     train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
 
@@ -1767,8 +1786,8 @@ ggplot() +
             aes(x = Date, y = `ARIMA`, col = "NVDA")) +
   #Data Ramal ARCH
     #Dari data ramal saja
-  geom_line(data = ramal[nrow(train_nvda):nrow(ramal),], linewidth=2,
-            aes(x = Date, y = `ARCH`, col = "NVDA")) +
+  geom_line(data = ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
+            aes(x = Date, y = `ARCH`, col = "GOOG")) +
   #Data Test
   geom_line(data = test_nvda, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
@@ -1789,7 +1808,7 @@ ggplot() +
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
     limits = c(as.Date(min(ramal$Date)), 
-               as.Date(max(ramal$Date)) + 60)
+               as.Date(max(ramal$Date)) + 80)
   ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
@@ -1801,13 +1820,13 @@ ggplot() +
                    y = max(nvda$`Adj Close`)* .58, 
                    yend = max(nvda$`Adj Close`)*.7), 
                arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
-               lineend = "round", color = "#4B75BA", size=1.5) +
+               lineend = "round", color = "gray40", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(train_nvda$Date)), 
                       y = max(nvda$`Adj Close`)*.7, 
                       label = max(train_nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
-    fill = "#4B75BA", box.color = "white", parse = TRUE
+    fill = "gray40", box.color = "white", parse = TRUE
   ) +
 
 #Data Uji
@@ -1842,15 +1861,15 @@ ggplot() +
   
 # Data Ramal ARCH Intersep
   geom_segment(aes(x = as.Date(max(data2$Date)), 
-                   xend = as.Date(max(data2$Date)) + 60, 
+                   xend = as.Date(max(data2$Date)) + 70, 
                    y = max(ramal$`ARCH`), 
                    yend = max(ramal$`ARCH`)), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#4B75BA", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(data2$Date)) +60, 
+    data = data.frame(x = as.Date(max(data2$Date)) +70, 
                       y = max(ramal$`ARCH`), 
-                      label = "ARIMA" ),
+                      label = "ARCH+\nIntersep" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
