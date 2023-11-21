@@ -2037,22 +2037,24 @@ sk_nvda.ramal.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```
 
 ```{r}
-lsk.new <- data.frame(
+lsk.ramal.new <- data.frame(
   Lambda = c(lambda_nvda.ramal.new ),
-  Batas.Bawah = c( min(sk_nvda.new)  ),
-  Batas.Atas = c( max(sk_nvda.new)  )
+  Batas.Bawah = c( min(sk_nvda.ramal.new)  ),
+  Batas.Atas = c( max(sk_nvda.ramal.new)  )
 ) %>%
   mutate(across(where(is.numeric), ~round(., 2)))
 
-lsk.new$Keterangan <- apply(lsk.new, 1, function(row) {
+lsk.ramal.new$Keterangan <- apply(lsk.ramal.new, 1, function(row) {
   ifelse(row["Batas.Bawah"] <= 1 && row["Batas.Atas"] >= 1,
          "Ragam Stasioner",  "Ragam Tidak Stasioner")
 })
 
-rownames(lsk.new) <- c("NVDA")
+rownames(lsk.ramal.new) <- c("NVDA")
 
-datatable(lsk.new, filter = 'none')
+datatable(lsk.ramal.new, filter = 'none')
 ```
+
+Terlihat bahwa data sudah stasioner dalam ragam.
 
 ## Data
 
