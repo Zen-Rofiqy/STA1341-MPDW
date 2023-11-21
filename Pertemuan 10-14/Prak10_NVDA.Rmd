@@ -2056,6 +2056,18 @@ datatable(lsk.ramal.new, filter = 'none')
 
 Terlihat bahwa data sudah stasioner dalam ragam.
 
+### Rataan
+
+```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
+#Diff
+nvda.diff <- diff(nvda.ts.new, differences = 1) 
+
+#Plot
+plot.ts(nvda.diff, lty=1, xlab="Periode (Hari)", 
+        col = col.nvda[1], lwd = 2,
+        main="Plot Differencing", cex.main = 2)
+```
+
 ## Data
 
 ```{r}
