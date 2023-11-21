@@ -2022,23 +2022,23 @@ ggplot() +
   #Label Data Asli 
   annotate( "rect", alpha=.1, fill="#4EC2C1",
             xmin=as.Date(min(data_ramal$Date)), 
-            xmax=as.Date(data_ramal$Date[nrow(train_nvda)]),
+            xmax=as.Date(data_ramal$Date[nrow(nvda)]),
             ymin=max(data_ramal$`Adj Close`) * .9, ymax=Inf ) + 
   
   annotate( "text", color="#4EC2C1",
-            x = as.Date(data_ramal$Date[ceiling(nrow(train_nvda)/2)]), 
+            x = as.Date(data_ramal$Date[ceiling(nrow(nvda)/2)]), 
             y = max(data_ramal$`Adj Close`) * .95, 
     label = "Data Latih", size=10) + 
   annotate( "text", color="#4EC2C1",
-            x = as.Date(data_ramal$Date[ceiling(nrow(train_nvda)/2)]), 
+            x = as.Date(data_ramal$Date[ceiling(nrow(nvda)/2)]), 
             y = max(data_ramal$`Adj Close`) * .85, 
-    label = paste0(nrow(train_nvda)," Hari (", 
+    label = paste0(nrow(nvda)," Hari (", 
                    round(nrow(data_ramal)/length(nDate)*100, 1), 
                    "%)"), size=10) + 
   
   #Label Data Ramal
   annotate( "rect", alpha=.1, fill="violetred",
-            xmin=as.Date(data_ramal$Date[nrow(train_nvda)]), 
+            xmin=as.Date(data_ramal$Date[nrow(nvda)]), 
             xmax=as.Date(max(data_ramal$Date)),
             ymin=max(data_ramal$`Adj Close`) * .9, ymax=Inf ) + 
   
@@ -2054,7 +2054,7 @@ ggplot() +
                    "%)"), size=10) +
   
   geom_vline( #Buat garis batas data
-    xintercept = as.Date(data_ramal$Date[nrow(train_nvda)]) , 
+    xintercept = as.Date(data_ramal$Date[nrow(nvda)]) , 
              linetype = "dotted", color = "black", linewidth = 2) +
 
 #Time Series
@@ -2063,7 +2063,7 @@ ggplot() +
             aes(x = Date, y = `Adj Close`, col = "GOOG")) +
   
   #Penanda
-  geom_point(data = tail(train_nvda, 1), alpha = .5, 
+  geom_point(data = tail(nvda, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
              size = 15, shape = 21, color = "black", fill="violetred") +
   scale_colour_manual(values = cols) +
@@ -2085,16 +2085,16 @@ ggplot() +
   ) +
   
 #Bagi Data Train & Test
-  geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
-                   xend = as.Date(max(train_nvda$Date)), 
+  geom_segment(aes(x = as.Date(max(nvda$Date)), 
+                   xend = as.Date(max(nvda$Date)), 
                    y = max(nvda$`Adj Close`)* .58, 
                    yend = max(nvda$`Adj Close`)*.7), 
                arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
                lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(train_nvda$Date)), 
+    data = data.frame(x = as.Date(max(nvda$Date)), 
                       y = max(nvda$`Adj Close`)*.7, 
-                      label = max(train_nvda$Date) ),
+                      label = max(nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
   ) +
