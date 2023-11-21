@@ -2024,6 +2024,8 @@ datatable(tran.ramal, filter = 'none')
 
 Berikut transformasi yang cocok.
 
+### Transformasi
+
 ```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 #Transformasi
 nvda.ts.new <- 1/sqrt(nvda.ts)
@@ -2056,7 +2058,7 @@ datatable(lsk.ramal.new, filter = 'none')
 
 Terlihat bahwa data sudah stasioner dalam ragam.
 
-### Rataan
+### Rataan & Differencing
 
 ```{r message=FALSE, warning=FALSE}
 #Diff
@@ -2071,9 +2073,25 @@ if (tseries::adf.test(nvda.diff)[["p.value"]] < 0.05) {
 }
 ```
 
-## Data
+## Model
 
 ```{r}
+#--Diff inv--
+  #ARIMA
+  ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
+    train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
+
+
+#--Transformasi Balik--
+  #ARIMA
+  ramal_nvda <- 1/(ramal_nvda)^2
+  
+  #ARCH + Intersep
+  ramal_nvda.arch1 <- 1/(ramal_nvda.arch1)^2
+
+  #ARCH - Intersep
+  ramal_nvda.arch2 <- 1/(ramal_nvda.arch2)^2
+
 #Model
 archSpec <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,0)),
@@ -2086,7 +2104,7 @@ nDate <- seq(from = max(data2$Date) + 1,
              by = "days")
 
 model.ramal = ugarchforecast(model.arch_nvda1, data = nvda.diff, 
-                      n.ahead = length(nDate))
+                      n.ahead = length(nDate)+2)
 data.model.ramal <- model.ramal@forecast[["seriesFor"]]
 
 
@@ -2096,7 +2114,7 @@ data_ramal <- data.frame(
              to = max(nDate), by="days")  ,
   `Adj Close` = c(as.vector(nvda.diff), data.model.ramal[-1] ),
   Name = rep(c("NVDA"), 
-              each = length(nvda.diff) + length(nDate) )
+              each = length(nvda.diff) + length(nDate)+1 )
 )
 colnames(data_ramal) <- c("Date", "Adj Close", "Name")
 ```
