@@ -1990,9 +1990,23 @@ archSpec <- ugarchspec(
 model.ramal <- ugarchfit(spec=archSpec, data=nvda.ts, solver="hybrid")
 
 #--Forecast--
-model.ramal = ugarchforecast(model.arch_nvda1, data = train_nvda.diff, 
-                      n.ahead = nrow(test_nvda))
+nDate <- seq(from = max(data2$Date) + 1, 
+             to = as.Date("2023-12-31"), #Dampe akhir tahun
+             by = "days")
+
+model.ramal = ugarchforecast(model.arch_nvda1, data = nvda.ts, 
+                      n.ahead = length(nDate))
 data.model.ramal <- model.ramal@forecast[["seriesFor"]]
+
+
+#Data Frame
+data_ramal <- data.frame(
+  Date = data2 %>% dplyr::select(Date)  ,
+  `Ramal` = c(as.vector(nvda.ts), data.model.ramal[-1] ),
+  Name = rep(c("NVDA"), 
+              each = nrow(nvda.ts) + length(nDate) )
+)
+colnames(data_ramal) <- c("Date", "Ramal", "Name")
 ```
 
 ## Plot
