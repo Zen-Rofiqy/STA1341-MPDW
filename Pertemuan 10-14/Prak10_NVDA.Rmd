@@ -2058,21 +2058,9 @@ ggplot() +
              linetype = "dotted", color = "black", linewidth = 2) +
 
 #Time Series
-  #Data RAMAL ARIMA
-    #Dari data asli & ramal
+  #Data RAMAL 
   geom_line(data = data_ramal, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "NVDA")) +
-  #Data Ramal ARCH + Intersep
-    #Dari data ramal saja
-  geom_line(data = data_ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "GOOG")) +
-  #Data Ramal ARCH - Intersep
-    #Dari data ramal saja
-  geom_line(data = data_ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "MSFT")) +
-  #Data Test
-  geom_line(data = test_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
   
   #Penanda
   geom_point(data = tail(train_nvda, 1), alpha = .5, 
