@@ -2188,7 +2188,7 @@ ggplot() +
 
 chart
 #Export Chart
-ggsave("06_Akurasi_model.png", chart, path = export.chart,
+ggsave("07_Ramalan.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
