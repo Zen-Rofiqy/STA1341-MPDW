@@ -2058,14 +2058,17 @@ Terlihat bahwa data sudah stasioner dalam ragam.
 
 ### Rataan
 
-```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
+```{r message=FALSE, warning=FALSE}
 #Diff
 nvda.diff <- diff(nvda.ts.new, differences = 1) 
 
-#Plot
-plot.ts(nvda.diff, lty=1, xlab="Periode (Hari)", 
-        col = col.nvda[1], lwd = 2,
-        main="Plot Differencing", cex.main = 2)
+tseries::adf.test(nvda.diff)
+
+if (tseries::adf.test(nvda.diff)[["p.value"]] < 0.05) {
+  cat("Karena p-value < 0.05, Maka Rataan Stasioner")
+} else {
+  cat("Karena p-value > 0.05, Maka Rataan Tidak Stasioner")
+}
 ```
 
 ## Data
@@ -2075,14 +2078,14 @@ plot.ts(nvda.diff, lty=1, xlab="Periode (Hari)",
 archSpec <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,0)),
   mean.model=list(armaOrder = arma.order, include.mean = TRUE) )
-model.ramal <- ugarchfit(spec=archSpec, data=nvda.ts, solver="hybrid")
+model.ramal <- ugarchfit(spec=archSpec, data=nvda.diff, solver="hybrid")
 
 #--Forecast--
 nDate <- seq(from = max(data2$Date) + 1, 
              to = as.Date("2023-12-31"), #Dampe akhir tahun
              by = "days")
 
-model.ramal = ugarchforecast(model.arch_nvda1, data = nvda.ts, 
+model.ramal = ugarchforecast(model.arch_nvda1, data = nvda.diff, 
                       n.ahead = length(nDate))
 data.model.ramal <- model.ramal@forecast[["seriesFor"]]
 
@@ -2090,10 +2093,10 @@ data.model.ramal <- model.ramal@forecast[["seriesFor"]]
 #Data Frame
 data_ramal <- data.frame(
   Date = seq(from = min(data2$Date),
-             to = max(nDate)-1, by="days")  ,
-  `Adj Close` = c(as.vector(nvda.ts), data.model.ramal[-1] ),
+             to = max(nDate), by="days")  ,
+  `Adj Close` = c(as.vector(nvda.diff), data.model.ramal[-1] ),
   Name = rep(c("NVDA"), 
-              each = length(nvda.ts) + length(nDate)-1 )
+              each = length(nvda.diff) + length(nDate) )
 )
 colnames(data_ramal) <- c("Date", "Adj Close", "Name")
 ```
