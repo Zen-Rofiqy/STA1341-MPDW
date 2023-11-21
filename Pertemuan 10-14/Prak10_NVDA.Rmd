@@ -1982,6 +1982,8 @@ Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** berkatergori *"Baik"* de
 
 ## Stasioneritas
 
+### Ragam
+
 ```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 index <- seq(1:nrow(nvda)) #Beda titik potong
 bc =boxcox(nvda.ts~index, lambda=seq(-2, 4, by=.01))
@@ -2008,7 +2010,31 @@ rownames(lsk.ramal) <- c("NVDA")
 datatable(lsk.ramal, filter = "none")
 ```
 
-Transformasi yang cocok dilakukan adalah
+Data tidak Stasioner dalam ragam.
+
+```{r}
+tran.ramal <- lsk.ramal %>%
+  mutate(
+    Transformasi = trans(Lambda),
+    `Transformasi Balik` = trans_balik(Lambda)
+  ) %>% dplyr::select(Lambda, Transformasi, `Transformasi Balik`)
+
+datatable(tran.ramal, filter = 'none')
+```
+
+Berikut transformasi yang cocok.
+
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+#Transformasi
+nvda.ts.new <- 1/sqrt(nvda.ts)
+
+#Plot BoxCox
+index <- seq(1:nrow(nvda))
+bc <-boxcox(nvda.ts.new ~index, lambda=seq(-2, 4, by=.01))
+title("NVDA", cex.main=2)
+lambda_nvda.ramal.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+```
 
 ## Data
 
