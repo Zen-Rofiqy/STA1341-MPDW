@@ -2033,7 +2033,7 @@ ggplot() +
             x = as.Date(data_ramal$Date[ceiling(nrow(train_nvda)/2)]), 
             y = max(data_ramal$`Adj Close`) * .85, 
     label = paste0(nrow(train_nvda)," Hari (", 
-                   round(nrow(train_nvda)/nrow(nvda)*100, 1), 
+                   round(nrow(data_ramal)/length(nDate)*100, 1), 
                    "%)"), size=10) + 
   
   #Label Data Ramal
