@@ -654,7 +654,7 @@ Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terli
 
 ### Plot ACF
 
-```{r fig.align="center", fig.height=5.625, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 install_load('tsibble','tseries')
 acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
 mtext("NVDA", side=3, line=1, cex=2, font=2)
@@ -665,7 +665,7 @@ Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/03_Stas_1_ACF.png", sep=""),
-    height = 5.625*300, width = 7.5*300, res=300)
+    height = 3.75*300, width = 7.5*300, res=300)
 
 # Plot 
 acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
@@ -1978,7 +1978,37 @@ datatable(akurasi, filter = 'top',
 
 Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** berkatergori *"Baik"* dengan nilai **MAPE** nya sebesar $12.3\%$ (kurang dari $20\%$).
 
-# Ramalan
+# Peramalan
+
+## Stasioneritas
+
+```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+index <- seq(1:nrow(nvda)) #Beda titik potong
+bc =boxcox(nvda.ts~index, lambda=seq(-2, 4, by=.01))
+title("NVDA", cex.main = 2)
+lambda_nvda.ramal <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
+sk_nvda.ramal <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+```
+
+```{r}
+lsk.ramal <- data.frame(
+  Lambda = c(lambda_nvda.ramal ),
+  Batas.Bawah = c( min(sk_nvda.ramal)  ),
+  Batas.Atas = c(max(sk_nvda.ramal) )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+lsk.ramal$Keterangan <- apply(lsk.ramal, 1, function(row) {
+  ifelse(row["Batas.Bawah"] <= 1 && row["Batas.Atas"] >= 1,
+         "Ragam Stasioner",  "Ragam Tidak Stasioner")
+})
+
+rownames(lsk.ramal) <- c("NVDA")
+
+datatable(lsk.ramal, filter = "none")
+```
+
+Transformasi yang cocok dilakukan adalah
 
 ## Data
 
@@ -2011,6 +2041,10 @@ colnames(data_ramal) <- c("Date", "Adj Close", "Name")
 ```
 
 ## Plot
+
+```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
+plot(model.ramal, which= 1)
+```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
 chart <- 
