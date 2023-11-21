@@ -2076,21 +2076,6 @@ if (tseries::adf.test(nvda.diff)[["p.value"]] < 0.05) {
 ## Model
 
 ```{r}
-#--Diff inv--
-  #ARIMA
-  ramal_nvda <- diffinv(data.ramalan_nvda.da, differences=1) +
-    train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
-
-
-#--Transformasi Balik--
-  #ARIMA
-  ramal_nvda <- 1/(ramal_nvda)^2
-  
-  #ARCH + Intersep
-  ramal_nvda.arch1 <- 1/(ramal_nvda.arch1)^2
-
-  #ARCH - Intersep
-  ramal_nvda.arch2 <- 1/(ramal_nvda.arch2)^2
 
 #Model
 archSpec <- ugarchspec(
@@ -2107,6 +2092,14 @@ model.ramal = ugarchforecast(model.arch_nvda1, data = nvda.diff,
                       n.ahead = length(nDate)+2)
 data.model.ramal <- model.ramal@forecast[["seriesFor"]]
 
+#--Diff inv--
+  #ARIMA
+  ramal.nvda <- diffinv(data.model.ramal, differences=1) +
+    train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
+
+
+#--Transformasi Balik--
+  ramal.nvda <- 1/(ramal.nvda)^2
 
 #Data Frame
 data_ramal <- data.frame(
