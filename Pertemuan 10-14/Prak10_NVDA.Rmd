@@ -211,7 +211,7 @@ final_data <- final_data %>%
 #Input Data Hilang
 install_load('imputeTS')
 
-data <- na_interpolation(final_data$`Adj Close`)
+data <- na_interpolation(final_data$`Adj Close`, option = "linear")
 
 install_load('ggplot2')
 chart <- ggplot_na_imputations(final_data$`Adj Close`, data)
@@ -2113,50 +2113,20 @@ ggplot() +
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
   ) +
-
-# Data Ramal ARIMA
-  geom_segment(aes(x = as.Date(max(data_ramal$Date)), 
-                   xend = as.Date(max(data_ramal$Date)) + 60, 
-                   y = max(data_ramal$`ARIMA`), 
-                   yend = max(data_ramal$`ARIMA`)), 
-               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
-               lineend = "round", color = "#D02A49", size=1.5) +
-  geom_richtext(
-    data = data.frame(x = as.Date(max(data_ramal$Date)) +60, 
-                      y = max(data_ramal$`ARIMA`), 
-                      label = "ARIMA" ),
-    aes(x, y, label = label), size = 8, color = "white", 
-    fill = "#D02A49", box.color = "white", parse = TRUE
-  ) +
   
 # Data Ramal ARCH + Intersep
   geom_segment(aes(x = as.Date(max(data_ramal$Date)), 
                    xend = as.Date(max(data_ramal$Date)) + 70, 
-                   y = max(data_ramal$`ARCH+Intersep`), 
-                   yend = max(data_ramal$`ARCH+Intersep`)), 
+                   y = max(data_ramal$`Adj Close`), 
+                   yend = max(data_ramal$`Adj Close`)), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#4B75BA", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data_ramal$Date)) +70, 
-                      y = max(data_ramal$`ARCH+Intersep`), 
+                      y = max(data_ramal$`Adj Close`), 
                       label = "ARCH + Intersep" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
-  ) +
-  
-# Data Ramal ARCH - Intersep
-  geom_segment(aes(x = as.Date(max(data_ramal$Date)), 
-                   xend = as.Date(max(data_ramal$Date)) + 70, 
-                   y = data_ramal$`ARCH-Intersep`[nrow(nvda)], 
-                   yend = data_ramal$`ARCH-Intersep`[nrow(nvda)]), 
-               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
-               lineend = "round", color = "#DC4F26", size=1.5) +
-  geom_richtext(
-    data = data.frame(x = as.Date(max(data_ramal$Date)) +70, 
-                      y = data_ramal$`ARCH-Intersep`[nrow(nvda)], 
-                      label = "ARCH - Intersep" ),
-    aes(x, y, label = label), size = 8, color = "white", 
-    fill = "#DC4F26", box.color = "white", parse = TRUE
   ) +
 
 #Tanggal akhir
