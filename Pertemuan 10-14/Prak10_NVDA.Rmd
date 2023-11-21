@@ -2001,10 +2001,11 @@ data.model.ramal <- model.ramal@forecast[["seriesFor"]]
 
 #Data Frame
 data_ramal <- data.frame(
-  Date = data2 %>% dplyr::select(Date)  ,
+  Date = seq(from = min(data2$Date),
+             to = max(nDate), by="days")  ,
   `Ramal` = c(as.vector(nvda.ts), data.model.ramal[-1] ),
   Name = rep(c("NVDA"), 
-              each = nrow(nvda.ts) + length(nDate) )
+              each = length(nvda.ts) + length(nDate) )
 )
 colnames(data_ramal) <- c("Date", "Ramal", "Name")
 ```
