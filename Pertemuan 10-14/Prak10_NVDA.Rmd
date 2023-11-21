@@ -2033,7 +2033,25 @@ index <- seq(1:nrow(nvda))
 bc <-boxcox(nvda.ts.new ~index, lambda=seq(-2, 4, by=.01))
 title("NVDA", cex.main=2)
 lambda_nvda.ramal.new <- bc$x[which.max(bc$y)] #Nilai Rounded Lambda
-sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+sk_nvda.ramal.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
+```
+
+```{r}
+lsk.new <- data.frame(
+  Lambda = c(lambda_nvda.ramal.new ),
+  Batas.Bawah = c( min(sk_nvda.new)  ),
+  Batas.Atas = c( max(sk_nvda.new)  )
+) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+lsk.new$Keterangan <- apply(lsk.new, 1, function(row) {
+  ifelse(row["Batas.Bawah"] <= 1 && row["Batas.Atas"] >= 1,
+         "Ragam Stasioner",  "Ragam Tidak Stasioner")
+})
+
+rownames(lsk.new) <- c("NVDA")
+
+datatable(lsk.new, filter = 'none')
 ```
 
 ## Data
