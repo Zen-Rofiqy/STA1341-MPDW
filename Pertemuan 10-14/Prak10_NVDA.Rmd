@@ -316,9 +316,8 @@ ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
                                 GOOG=col.goog[1], META=col.meta[1],
                                 MSFT=col.msft[1], NFLX=col.nflx[1], 
                                 NVDA=col.nvda[1]) ) +
-  scale_alpha_manual(values = c("NVDA" = 1, "NFLX" = .25, "MSFT" = .25, 
-                                "META" = .25, "AAPL" = .25, "GOOG" = 1, 
-                                "AMZN" = .25)) +
+  scale_alpha_manual(values = c("AMD" = .25, "ARM" = .25, "AVGO" = .25, 
+                                "INTC" = .25, "NVDA" = 1, "TSM" = .25)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Time Series MAANG",
