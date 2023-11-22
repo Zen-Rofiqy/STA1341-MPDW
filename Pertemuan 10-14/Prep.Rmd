@@ -57,7 +57,10 @@ opts_knit$set(root.dir = "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt
 ```
 
 ```{r message=FALSE, warning=FALSE}
-install_load("openxlsx","rio","dplyr","lubridate")
+install_load("openxlsx","rio","dplyr","lubridate","purrr","imputeTS",
+             "ggplot2","DT","extrafont","viridis","ggrepel","ggtext",
+             "forecast","tsibble","tseries","MASS","TSA","dynlm","FinTS",
+             "rugarch")
 ```
 
 ```{r}
