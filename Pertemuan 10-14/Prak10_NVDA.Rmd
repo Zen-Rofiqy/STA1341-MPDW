@@ -359,7 +359,7 @@ ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
 chart
 
 #Export Chart
-ggsave("01_Time Series MAANG.png", chart, path = export.chart,
+ggsave("01_Time Series AAANTI.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
@@ -424,7 +424,7 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
 chart
 
 #Export Chart
-ggsave("01_Time Series MAANG_2022-2023.png", chart, path = export.chart,
+ggsave("01_Time Series AAANTI_2022-2023.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
