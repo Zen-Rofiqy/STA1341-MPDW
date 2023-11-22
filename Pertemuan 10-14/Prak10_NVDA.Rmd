@@ -2081,8 +2081,8 @@ Setelah di differencing, data sudah stasioner.
 
 #Model
 archSpec <- ugarchspec(
-  variance.model=list(model="sGARCH", garchOrder=c(1,0)),
-  mean.model=list(armaOrder = arma.order, include.mean = TRUE) )
+  variance.model=list(model="sGARCH", garchOrder=c(1,0)), #ARCH(1)
+  mean.model=list(armaOrder = arma.order, include.mean = TRUE) ) #ARIMA(0,1,1) + Intersep
 model.ramal <- ugarchfit(spec=archSpec, data=nvda.diff, solver="hybrid")
 
 #--Forecast--
@@ -2090,7 +2090,7 @@ nDate <- seq(from = max(data2$Date) + 1,
              to = as.Date("2023-12-31"), #Dampe akhir tahun
              by = "days")
 
-model.ramal = ugarchforecast(model.arch_nvda1, data = nvda.diff, 
+model.ramal = ugarchforecast(model.ramal, data = nvda.diff, 
                       n.ahead = length(nDate))
 data.model.ramal <- model.ramal@forecast[["seriesFor"]]
 
