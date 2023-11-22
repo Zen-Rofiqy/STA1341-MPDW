@@ -2091,7 +2091,7 @@ nDate <- seq(from = max(data2$Date) + 1,
              by = "days")
 
 model.ramal = ugarchforecast(model.arch_nvda1, data = nvda.diff, 
-                      n.ahead = length(nDate)+2)
+                      n.ahead = length(nDate)+1)
 data.model.ramal <- model.ramal@forecast[["seriesFor"]]
 
 #--Diff inv--
@@ -2107,7 +2107,7 @@ data.model.ramal <- model.ramal@forecast[["seriesFor"]]
 data_ramal <- data.frame(
   Date = seq(from = min(data2$Date),
              to = max(nDate), by="days")  ,
-  `Adj Close` = c(as.vector(nvda.diff), data.model.ramal[-1] ),
+  `Adj Close` = c(as.vector(nvda.diff), ramal.nvda[-1] ),
   Name = rep(c("NVDA"), 
               each = length(nvda.diff) + length(nDate)+1 )
 )
