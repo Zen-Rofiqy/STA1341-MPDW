@@ -2190,15 +2190,9 @@ ggplot() +
   ) +
   
 #Tanggal akhir data asli
-  geom_segment(aes(x = as.Date(max(nvda$Date)), 
-                   xend = as.Date(max(nvda$Date)), 
-                   y = max(nvda$`Adj Close`)* .9, 
-                   yend = max(nvda$`Adj Close`)*.8), 
-               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
-               lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(nvda$Date)), 
-                      y = max(nvda$`Adj Close`)*.8, 
+                      y = max(nvda$`Adj Close`)*.75, 
                       label = max(nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
