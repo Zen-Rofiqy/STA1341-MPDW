@@ -65,15 +65,14 @@ install_load("openxlsx","rio","dplyr","lubridate","purrr","imputeTS",
 
 ```{r}
 data1 <- rbind(
-  read.csv("AAPL.csv") %>% mutate(Name = "AAPL"),
-  read.csv("AMZN.csv") %>% mutate(Name = "AMZN"),
-  read.csv("GOOG.csv") %>% mutate(Name = "GOOG"),
-  read.csv("META.csv") %>% mutate(Name = "META"),
-  read.csv("MSFT.csv") %>% mutate(Name = "MSFT"),
-  read.csv("NFLX.csv") %>% mutate(Name = "NFLX"),
-  read.csv("NVDA.csv") %>% mutate(Name = "NVDA")  ) %>% 
+  read.csv("AMD.csv") %>% mutate(Name = "AMD"),
+  read.csv("ARM.csv") %>% mutate(Name = "ARM"),
+  read.csv("AVGO.csv") %>% mutate(Name = "AVGO"),
+  read.csv("NVDA.csv") %>% mutate(Name = "NVDA"),
+  read.csv("TSM.csv") %>% mutate(Name = "TSM"),
+  read.csv("INTC.csv") %>% mutate(Name = "INTC")  ) %>% 
     relocate(Name, .before = 1) %>% 
   rename(`Adj Close` = Adj.Close)
 
-write.csv(data1, "@MAANG Stock Prices.csv", row.names=FALSE)
+write.csv(data1, "@AAANTI Stock Prices.csv", row.names=FALSE)
 ```
