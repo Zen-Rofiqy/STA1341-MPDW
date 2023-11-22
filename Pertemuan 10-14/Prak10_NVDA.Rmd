@@ -2134,7 +2134,7 @@ ggplot() +
             ymin=-Inf, ymax=Inf ) + 
   annotate( "text", color="violetred",
             x = as.Date(max(nDate)-25) , 
-            y = max(data2$`Adj Close`) * .95, 
+            y = min(data2$`Adj Close`) * 3, 
     label = "Data\nRamal", size=10) +
   
   geom_vline( #Buat garis batas data
@@ -2162,7 +2162,7 @@ ggplot() +
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
     limits = c(as.Date("2022-06-01"), 
-               as.Date(max(data_ramal$Date)) + 50)
+               as.Date(max(data_ramal$Date)) + 40)
   ) +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
@@ -2179,15 +2179,16 @@ ggplot() +
   
 # Data Ramal ARCH + Intersep
   geom_segment(aes(x = as.Date(max(data_ramal$Date)), 
-                   xend = as.Date(max(data_ramal$Date)) + 40, 
+                   xend = as.Date(max(data_ramal$Date)) + 30, 
                    y = max(data_ramal$`Adj Close`), 
                    yend = max(data_ramal$`Adj Close`)), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#4B75BA", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(data_ramal$Date)) +40, 
+    data = data.frame(x = as.Date(max(data_ramal$Date)) +30, 
                       y = max(data_ramal$`Adj Close`), 
-                      label = "Data Ramal" ),
+                      label = paste0(data_ramal$`Adj Close`[nrow(data_ramal)] %>% round(.,2),
+                                     "$") ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
