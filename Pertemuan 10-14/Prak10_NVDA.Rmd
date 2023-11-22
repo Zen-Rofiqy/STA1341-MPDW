@@ -2078,7 +2078,6 @@ Setelah di differencing, data sudah stasioner.
 ## Model
 
 ```{r}
-
 #Model
 archSpec <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,0)), #ARCH(1)
@@ -2090,24 +2089,24 @@ nDate <- seq(from = max(data2$Date) + 1,
              to = as.Date("2023-12-31"), #Dampe akhir tahun
              by = "days")
 
-model.ramal = ugarchforecast(model.ramal, data = nvda.diff, 
+ramalan_nvda <- ugarchforecast(model.ramal, data = nvda.diff, 
                       n.ahead = length(nDate))
-data.model.ramal <- model.ramal@forecast[["seriesFor"]]
+data.ramal_nvda <- ramalan_nvda@forecast[["seriesFor"]]
 
 #--Diff inv--
   #ARIMA
-  ramal.nvda <- diffinv(data.model.ramal, differences=1) +
-    train_nvda.ts.new[length(train_nvda.ts)] #nilai akhir data latih
+  ramal_nvda <- diffinv(data.ramal_nvda, differences=1) +
+    train_nvda.ts.new[length(nvda.ts)] #nilai akhir data latih
 
 
 #--Transformasi Balik--
-  ramal.nvda <- 1/(ramal.nvda)^2
+  ramal_nvda <- 1/(ramal_nvda)^2
 
 #Data Frame
 data_ramal <- data.frame(
   Date = seq(from = min(data2$Date),
              to = max(nDate), by="days")  ,
-  `Adj Close` = c(as.vector(nvda.ts), ramal.nvda[-1] ),
+  `Adj Close` = c(as.vector(nvda.ts), ramal_nvda[-1] ),
   Name = rep(c("NVDA"), 
               each = length(nvda.ts) + length(nDate) )
 )
