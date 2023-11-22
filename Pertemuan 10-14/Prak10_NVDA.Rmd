@@ -1754,7 +1754,7 @@ ggplot() +
   annotate( "text", color="#4EC2C1",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
             y = max(data2$`Adj Close`) * .95, 
-    label = "Data Latih", size=10) + 
+    label = "Data Asli", size=10) + 
   annotate( "text", color="#4EC2C1",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
             y = max(data2$`Adj Close`) * .85, 
@@ -1877,7 +1877,7 @@ ggplot() +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)) +70, 
                       y = max(ramal$`ARCH+Intersep`), 
-                      label = "ARCH + Intersep" ),
+                      label = "ARCH dengan <br> Intersep" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
@@ -1892,7 +1892,7 @@ ggplot() +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)) +70, 
                       y = ramal$`ARCH-Intersep`[nrow(nvda)], 
-                      label = "ARCH - Intersep" ),
+                      label = "ARCH tanpa <br> Intersep" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#DC4F26", box.color = "white", parse = TRUE
   ) +
@@ -2135,13 +2135,11 @@ ggplot() +
   annotate( "text", color="#4EC2C1",
             x = as.Date(data_ramal$Date[ceiling(nrow(nvda)/2)]), 
             y = max(data_ramal$`Adj Close`) * .95, 
-    label = "Data Latih", size=10) + 
+    label = "Data Saham NVDA", size=10) + 
   annotate( "text", color="#4EC2C1",
             x = as.Date(data_ramal$Date[ceiling(nrow(nvda)/2)]), 
             y = max(data_ramal$`Adj Close`) * .85, 
-    label = paste0(nrow(nvda)," Hari (", 
-                   round(nrow(data_ramal)/length(nDate)*100, 1), 
-                   "%)"), size=10) + 
+    label = paste0(""), size=10) + 
   
   #Label Data Ramal
   annotate( "rect", alpha=.1, fill="violetred",
@@ -2202,21 +2200,6 @@ ggplot() +
     data = data.frame(x = as.Date(max(nvda$Date)), 
                       y = max(nvda$`Adj Close`)*.7, 
                       label = max(nvda$Date) ),
-    aes(x, y, label = label), size = 8, color = "white", 
-    fill = "gray60", box.color = "white", parse = TRUE
-  ) +
-
-#Data Uji
-  geom_segment(aes(x = as.Date(max(data_ramal$Date)), 
-                   xend = as.Date(max(data_ramal$Date))+60, 
-                   y = nvda$`Adj Close`[nrow(nvda)], 
-                   yend = nvda$`Adj Close`[nrow(nvda)]), 
-               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
-               lineend = "round", color = "gray60", size=1.5) +
-  geom_richtext(
-    data = data.frame(x = as.Date(max(data_ramal$Date))+60, 
-                      y = nvda$`Adj Close`[nrow(nvda)], 
-                      label = "Data Asli" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
   ) +
