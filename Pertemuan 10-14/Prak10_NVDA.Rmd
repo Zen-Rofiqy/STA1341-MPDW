@@ -2133,7 +2133,7 @@ ggplot() +
             xmax=as.Date(max(data_ramal$Date)),
             ymin=-Inf, ymax=Inf ) + 
   annotate( "text", color="violetred",
-            x = as.Date(max(nDate)-30) , 
+            x = as.Date(max(nDate)-25) , 
             y = max(data2$`Adj Close`) * .95, 
     label = "Data\nRamal", size=10) +
   
