@@ -220,7 +220,7 @@ chart
 ggsave("00_Imputasi Data.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 23)
 
-data <- final_data %>% select(Name, Date) %>% 
+data <- final_data %>% dplyr::select(Name, Date) %>% 
   mutate(`Adj Close` = data)
 ```
 
@@ -1609,7 +1609,7 @@ png(paste(export.chart, "/05_Arch_NVDA.png", sep=""),
     height = 6*300, width = 12*300, res=300)
 
 # Plot 
-plot.ts(ts(model.arch_nvda@fit$residuals), col=col.nvda[1], lty=1, 
+plot.ts(ts(model.arch_nvda1@fit$residuals), col=col.nvda[1], lty=1, 
         xlab="Periode (Hari)", ylab="Conditional Variance",
         lwd = 2, main="ARIMA(0,1,1)-ARCH(1) NVDA", cex.main = 1.5)
 
@@ -1624,7 +1624,7 @@ Referensi : [GARCH models with R programming : a practical example with TESLA st
 Ya walaupun diatas sudah dijelaskan "tidak usah melanjutkan ke garch", tapi kami hanya ingin mencoba. "Apa yang terjadi jika kita tetap melakukan model GARCH?". Model terbaik dari **GARCH(p,q)** ditentukan dari banyaknya paramter yang signifikan dan AIC nya yang terkecil.
 
 ```{r message=FALSE, warning=FALSE}
-model.garch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 12, arma.order = arma.order)
+model.garch <- arch.garch(data = train_nvda.diff, pp = 5, qq = 5, arma.order = arma.order)
 datatable(model.garch$arch.model, filter = 'top', 
           options = list(pageLength = 6))
 ```
@@ -1640,7 +1640,7 @@ Terlihat bahwa memang data tidak cocok untuk model **GARCH(p,q)** karena dari re
 Sehingga diperoleh model terbaik yakni **ARIMA(0,1,1)+ARCH(1)**.
 
 ```{r fig.align="center", fig.height=9, fig.width=16, message=FALSE, warning=FALSE, dpi=300}
-plot(model.arch_nvda, which="all")
+plot(model.arch_nvda1, which="all")
 ```
 
 Diperoleh mean model yaitu **ARIMA(0,1,1)** dan varian model yaitu **ARCH(1)** untuk digunakan dalam peralaman, pada uji dignostik model pada plot QQ-norm terlihat bahwa sebaran residual tidak mengikuti garis lurus sehingga dapat disimpulkan bahwa **residual tidak menyebar normal,** lalu untuk uji autokorelasi dapat dilihat plot ACF squared residual telah terlihat bahwa setiap lag berada dibawah batas, sehingga dapat dikatakan bahwa **ada autokorelasi antar residual**, diperkuat dengan nilai p-value pada uji L-jung Box yang lebih besar dari alpha=0.05.
@@ -1651,7 +1651,7 @@ png(paste(export.chart, "/05_Arch-All_NVDA.png", sep=""),
     height = 9*300, width = 16*300, res=300)
 
 # Plot 
-plot(model.arch_nvda, which="all")
+plot(model.arch_nvda1, which="all")
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
@@ -1697,7 +1697,7 @@ Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cender
 > Model **ARIMA(0,1,1)+ARCH(1)**
 
 ```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
-plot(ramalan_nvda.arch, which= 1)
+plot(ramalan_nvda.arch1, which= 1)
 ```
 
 Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
@@ -2072,6 +2072,8 @@ if (tseries::adf.test(nvda.diff)[["p.value"]] < 0.05) {
   cat("Karena p-value > 0.05, Maka Rataan Tidak Stasioner")
 }
 ```
+
+Setelah di differencing, data sudah stasioner.
 
 ## Model
 
