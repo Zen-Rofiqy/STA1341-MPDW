@@ -312,16 +312,15 @@ chart <-
 ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
-  scale_color_manual(values = c(AAPL=col.aapl[1], AMZN=col.amzn[1],
-                                GOOG=col.goog[1], META=col.meta[1],
-                                MSFT=col.msft[1], NFLX=col.nflx[1], 
-                                NVDA=col.nvda[1]) ) +
+  scale_color_manual(values = c(AMD=col.amd[1],   ARM=col.arm[1],
+                                AVGO=col.avgo[1], NVDA=col.nvda[1],
+                                TSM=col.tsm[1],   INTC=col.intc[1] )) +
   scale_alpha_manual(values = c("AMD" = .25, "ARM" = .25, "AVGO" = .25, 
-                                "INTC" = .25, "NVDA" = 1, "TSM" = .25)) +
+                                "NVDA" = 1, "TSM" = .25, "INTC" = .25)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Time Series MAANG",
-       subtitle = "Seperti apa sih pola deret waktu saham MAANG?\n") +
+       title = "Time Series AAANTI",
+       subtitle = "Seperti apa sih pola deret waktu saham AAANTI?\n") +
   # Label / legend
   geom_text_repel(
     data=data[data$Date == max(data$Date),], #Posisi di ujung data
@@ -351,7 +350,7 @@ ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
     annotate( #Buat nandain batas data
-    "text", x = as.Date(max(data$Date)), y = 50, 
+    "text", x = as.Date(max(data$Date)), y = -35, 
     label = max(data$Date), size=6
   ) +
   geom_vline( #Buat garis batas data
@@ -375,17 +374,18 @@ data2 <- data %>%
 install_load('viridis','ggrepel')
 #Plot
 chart <-
-ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name)) + #Data
+ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
   geom_line(aes(color=Name), linewidth=1.5) + #Timeseries
   #Color
-  scale_color_manual(values = c(AAPL=col.aapl[1], AMZN=col.amzn[1],
-                                GOOG=col.goog[1], META=col.meta[1],
-                                MSFT=col.msft[1], NFLX=col.nflx[1], 
-                                NVDA=col.nvda[1]) ) +
+  scale_color_manual(values = c(AMD=col.amd[1],   ARM=col.arm[1],
+                                AVGO=col.avgo[1], NVDA=col.nvda[1],
+                                TSM=col.tsm[1],   INTC=col.intc[1] )) +
+  scale_alpha_manual(values = c("AMD" = .35, "ARM" = .35, "AVGO" = .35, 
+                                "NVDA" = 1, "TSM" = .35, "INTC" = .35)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Time Series MAANG",
-       subtitle = "Seperti apa sih pola deret waktu saham MAANG pada 2021-2023?\n") +
+       title = "Time Series AAANTI",
+       subtitle = "Seperti apa sih pola deret waktu saham AAANTI pada 2021-2023?\n") +
   # Label / legend
   geom_text_repel(
     data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
@@ -415,7 +415,7 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name)) + #Data
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
     annotate( #Buat nandain batas data
-    "text", x = as.Date(max(data2$Date)), y = 50, 
+    "text", x = as.Date(max(data2$Date)), y = -35, 
     label = max(data2$Date), size=6
   ) +
   geom_vline( #Buat garis batas data
