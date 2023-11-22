@@ -252,18 +252,16 @@ datatable(data, filter = 'top',
 Referensi : [Warna1](https://blog.datawrapper.de/colors-for-data-vis-style-guides/){.uri}, [Warna2](https://ux.mailchimp.com/patterns/data#palette){.uri}
 
 ```{r}
-col.aapl <- c("#6F8086", "#B4CBD2"); col.amzn <- c("#EDB64E", "#F6DEB3") 
-col.goog <- c("#919C49", "#CCD775"); col.meta <- c("#4B75BA", "#9BC6EA") 
-col.msft <- c("#4EC2C1", "#B8E0DC"); col.nflx <- c("#D02A49", "#F3AEAA") 
-col.nvda <- c("#36B450", "#ACD694")
+col.amd <- c("#D02A49", "#F3AEAA"); col.arm <- c("#4EC2C1", "#B8E0DC") 
+col.avgo <- c("#DC4F26", "#FCCFBC"); col.nvda <- c("#36B450", "#ACD694") 
+col.tsm <- c("#EDB64E", "#F6DEB3"); col.intc <- c("#4B75BA", "#9BC6EA") 
 
-cols <- c("AAPL"=col.aapl[1], "test_aapl"=col.aapl[2],
-          "AMZN"=col.amzn[1], "test_amzn"=col.amzn[2],
-          "GOOG"=col.goog[1], "test_goog"=col.goog[2],
-          "META"=col.meta[1], "test_meta"=col.meta[2],
-          "MSFT"=col.msft[1], "test_msft"=col.msft[2],
-          "NFLX"=col.nflx[1], "test_nflx"=col.nflx[2],
-          "NVDA"=col.nvda[1], "test_nvda"=col.nvda[2] )
+cols <- c("AMD"=col.amd[1],   "test_amd"=col.amd[2],
+          "ARM"=col.arm[1],   "test_arm"=col.arm[2],
+          "AVGO"=col.avgo[1], "test_avgo"=col.avgo[2],
+          "NVDA"=col.nvda[1], "test_mvda"=col.nvda[2],
+          "TSM"=col.tsm[1],   "test_tsm"=col.tsm[2],
+          "INTC"=col.intc[1], "test_intc"=col.intc[2])
 ```
 
 ## Plot Time Series
