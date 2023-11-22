@@ -56,6 +56,10 @@ require("knitr")
 opts_knit$set(root.dir = "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/6. Metode Peramalan Deret Waktu/@Proj/STA1341-MPDW/Data/New")
 ```
 
+```{r message=FALSE, warning=FALSE}
+install_load("openxlsx","rio","dplyr","lubridate")
+```
+
 ```{r}
 data1 <- rbind(
   read.csv("AAPL.csv") %>% mutate(Name = "AAPL"),
