@@ -2178,8 +2178,8 @@ ggplot() +
   ) +
   
 # Harga akhir Data Asli
-  geom_segment(aes(x = as.Date(max(nvda$Date)) - 30, 
-                   xend = as.Date(max(nvda$Date)), 
+  geom_segment(aes(x = as.Date(max(nvda$Date)), 
+                   xend = as.Date(max(nvda$Date))- 30, 
                    y = nvda$`Adj Close`[nrow(nvda)], 
                    yend = max(data_ramal$`Adj Close`)*.9 ) , 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
