@@ -2182,7 +2182,7 @@ ggplot() +
     scale_x_date( #Sumbu x
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
-    limits = c(as.Date(min(data_ramal$Date)), 
+    limits = c(as.Date("2022-01-01"), 
                as.Date(max(data_ramal$Date)) + 80)
   ) +
     scale_y_continuous( #Sumbu y
