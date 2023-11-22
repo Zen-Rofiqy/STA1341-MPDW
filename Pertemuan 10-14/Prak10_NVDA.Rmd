@@ -2178,15 +2178,15 @@ ggplot() +
   ) +
   
 # Harga akhir Data Asli
-  geom_segment(aes(x = as.Date(max(nvda$Date)), 
-                   xend = as.Date(max(nvda$Date)) - 30, 
-                   y = max(data_ramal$`Adj Close`), 
-                   yend = max(data_ramal$`Adj Close`)), 
+  geom_segment(aes(x = as.Date(max(nvda$Date)) - 30, 
+                   xend = as.Date(max(nvda$Date)), 
+                   y = nvda$`Adj Close`[nrow(nvda)], 
+                   yend = max(data_ramal$`Adj Close`)*.9 ) , 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#4B75BA", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(nvda$Date)) -30, 
-                      y = max(data_ramal$`Adj Close`), 
+    data = data.frame(x = as.Date(max(nvda$Date)) - 30, 
+                      y = max(data_ramal$`Adj Close`) *.9, 
                       label = paste0("$ ",nvda$`Adj Close`[nrow(nvda)] %>% round(.,2)) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
