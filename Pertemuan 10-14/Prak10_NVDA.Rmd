@@ -2096,7 +2096,7 @@ data.ramal_nvda <- ramalan_nvda@forecast[["seriesFor"]]
 #--Diff inv--
   #ARIMA
   ramal_nvda <- diffinv(data.ramal_nvda, differences=1) +
-    train_nvda.ts.new[length(nvda.ts)] #nilai akhir data latih
+    nvda.ts.new[length(nvda.ts)] #nilai akhir data latih
 
 
 #--Transformasi Balik--
