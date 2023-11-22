@@ -2187,8 +2187,7 @@ ggplot() +
   geom_richtext(
     data = data.frame(x = as.Date(max(data_ramal$Date)) +30, 
                       y = max(data_ramal$`Adj Close`), 
-                      label = paste0(data_ramal$`Adj Close`[nrow(data_ramal)] %>% round(.,2),
-                                     "$") ),
+                      label = paste0("$ ",data_ramal$`Adj Close`[nrow(data_ramal)] %>% round(.,2)) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
