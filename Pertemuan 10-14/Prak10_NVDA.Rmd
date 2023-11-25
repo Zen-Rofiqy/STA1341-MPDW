@@ -600,7 +600,7 @@ ggplot() +
   geom_point(data = tail(train_nvda, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
              size = 15, shape = 21, color = "black", fill="violetred") +
-  scale_colour_manual(values = cols) +
+  scale_colour_manual(values = c("NVDA"=col.nvda[1], "test_nvda"=col.nvda[2])) +
     theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Time Series Saham NVDA",
