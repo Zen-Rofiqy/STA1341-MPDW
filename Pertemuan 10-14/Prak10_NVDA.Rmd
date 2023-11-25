@@ -911,7 +911,7 @@ ggplot() +
             aes(x = Date, y = `Asli`, col = "Asli")) +
   #Data Transformasi
   geom_line(data = ragam, linewidth=2,
-            aes(x = Date, y = `Trans`, col = "Trans")) +
+            aes(x = Date, y = `Trans`*3000, col = "Trans")) +
 
   scale_colour_manual(values = c("Asli"=col.nvda[2], "Trans"=col.nvda[1])) +
   theme.ts + #THeme
