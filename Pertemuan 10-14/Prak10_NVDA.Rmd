@@ -874,23 +874,11 @@ Setelah melalui proses transformasi, gambar dan tabel di atas mengindikasikan ba
 
 #### Plot Transformasi
 
-```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
-ts.plot(train_nvda.ts.new)
-ggplot() +
-geom_line(data = ragam, linewidth=2,
-            aes(x = Date, y = `Asli`, col = "Asli")) +
-  #Data Transformasi
-  geom_line(data = ragam, linewidth=2,
-            aes(x = Date, y = `Trans` * 3000, col = "Trans")) +
-
-  scale_colour_manual(values = c("Asli"=col.nvda[2], "Trans"=col.nvda[1]))
-```
-
 ```{r}
 ragam <- data.frame(
   Date = train_nvda %>% dplyr::select(Date)  ,
   `Asli` = c(as.vector(train_nvda.ts) ),
-  `Trans` = c(as.vector(train_nvda.ts.new) ),
+  `Trans` = c(as.vector(train_nvda.ts.new) ) *3000,
   Name = rep(c("NVDA"), 
               each = nrow(train_nvda) )
 )
@@ -902,7 +890,7 @@ chart <-
 ggplot() +
 # Akhir data
   geom_vline( #Buat garis batas data
-    xintercept = as.numeric(as.Date( max(nvda$Date) )), 
+    xintercept = as.numeric(as.Date( max(train_nvda$Date) )), 
              linetype = "dotted", color = "red") +
 
 #Time Series
@@ -911,7 +899,7 @@ ggplot() +
             aes(x = Date, y = `Asli`, col = "Asli")) +
   #Data Transformasi
   geom_line(data = ragam, linewidth=2,
-            aes(x = Date, y = `Trans`*3000, col = "Trans")) +
+            aes(x = Date, y = `Trans`, col = "Trans")) +
 
   scale_colour_manual(values = c("Asli"=col.nvda[2], "Trans"=col.nvda[1])) +
   theme.ts + #THeme
@@ -930,49 +918,49 @@ ggplot() +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
-  
+  ylim(min(ragam$Asli), max(ragam$Asli)) +
 
 #Data asli
-  geom_segment(aes(x = as.Date(max(nvda$Date)), 
-                   xend = as.Date(max(nvda$Date))+60, 
-                   y = nvda$`Adj Close`[nrow(nvda)], 
-                   yend = nvda$`Adj Close`[nrow(nvda)]), 
+  geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
+                   xend = as.Date(max(train_nvda$Date))+60, 
+                   y = train_nvda$`Adj Close`[nrow(train_nvda)], 
+                   yend = train_nvda$`Adj Close`[nrow(train_nvda)]), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(nvda$Date))+60, 
-                      y = nvda$`Adj Close`[nrow(nvda)], 
+    data = data.frame(x = as.Date(max(train_nvda$Date))+60, 
+                      y = train_nvda$`Adj Close`[nrow(train_nvda)], 
                       label = "Data Asli" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
   ) +
 
 # Data Transformasi
-  geom_segment(aes(x = as.Date(max(nvda$Date)), 
-                   xend = as.Date(max(nvda$Date)) + 60, 
-                   y = max(ragam$Asli), 
-                   yend = max(ragam$Asli)), 
+  geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
+                   xend = as.Date(max(train_nvda$Date)) + 60, 
+                   y = ragam$Trans[nrow(ragam)], 
+                   yend = ragam$Trans[nrow(ragam)] ), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#D02A49", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(nvda$Date)) +60, 
-                      y = max(ragam$Asli), 
-                      label = "ARIMA" ),
+    data = data.frame(x = as.Date(max(train_nvda$Date)) +60, 
+                      y = ragam$Trans[nrow(ragam)], 
+                      label = "Transformasi" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#D02A49", box.color = "white", parse = TRUE
   ) +
   
 #Tanggal akhir
-  geom_segment(aes(x = as.Date(max(nvda$Date)), 
-                   xend = as.Date(max(nvda$Date)), 
+  geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
+                   xend = as.Date(max(train_nvda$Date)), 
                    y = -Inf, 
-                   yend = max(nvda$`Adj Close`)*.15), 
+                   yend = max(train_nvda$`Adj Close`)*.15), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(nvda$Date)), 
-                      y = max(nvda$`Adj Close`)*.15, 
-                      label = max(nvda$Date) ),
+    data = data.frame(x = as.Date(max(train_nvda$Date)), 
+                      y = max(train_nvda$`Adj Close`)*.15, 
+                      label = max(train_nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
   )
