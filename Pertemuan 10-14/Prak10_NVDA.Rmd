@@ -876,7 +876,7 @@ Setelah melalui proses transformasi, gambar dan tabel di atas mengindikasikan ba
 
 ```{r}
 ragam <- data.frame(
-  Date = nvda %>% dplyr::select(Date)  ,
+  Date = train_nvda %>% dplyr::select(Date)  ,
   `Asli` = c(as.vector(train_nvda.ts) ),
   `Trans` = c(as.vector(train_nvda.ts.new) ),
   Name = rep(c("NVDA"), 
@@ -967,7 +967,7 @@ ggplot() +
 
 chart
 #Export Chart
-ggsave("06_Akurasi_model.png", chart, path = export.chart,
+ggsave("03_Stas_4_Transform.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
