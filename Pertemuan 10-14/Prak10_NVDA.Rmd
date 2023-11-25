@@ -629,13 +629,13 @@ ggplot() +
 
   geom_segment(aes(x = as.Date(max(data2$Date)), 
                    xend = as.Date(max(data2$Date)), 
-                   y = max(nvda$`Adj Close`)* .95, 
-                   yend = max(nvda$`Adj Close`)*1.01), 
+                   y = max(nvda$`Adj Close`)* .98, 
+                   yend = max(nvda$`Adj Close`)*1.05), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#D02A49", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(data2$Date)), 
-                      y = max(nvda$`Adj Close`)*1.01, 
+                      y = max(nvda$`Adj Close`)*1.05, 
                       label = max(data2$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#D02A49", box.color = "white", parse = TRUE
