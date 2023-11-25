@@ -1430,6 +1430,10 @@ dev.off() # Menutup file PNG
 
 ## **Uji Formal** {.tabset}
 
+```{r}
+
+```
+
 ### Sisaan Menyebar Normal
 
 Selain dengan eksplorasi, asumsi tersebut dapat diuji menggunakan uji formal. Pada tahapan ini uji formal yang digunakan untuk normalitas adalah uji Kolmogorov-Smirnov (KS). Hipotesis pada uji KS adalah sebagai berikut.
