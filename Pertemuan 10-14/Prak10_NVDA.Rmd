@@ -234,10 +234,10 @@ Data sudah di imputasi.
 
 ```{r}
 cat("Ukuran data awal adalah", nrow(data2), "(", nrow(data2)/6, "Jika persaham)",
-    "\nBanyaknya peride data yang hilang", length(missing_dates),
-    "(PerSaham.", length(missing_dates) * 6, "Jika semua)",
+    "\nBanyaknya peride data yang hilang", (nrow(data)-nrow(data2))/6,
+    "(PerSaham.", (nrow(data)-nrow(data2)) , "Jika semua)",
     "\nUkuran data yang baru seharusnya =", 
-    nrow(data2) + length(missing_dates) * 6,
+    nrow(data2) + (nrow(data)-nrow(data2)) ,
     "\nIni sudah sesuai dengan Ukuran data input yakni =", nrow(data))
 ```
 
