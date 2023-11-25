@@ -1729,6 +1729,12 @@ datatable(model.arch$arch.model, filter = 'top',
 ```
 
 ```{r}
+cat("Best Model:", model.arch$best_model)
+```
+
+Sama seperti model ARCH tanpa intersep, model terbaiknya adalah ARCH(1).
+
+```{r}
 #Model dengan intersep
 archSpec <- ugarchspec(
   variance.model=list(model="sGARCH", garchOrder=c(1,0)),
