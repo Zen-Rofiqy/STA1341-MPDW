@@ -390,7 +390,7 @@ Data saham berakhir pada tanggal 21 November 2023 dengan harga saham **NVDA** me
 
 ```{r}
 data2 <- data %>% 
-  filter(Date >= as.Date("2021-01-01")) 
+  filter(Date >= as.Date("2021-01-01") | Date <= as.Date("2023-11-10")) 
 ```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
