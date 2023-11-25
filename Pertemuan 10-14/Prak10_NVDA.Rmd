@@ -144,7 +144,7 @@ data <- raw.data %>%
   mutate(
     Date = as.Date(raw.data[, 2], format = "%m/%d/%y"), #Mengubah menjadi Date 
     across(3:ncol(raw.data), as.numeric)                #Mengubah menjadi Numerik
-  )
+  ) 
 str(data)
 ```
 
@@ -162,7 +162,7 @@ cat('Banyaknya Data Kosong', sum(is.na(data)))
 data2 <- data
 install_load("lubridate")
 
-dates <- as.Date(data$Date)
+dates <- as.Date(data2$Date)
 
 # Buat rentang waktu mulai dari tanggal pertama hingga tanggal terakhir dalam data
 full_date_range <- seq(min(dates), max(dates), by = "days")
@@ -175,8 +175,8 @@ if (length(missing_dates) == 0) {
   cat("Semua tanggal ada dalam data.\n")
 } else {
   cat("Tanggal yang tidak ada dalam data sebanyak", length(missing_dates),
-      "\nAtau sebanyak", length(missing_dates) * 7, 
-      "Data Hilang dari ke-7 perusahaan yang ada")
+      "\nAtau sebanyak", length(missing_dates) * 6, 
+      "Data Hilang dari ke-6 perusahaan yang ada")
 }
 ```
 
@@ -370,7 +370,7 @@ ggsave("01_Time Series AAANTI.png", chart, path = export.chart,
 Data saham berakhir pada tanggal 21 November 2023 dengan harga saham **NVDA** merupakan saham tertinggi kedua. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2022-2023` polanya cenderung trend turun. Dan `2023` keatas, polanya cenderung naik.
 
 ```{r}
-data2 <- data %>%
+data2 <- data %>% 
   filter(Date >= as.Date("2021-01-01")) 
 ```
 
