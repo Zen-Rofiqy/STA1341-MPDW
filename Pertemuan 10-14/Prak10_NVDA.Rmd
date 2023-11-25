@@ -390,7 +390,7 @@ Data saham berakhir pada tanggal 21 November 2023 dengan harga saham **NVDA** me
 
 ```{r}
 data2 <- data %>% 
-  filter(Date >= as.Date("2021-01-01") | Date <= as.Date("2023-11-10")) 
+  filter(Date >= as.Date("2021-01-01") & Date <= as.Date("2023-11-10")) 
 ```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
@@ -431,7 +431,7 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
     date_breaks = "1 year",  # Menampilkan label setiap tahun
     date_labels = "%Y",  # Format label tahun
     limits = c(as.Date(min(data2$Date)), 
-               as.Date(max(data2$Date)) + 120)
+               as.Date(max(data2$Date)) + 60)
     #Tampilin lebih dari 20023-07-28 agar label saham bisa masuk
   ) +
     scale_y_continuous( #Sumbu y
