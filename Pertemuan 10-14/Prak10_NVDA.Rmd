@@ -1439,7 +1439,7 @@ formal <- data.frame(
   p.value = c(ks.test(sisaan_nvda.da, "pnorm")[["p.value"]],
               Box.test(sisaan_nvda.da, type = "Ljung")[["p.value"]],
               Box.test((sisaan_nvda.da)^2, type = "Ljung")[["p.value"]],
-              t.test(sisaan_nvda.da, mu=0, conf.level=.95)[["p.value"]])
+              t.test(sisaan_nvda.da, mu=0, conf.level=.95)[["p.value"]]) 
 )
 formal$Keputusan[1] <- ifelse(formal$p.value[1] < .05, "Sisaan Tidak Menyebar Normal",
                               "Sisaan Menyebar Normal")
@@ -1449,6 +1449,11 @@ formal$Keputusan[3] <- ifelse(formal$p.value[3] < .05, "Ragam Sisaan Tidak Homog
                               "Ragam Sisaan Homogen")
 formal$Keputusan[4] <- ifelse(formal$p.value[4] < .05, "Nilai Tengah Sisaan \u2260 0",
                               "Nilai Tengah Sisaan = 0")
+
+formal$p.value <- ifelse(round(formal$p.value, 2) == 0, 
+                                  "< 2.2e-16",
+                                  round(formal$p.value, 2) )
+
 datatable(formal, options = list(pageLength = 4))
 ```
 
