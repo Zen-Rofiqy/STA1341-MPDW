@@ -1626,17 +1626,17 @@ Dari Lag 1 sampai Lag 12 yang ditest, Terlihat bahwa Lag 2 memiliki *p-value* se
 ```{r message=FALSE, warning=FALSE}
 install_load('rugarch')
 
-create_spec <- function(i, j, arma_order) {
+create_spec <- function(i, j, arma_order, mean=mean) {
   return(ugarchspec(
     variance.model = list(model = "sGARCH", garchOrder = c(i, j)),
     mean.model = list(armaOrder = arma_order, 
               #model tidak harus memasukkan komponen rata-rata (intercept)
-                      include.mean = FALSE)
+                      include.mean = mean)
   ))
 }
 
 
-arch.garch <- function(data, pp, qq = 0, arma.order = c(0, 0)) {
+arch.garch <- function(data, pp, qq = 0, arma.order = c(0, 0), mean=FALSE) {
   arch.model <- data.frame(Model = character(0),
                             Signif = numeric(0),
                             AIC = numeric(0),
@@ -1656,7 +1656,7 @@ arch.garch <- function(data, pp, qq = 0, arma.order = c(0, 0)) {
     for (j in n:qq) {
         # GARCH model
         formula <- as.formula(paste("~ garch(", i, ",", j, ")", sep = ""))
-        archSpec <- create_spec(i, j, arma.order)
+        archSpec <- create_spec(i, j, arma.order, mean=mean)
   
       archFit <- ugarchfit(spec = archSpec, data = data, solver = "hybrid")
   
@@ -1705,6 +1705,8 @@ arch.garch <- function(data, pp, qq = 0, arma.order = c(0, 0)) {
 }
 ```
 
+> Model ARCH tanpa Intersep
+
 ```{r}
 model.arch <- arch.garch(data = train_nvda.diff, pp = 12, qq = 0, arma.order = arma.order)
 datatable(model.arch$arch.model, filter = 'top', 
@@ -1716,6 +1718,15 @@ cat("Best Model:", model.arch$best_model)
 ```
 
 Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model yang semua parameternya signifikan yakni **ARCH(1).** Karena itu tidak perlu membandingkan nilai **AIC**. Sehingga model terbaik adalah **ARIMA(0,1,1)+ARCH(1).**
+
+> Model ARCH dengan intersep
+
+```{r}
+model.arch <- arch.garch(data=train_nvda.diff, pp=12, qq=0, arma.order=arma.order,
+                         mean=TRUE)
+datatable(model.arch$arch.model, filter = 'top', 
+          options = list(pageLength = 6))
+```
 
 ```{r}
 #Model dengan intersep
