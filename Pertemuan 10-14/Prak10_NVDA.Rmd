@@ -90,7 +90,7 @@ Dengan kombinasi faktor-faktor ini, pemilihan data saham NVIDIA bukan hanya memu
 
 ## Dataset
 
-Dataset yang saya gunakan merupakan koleksi data harga saham historis periode 1 Januari 2018 hingga 21 November 2023 dari 6 saham yakni saham saingan `NVDA` seperti `AMD`, `ARM`, `AVGO`, `TSM`, dan `INTC`.
+Dataset yang saya gunakan merupakan koleksi data harga saham historis periode 1 Januari 2018 hingga 10 November 2023 dari 6 saham yakni saham saingan `NVDA` seperti `AMD`, `ARM`, `AVGO`, `TSM`, dan `INTC`.
 
 Dataset ini memilki data :
 
