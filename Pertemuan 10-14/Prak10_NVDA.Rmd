@@ -872,6 +872,22 @@ datatable(lsk.new, filter = 'none')
 
 Setelah melalui proses transformasi, gambar dan tabel di atas mengindikasikan bahwa setiap rangkaian data sekarang mencakup nilai satu dalam selangnya, yang menunjukkan bahwa data tersebut sekarang sudah **stasioner dalam ragam**.
 
+```{r dpi=300, fig.height = 6, fig.width = 12, fig.align = "center"}
+#Plot ts
+plot.ts(train_nvda.ts.new, lty=1, xlab="Periode (Hari)", 
+        col = col.nvda[1], lwd = 2,
+        main="Plot Differencing", cex.main = 2)
+
+ragam <- data.frame(
+  Date = nvda %>% dplyr::select(Date)  ,
+  `Asli` = c(as.vector(train_nvda.ts) ),
+  `Trans` = c(as.vector(train_nvda.ts.new) ),
+  Name = rep(c("NVDA"), 
+              each = nrow(train_nvda) )
+)
+colnames(ragam) <- c("Date", "Asli", "Trans", "Name")
+```
+
 ### Dalam Rataan: Differencing
 
 *Differencing* (diferensiasi) adalah suatu proses statistik yang digunakan untuk mengatasi ketidakstasioneran dalam data rata-rata atau tren data. Tujuannya adalah untuk membuat data menjadi lebih stasioner dengan mengurangi atau menghilangkan tren atau pola waktu yang mungkin ada dalam data tersebut.
