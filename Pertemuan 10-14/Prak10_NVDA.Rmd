@@ -248,9 +248,9 @@ Jika dalam rentang tahun 2021 hingga 2023 akan seperti :
 
 ```{r}
 coba <- data %>% 
-  filter(Date >= as.Date("2021-01-01")) 
+  filter(Date >= as.Date("2021-01-01") & Date <= as.Date("2023-11-10")) 
 coba2 <- data2 %>% 
-  filter(Date >= as.Date("2021-01-01")) 
+  filter(Date >= as.Date("2021-01-01") & Date <= as.Date("2023-11-10")) 
 
 cat("Ukuran data awal adalah", nrow(coba2), "(", nrow(coba2)/6, "Jika persaham)",
     "\nBanyaknya peride data yang hilang", (nrow(coba)-nrow(coba2))/6,
