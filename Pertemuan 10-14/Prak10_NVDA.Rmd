@@ -578,11 +578,11 @@ ggplot() +
             ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling( 1.05*length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling( 1.04*length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * .95, 
     label = "Data Uji", size=10) +
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling( 1.05*length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling( 1.04*length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * .85, 
     label = paste0(nrow(test_nvda)," Hari (", 
                    round(nrow(test_nvda)/nrow(nvda)*100, 1), 
@@ -647,7 +647,7 @@ ggsave("02_TS_NVDA_train-test.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
-Berdasarkan plot data deret waktu pada data latih ($80\%$ dari data asli), terlihat bahwa data menunjukkan tren turun dan tren naik yang keduanya mulus. Ini mengisyaratkan bahwa data latih **tidak** memenuhi kriteria **stasioneritas dalam rataan maupun ragam**. Di sisi lain, dalam plot data uji ($20\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji **tidak stasioner dalam rataan**[.]{.underline}
+Berdasarkan plot data deret waktu pada data latih ($78\%$ dari data asli), terlihat bahwa data menunjukkan tren naik dan tren turun. Ini mengisyaratkan bahwa data latih **tidak** memenuhi kriteria **stasioneritas dalam rataan maupun ragam**. Di sisi lain, dalam plot data uji ($22\%$ dari data asli), terlihat adanya tren yang melonjak naik dan kurangnya nilai tengah yang stabil. Ini juga menunjukkan bahwa data uji **tidak stasioner dalam rataan**[.]{.underline}
 
 # Stasioneritas
 
