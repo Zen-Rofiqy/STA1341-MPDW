@@ -388,8 +388,8 @@ ggplot(data2, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
                                 "NVDA" = 1, "TSM" = .35, "INTC" = .35)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Time Series AAANTI",
-       subtitle = "Seperti apa sih pola deret waktu saham AAANTI pada 2021-2023?\n") +
+       title = "Time Series NVDA 2021-2023",
+       subtitle = "Seperti apa sih pola deret waktu saham NVDA dan saingannya?\n") +
   # Label / legend
   geom_text_repel(
     data=data2[data2$Date == max(data2$Date),], #Posisi di ujung data
