@@ -890,45 +890,8 @@ chart <-
 ggplot() +
 # Akhir data
   geom_vline( #Buat garis batas data
-    xintercept = as.numeric(as.Date( max(data2$Date) )), 
+    xintercept = as.numeric(as.Date( max(nvda$Date) )), 
              linetype = "dotted", color = "red") +
-  #Label Data Asli 
-  annotate( "rect", alpha=.1, fill="#4EC2C1",
-            xmin=as.Date(min(data2$Date)), 
-            xmax=as.Date(data2$Date[nrow(train_nvda)]),
-            ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
-  
-  annotate( "text", color="#4EC2C1",
-            x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
-            y = max(data2$`Adj Close`) * .95, 
-    label = "Data Asli", size=10) + 
-  annotate( "text", color="#4EC2C1",
-            x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
-            y = max(data2$`Adj Close`) * .85, 
-    label = paste0(nrow(train_nvda)," Hari (", 
-                   round(nrow(train_nvda)/nrow(nvda)*100, 1), 
-                   "%)"), size=10) + 
-  
-  #Label Data Ramal
-  annotate( "rect", alpha=.1, fill="violetred",
-            xmin=as.Date(data2$Date[nrow(train_nvda)]), 
-            xmax=as.Date(max(data2$Date)),
-            ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
-  
-  annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * .95, 
-    label = "Data Ramal", size=10) +
-  annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * .85, 
-    label = paste0(nrow(test_nvda)," Hari (", 
-                   round(nrow(test_nvda)/nrow(nvda)*100, 1), 
-                   "%)"), size=10) +
-  
-  geom_vline( #Buat garis batas data
-    xintercept = as.Date(data2$Date[nrow(train_nvda)]) , 
-             linetype = "dotted", color = "black", linewidth = 2) +
 
 #Time Series
   #Data Asli
@@ -941,8 +904,8 @@ ggplot() +
   scale_colour_manual(values = c("Asli"=col.nvda[2], "Trans"=col.nvda[1])) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Akurasi Ramalan Saham NVDA",
-       subtitle = "Perbandingan Hasil Ramalan dengan data Asli\n") +
+       title = "Plot Transformasi NVDA",
+       subtitle = "Perbandingan plot Transformasi dengan Plot Asli\n") +
   #Axis
     coord_cartesian(clip = "off"
   ) +
@@ -956,92 +919,48 @@ ggplot() +
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
   
-#Bagi Data Train & Test
-  geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
-                   xend = as.Date(max(train_nvda$Date)), 
-                   y = max(nvda$`Adj Close`)* .58, 
-                   yend = max(nvda$`Adj Close`)*.7), 
-               arrow = arrow(type = "closed", length = unit(0.1, "inches")), 
-               lineend = "round", color = "gray60", size=1.5) +
-  geom_richtext(
-    data = data.frame(x = as.Date(max(train_nvda$Date)), 
-                      y = max(nvda$`Adj Close`)*.7, 
-                      label = max(train_nvda$Date) ),
-    aes(x, y, label = label), size = 8, color = "white", 
-    fill = "gray60", box.color = "white", parse = TRUE
-  ) +
 
-#Data Uji
-  geom_segment(aes(x = as.Date(max(data2$Date)), 
-                   xend = as.Date(max(data2$Date))+60, 
+#Data asli
+  geom_segment(aes(x = as.Date(max(nvda$Date)), 
+                   xend = as.Date(max(nvda$Date))+60, 
                    y = nvda$`Adj Close`[nrow(nvda)], 
                    yend = nvda$`Adj Close`[nrow(nvda)]), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(data2$Date))+60, 
+    data = data.frame(x = as.Date(max(nvda$Date))+60, 
                       y = nvda$`Adj Close`[nrow(nvda)], 
                       label = "Data Asli" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
   ) +
 
-# Data Ramal ARIMA
-  geom_segment(aes(x = as.Date(max(data2$Date)), 
-                   xend = as.Date(max(data2$Date)) + 60, 
-                   y = max(ragam$`ARIMA`), 
-                   yend = max(ragam$`ARIMA`)), 
+# Data Transformasi
+  geom_segment(aes(x = as.Date(max(nvda$Date)), 
+                   xend = as.Date(max(nvda$Date)) + 60, 
+                   y = max(ragam$Asli), 
+                   yend = max(ragam$Asli)), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "#D02A49", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(data2$Date)) +60, 
-                      y = max(ragam$`ARIMA`), 
+    data = data.frame(x = as.Date(max(nvda$Date)) +60, 
+                      y = max(ragam$Asli), 
                       label = "ARIMA" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#D02A49", box.color = "white", parse = TRUE
   ) +
   
-# Data Ramal ARCH + Intersep
-  geom_segment(aes(x = as.Date(max(data2$Date)), 
-                   xend = as.Date(max(data2$Date)) + 70, 
-                   y = max(ragam$`ARCH+Intersep`), 
-                   yend = max(ragam$`ARCH+Intersep`)), 
-               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
-               lineend = "round", color = "#4B75BA", size=1.5) +
-  geom_richtext(
-    data = data.frame(x = as.Date(max(data2$Date)) +70, 
-                      y = max(ragam$`ARCH+Intersep`), 
-                      label = "ARCH dengan <br> Intersep" ),
-    aes(x, y, label = label), size = 8, color = "white", 
-    fill = "#4B75BA", box.color = "white", parse = TRUE
-  ) +
-  
-# Data Ramal ARCH - Intersep
-  geom_segment(aes(x = as.Date(max(data2$Date)), 
-                   xend = as.Date(max(data2$Date)) + 70, 
-                   y = ragam$`ARCH-Intersep`[nrow(nvda)], 
-                   yend = ragam$`ARCH-Intersep`[nrow(nvda)]), 
-               arrow = arrow(type = "closed", length = unit(.1, "inches")), 
-               lineend = "round", color = "#DC4F26", size=1.5) +
-  geom_richtext(
-    data = data.frame(x = as.Date(max(data2$Date)) +70, 
-                      y = ragam$`ARCH-Intersep`[nrow(nvda)], 
-                      label = "ARCH tanpa <br> Intersep" ),
-    aes(x, y, label = label), size = 8, color = "white", 
-    fill = "#DC4F26", box.color = "white", parse = TRUE
-  ) +
-
 #Tanggal akhir
-  geom_segment(aes(x = as.Date(max(data2$Date)), 
-                   xend = as.Date(max(data2$Date)), 
+  geom_segment(aes(x = as.Date(max(nvda$Date)), 
+                   xend = as.Date(max(nvda$Date)), 
                    y = -Inf, 
                    yend = max(nvda$`Adj Close`)*.15), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
-    data = data.frame(x = as.Date(max(data2$Date)), 
+    data = data.frame(x = as.Date(max(nvda$Date)), 
                       y = max(nvda$`Adj Close`)*.15, 
-                      label = max(data2$Date) ),
+                      label = max(nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
   )
