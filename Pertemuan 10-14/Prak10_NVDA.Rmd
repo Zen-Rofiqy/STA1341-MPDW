@@ -323,8 +323,8 @@ ggplot(data, aes(x=Date, y=`Adj Close`, color=Name, alpha=Name)) + #Data
                                 "NVDA" = 1, "TSM" = .25, "INTC" = .25)) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
-       title = "Time Series AAANTI",
-       subtitle = "Seperti apa sih pola deret waktu saham AAANTI?\n") +
+       title = "Time Series NVDA",
+       subtitle = "Seperti apa sih pola deret waktu saham NVDA dan saingannya?\n") +
   # Label / legend
   geom_text_repel(
     data=data[data$Date == max(data$Date),], #Posisi di ujung data
@@ -367,7 +367,7 @@ ggsave("01_Time Series AAANTI.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
-Data saham berakhir pada tanggal 28 juli dengan harga saham tertinggi yakni **NVIDIA** dan daham terendah yakni **Google**. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2021-2023` polanya cenderung trend turun. Untuk tugas praktikum kali ini, kami ingin membandingkan pengambilan rentang tahun mana yang lebih baik forcast/peramalannya. Pada Sesi ini hanya akan menggunakan rentang tahun `2022-2023` dengan tren cenderung turun.
+Data saham berakhir pada tanggal 21 November 2023 dengan harga saham **NVDA** merupakan saham tertinggi kedua. Jika dilihat dari tahun `2019-2022`, semua saham cenderung memiliki pola trend naik. Lalu dari `2022-2023` polanya cenderung trend turun. Dan `2023` keatas, polanya cenderung naik.
 
 ```{r}
 data2 <- data %>%
