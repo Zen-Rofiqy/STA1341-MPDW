@@ -874,6 +874,18 @@ Setelah melalui proses transformasi, gambar dan tabel di atas mengindikasikan ba
 
 #### Plot Transformasi
 
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
+ts.plot(train_nvda.ts.new)
+ggplot() +
+geom_line(data = ragam, linewidth=2,
+            aes(x = Date, y = `Asli`, col = "Asli")) +
+  #Data Transformasi
+  geom_line(data = ragam, linewidth=2,
+            aes(x = Date, y = `Trans` * 3000, col = "Trans")) +
+
+  scale_colour_manual(values = c("Asli"=col.nvda[2], "Trans"=col.nvda[1]))
+```
+
 ```{r}
 ragam <- data.frame(
   Date = train_nvda %>% dplyr::select(Date)  ,
