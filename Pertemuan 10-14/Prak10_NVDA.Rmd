@@ -243,6 +243,22 @@ cat("Ukuran data awal adalah", nrow(data2), "(", nrow(data2)/6, "Jika persaham)"
 
 Data sudah benar, siap untuk dianalisis.
 
+```{r}
+cat("Ukuran data awal adalah", nrow(data2  %>% filter(Date >= as.Date("2021-01-01")) ) ,
+    "(", nrow(data2  %>% filter(Date >= as.Date("2021-01-01")) )/6, "Jika persaham)",
+    "\nBanyaknya peride data yang hilang", 
+    (nrow(data  %>% filter(Date >= as.Date("2021-01-01")) )-
+       nrow(data2  %>% filter(Date >= as.Date("2021-01-01")) ))/6,
+    "(PerSaham.", (nrow(data  %>% filter(Date >= as.Date("2021-01-01")) )-
+                     nrow(data2  %>% filter(Date >= as.Date("2021-01-01")) )) , "Jika semua)",
+    "\nUkuran data yang baru seharusnya =", 
+    nrow(data2  %>% filter(Date >= as.Date("2021-01-01")) ) + 
+      (nrow(data  %>% filter(Date >= as.Date("2021-01-01")) )-
+         nrow(data2  %>% filter(Date >= as.Date("2021-01-01")) )) ,
+    "\nIni sudah sesuai dengan Ukuran data input yakni =", 
+    nrow(data  %>% filter(Date >= as.Date("2021-01-01")) ))
+```
+
 ### Data Cleaned
 
 ```{r message=FALSE, warning=FALSE}
