@@ -1850,7 +1850,7 @@ Akan dilakukan peramalan sebanyak data uji untuk mengukur akurasi. Peramalan dil
 ```{r dpi=300, fig.height = 7.5, fig.width = 15, fig.align = "center"}
 #Plot
 plot(ramalan_nvda.da, main="NVDA", xlab="Periode(Hari)", cex.main=4, 
-     lwd=2.5, col = "green4")
+     lwd=2.5, col = col.nvda[1])
 ```
 
 Berdasarkan hasil plot ramalan di atas, dapat dilihat bahwa semua ramalan cenderung stabil hingga akhir periode.
