@@ -715,7 +715,7 @@ Berdasarkan uji ADF tersebut, *p-value* lebih besar dari taraf nyata $5\%$ sehin
 
 ### Plot Box-Cox
 
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=4, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 install_load('MASS')
 index <- seq(1:nrow(train_nvda)) #Beda titik potong
 bc =boxcox(train_nvda.ts~index, lambda=seq(-2, 4, by=.01))
@@ -729,7 +729,7 @@ Gambar di atas menunjukkan bahwa dari rentang nilai $\lambda$ -2 hingga 4, pada 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/03_Stas_2_BoxCox.png", sep=""),
-    height = 3.75*300, width = 7.5*300, res=300)
+    height = 4*300, width = 7.5*300, res=300)
 
 # Plot 
 index <- seq(1:nrow(train_nvda)) #Beda titik potong
@@ -826,7 +826,7 @@ datatable(tran, filter = 'none')
 
 #### Transformasi
 
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=4, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 #Transformasi
 train_nvda.ts.new <- 1/sqrt(train_nvda.ts)
 
@@ -841,7 +841,7 @@ sk_nvda.new <- bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)] #SK
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/03_Stas_3_BoxCox.png", sep=""),
-    height = 3.75*300, width = 7.5*300, res=300)
+    height = 4*300, width = 7.5*300, res=300)
 
 # Plot 
 index <- seq(1:nrow(train_nvda))
