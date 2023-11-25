@@ -1431,7 +1431,25 @@ dev.off() # Menutup file PNG
 ## **Uji Formal** {.tabset}
 
 ```{r}
-
+formal <- data.frame(
+  Menguji = c("Kenormalan Siaan", "Kebebasan Sisaan", 
+              "Homogenitas Sisaan", "Nilai Tengah = 0"),
+  Uji = c("Kolmogorov-Smirnov", "Ljung-Box", 
+          "Ljung-Box Sisaan^2", "Uji-T"),
+  p.value = c(ks.test(sisaan_nvda.da, "pnorm")[["p.value"]],
+              Box.test(sisaan_nvda.da, type = "Ljung")[["p.value"]],
+              Box.test((sisaan_nvda.da)^2, type = "Ljung")[["p.value"]],
+              t.test(sisaan_nvda.da, mu=0, conf.level=.95)[["p.value"]])
+)
+formal$Keputusan[1] <- ifelse(formal$p.value[1] < .05, "Sisaan Tidak Menyebar Normal",
+                              "Sisaan Menyebar Normal")
+formal$Keputusan[2] <- ifelse(formal$p.value[2] < .05, "Sisaan Tidak Saling Bebas",
+                              "Sisaan Saling Bebas")
+formal$Keputusan[3] <- ifelse(formal$p.value[3] < .05, "Ragam Sisaan Tidak Homogen",
+                              "Ragam Sisaan Homogen")
+formal$Keputusan[4] <- ifelse(formal$p.value[4] < .05, "Nilai Tengah Sisaan \u2260 0",
+                              "Nilai Tengah Sisaan = 0")
+datatable(formal, options = list(pageLength = 4))
 ```
 
 ### Sisaan Menyebar Normal
