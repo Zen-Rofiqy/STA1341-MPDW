@@ -1948,24 +1948,26 @@ ggplot() +
   #Data RAMAL ARIMA
     #Dari data asli & ramal
   geom_line(data = ramal, linewidth=2,
-            aes(x = Date, y = `ARIMA`, col = "NVDA")) +
+            aes(x = Date, y = `ARIMA`, col = "ARIMA")) +
   #Data Ramal ARCH + Intersep
     #Dari data ramal saja
   geom_line(data = ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
-            aes(x = Date, y = `ARCH+Intersep`, col = "GOOG")) +
+            aes(x = Date, y = `ARCH+Intersep`, col = "ARCH+")) +
   #Data Ramal ARCH - Intersep
     #Dari data ramal saja
   geom_line(data = ramal[nrow(train_nvda):nrow(nvda),], linewidth=2,
-            aes(x = Date, y = `ARCH-Intersep`, col = "MSFT")) +
+            aes(x = Date, y = `ARCH-Intersep`, col = "ARCH-")) +
   #Data Test
   geom_line(data = test_nvda, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "test_nvda")) +
+            aes(x = Date, y = `Adj Close`, col = "Test")) +
   
   #Penanda
   geom_point(data = tail(train_nvda, 1), alpha = .5, 
              aes(x = Date, y = `Adj Close`), stroke=2,
              size = 15, shape = 21, color = "black", fill="violetred") +
-  scale_colour_manual(values = cols) +
+  scale_colour_manual(values = c("ARIMA"="#005833","ARCH+"="#00934F",
+                                "ARCH-"="#36B450","Test"="#ACD694"
+                                 )) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Akurasi Ramalan Saham NVDA",
