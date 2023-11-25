@@ -238,7 +238,9 @@ cat("Ukuran data awal adalah", nrow(data2), "(", nrow(data2)/6, "Jika persaham)"
     "(PerSaham.", (nrow(data)-nrow(data2)) , "Jika semua)",
     "\nUkuran data yang baru seharusnya =", 
     nrow(data2) + (nrow(data)-nrow(data2)) ,
-    "\nIni sudah sesuai dengan Ukuran data input yakni =", nrow(data))
+    "\nIni sudah sesuai dengan Ukuran data input yakni =", nrow(data),
+    "(", nrow(data)/6, "jika persaham)",
+    "\nJadi ada sekitar", (nrow(data)-nrow(data2))/nrow(data)*100,"% Data hilang")
 ```
 
 Data sudah benar, siap untuk dianalisis.
