@@ -1910,15 +1910,15 @@ ggplot() +
   annotate( "rect", alpha=.1, fill="#4EC2C1",
             xmin=as.Date(min(data2$Date)), 
             xmax=as.Date(data2$Date[nrow(train_nvda)]),
-            ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
+            ymin=max(nvda$`Adj Close`) * 1.25, ymax=Inf ) + 
   
   annotate( "text", color="#4EC2C1",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
-            y = max(data2$`Adj Close`) * .95, 
+            y = max(nvda$`Adj Close`) * 1.3, 
     label = "Data Asli", size=10) + 
   annotate( "text", color="#4EC2C1",
             x = as.Date(data2$Date[ceiling(nrow(train_nvda)/2)]), 
-            y = max(data2$`Adj Close`) * .85, 
+            y = max(nvda$`Adj Close`) * 1.2, 
     label = paste0(nrow(train_nvda)," Hari (", 
                    round(nrow(train_nvda)/nrow(nvda)*100, 1), 
                    "%)"), size=10) + 
@@ -1927,15 +1927,15 @@ ggplot() +
   annotate( "rect", alpha=.1, fill="violetred",
             xmin=as.Date(data2$Date[nrow(train_nvda)]), 
             xmax=as.Date(max(data2$Date)),
-            ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
+            ymin=max(nvda$`Adj Close`) * 1.25, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
             x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * .95, 
+            y = max(nvda$`Adj Close`) * 1.3, 
     label = "Data Ramal", size=10) +
   annotate( "text", color="violetred",
             x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
-            y = max(data2$`Adj Close`) * .85, 
+            y = max(nvda$`Adj Close`) * 1.2, 
     label = paste0(nrow(test_nvda)," Hari (", 
                    round(nrow(test_nvda)/nrow(nvda)*100, 1), 
                    "%)"), size=10) +
