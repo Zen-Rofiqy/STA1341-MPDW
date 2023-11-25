@@ -578,11 +578,11 @@ ggplot() +
             ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling( 1*length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * .95, 
     label = "Data Uji", size=10) +
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling( .89*length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling( 1*length(data2$Date)/7)]) , 
             y = max(data2$`Adj Close`) * .85, 
     label = paste0(nrow(test_nvda)," Hari (", 
                    round(nrow(test_nvda)/nrow(nvda)*100, 1), 
