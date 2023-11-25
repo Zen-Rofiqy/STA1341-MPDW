@@ -674,7 +674,7 @@ Berdasarkan plot data deret waktu pada data latih ($78\%$ dari data asli), terli
 
 ### Plot ACF
 
-```{r fig.align="center", fig.height=3.75, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=4, fig.width=7.5, message=FALSE, warning=FALSE, dpi=300}
 install_load('tsibble','tseries')
 acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
 mtext("NVDA", side=3, line=1, cex=2, font=2)
@@ -685,7 +685,7 @@ Berdasarkan plot ACF, terlihat bahwa plot ACF data train menurun secara perlahan
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/03_Stas_1_ACF.png", sep=""),
-    height = 3.75*300, width = 7.5*300, res=300)
+    height = 4*300, width = 7.5*300, res=300)
 
 # Plot 
 acf(train_nvda.ts, main="", col=col.nvda[1], lwd=2)
