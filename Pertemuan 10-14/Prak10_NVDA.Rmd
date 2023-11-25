@@ -243,7 +243,24 @@ cat("Ukuran data awal adalah", nrow(data2), "(", nrow(data2)/6, "Jika persaham)"
     "\nJadi ada sekitar", (nrow(data)-nrow(data2))/nrow(data)*100,"% Data hilang")
 ```
 
-Data sudah benar, siap untuk dianalisis.
+Data sudah benar, siap untuk dianalisis. \
+Jika dalam rentang tahun 2021 hingga 2023 akan seperti :
+
+```{r}
+coba <- data %>% 
+  filter(Date >= as.Date("2021-01-01")) 
+coba2 <- data2 %>% 
+  filter(Date >= as.Date("2021-01-01")) 
+
+cat("Ukuran data awal adalah", nrow(coba2), "(", nrow(coba2)/6, "Jika persaham)",
+    "\nBanyaknya peride data yang hilang", (nrow(coba)-nrow(coba2))/6,
+    "(PerSaham.", (nrow(coba)-nrow(coba2)) , "Jika semua)",
+    "\nUkuran data yang baru seharusnya =", 
+    nrow(coba2) + (nrow(coba)-nrow(coba2)) ,
+    "\nIni sudah sesuai dengan Ukuran data input yakni =", nrow(coba),
+    "(", nrow(coba)/6, "jika persaham)",
+    "\nJadi ada sekitar", (nrow(coba)-nrow(coba2))/nrow(coba)*100,"% Data hilang")
+```
 
 ### Data Cleaned
 
@@ -580,11 +597,11 @@ ggplot() +
             ymin=max(data2$`Adj Close`) * .9, ymax=Inf ) + 
   
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling( 1.04*length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling( .88*length(data2$Date)/6)]) , 
             y = max(data2$`Adj Close`) * .95, 
     label = "Data Uji", size=10) +
   annotate( "text", color="violetred",
-            x = as.Date(data2$Date[ceiling( 1.04*length(data2$Date)/7)]) , 
+            x = as.Date(data2$Date[ceiling( .88*length(data2$Date)/6)]) , 
             y = max(data2$`Adj Close`) * .85, 
     label = paste0(nrow(test_nvda)," Hari (", 
                    round(nrow(test_nvda)/nrow(nvda)*100, 1), 
