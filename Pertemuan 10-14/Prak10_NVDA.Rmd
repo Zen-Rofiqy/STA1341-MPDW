@@ -243,7 +243,7 @@ cat("Ukuran data awal adalah", nrow(data2), "(", nrow(data2)/6, "Jika persaham)"
     "\nJadi ada sekitar", (nrow(data)-nrow(data2))/nrow(data)*100,"% Data hilang")
 ```
 
-Data sudah benar, siap untuk dianalisis. \
+Data sudah benar, siap untuk dianalisis.\
 Jika dalam rentang tahun 2021 hingga 2023 akan seperti :
 
 ```{r}
@@ -2295,6 +2295,11 @@ colnames(data_ramal) <- c("Date", "Adj Close", "BB", "BA", "Name")
 
 ```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
 plot(ramalan_nvda, which= 1)
+```
+
+```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
+ts.plot(ramalan_nvda@forecast$sigmaFor)
+ts.plot(ramalan_nvda@forecast$seriesFor)
 ```
 
 ```{r}
