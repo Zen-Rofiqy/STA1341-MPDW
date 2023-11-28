@@ -2422,7 +2422,7 @@ ggplot() +
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
 # Harga akhir data ramal beda brp persen
-  annotate( "text", color="green4",
+  annotate( "text", color=ifelse(perc>0, "green4", "red3"),
             x = as.Date(max(data_ramal$Date)) +30, 
             y = max(data_ramal$`Adj Close`) *.94, 
     label = paste0(ifelse(perc>0, "+ ", "- "), perc %>% round(.,2), "%"), 
