@@ -2256,11 +2256,11 @@ ramalan_nvda <- ugarchforecast(model.ramal, data = nvda.diff,
                       n.ahead = length(nDate))
 data.ramal_nvda <- ramalan_nvda@forecast[["seriesFor"]]
 
-data.ramal_nvda.bb <- ramalan_nvda@forecast[["seriesFor"]] -
-                          ramalan_nvda@forecast[["sigmaFor"]]
+data.ramal_nvda.bb <- ramalan_nvda@forecast[["seriesFor"]]/
+  -( ramalan_nvda@forecast[["sigmaFor"]] )^2
 
-data.ramal_nvda.ba <- ramalan_nvda@forecast[["seriesFor"]] + 
-                          ramalan_nvda@forecast[["sigmaFor"]]
+data.ramal_nvda.ba <- ramalan_nvda@forecast[["seriesFor"]]/
+  ( ramalan_nvda@forecast[["sigmaFor"]] )^2
 #--Diff inv--
   #Mean
   ramal_nvda <- diffinv(data.ramal_nvda, differences=1) +
@@ -2300,17 +2300,20 @@ plot(ramalan_nvda, which= 1)
 ```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
 ts.plot(ramalan_nvda@forecast$sigmaFor)
 ts.plot(ramalan_nvda@forecast$seriesFor)
+ts.plot(-ramalan_nvda@forecast$sigmaFor)
 ```
 
-```{r}
+```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
 ggplot()+
-    geom_line(data = data_ramal, linewidth=1,
-            aes(x = Date, y = `Adj Close`, col = "NVDA")) +
   #BB
-
+  geom_line(data = data_ramal, linewidth=2,
+            aes(x = Date, y = `BB`, col = "Atas")) +
   #BA
-  geom_line(data = data_ramal, linewidth=1,
-            aes(x = Date, y = `BA`, col = "NVDA")) 
+  geom_line(data = data_ramal, linewidth=2,
+            aes(x = Date, y = `BA`, col = "Bawah")) +
+    geom_line(data = data_ramal, linewidth=2,
+            aes(x = Date, y = `Adj Close`, col = "NVDA")) 
+
 ```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
@@ -2353,12 +2356,6 @@ ggplot() +
   #Data RAMAL 
   geom_line(data = data_ramal, linewidth=2,
             aes(x = Date, y = `Adj Close`, col = "NVDA")) +
-  #BB
-  geom_line(data = data_ramal, linewidth=2,
-            aes(x = Date, y = `BB`, col = "NVDA")) +
-  #BA
-  geom_line(data = data_ramal, linewidth=2,
-            aes(x = Date, y = `BA`, col = "NVDA")) +
   
   #Penanda
   geom_point(data = tail(nvda, 1), alpha = .5, 
