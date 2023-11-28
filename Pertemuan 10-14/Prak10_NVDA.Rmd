@@ -2317,6 +2317,9 @@ ggplot()+
 ```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
+harga_akhir <- nvda$`Adj Close`[nrow(nvda)]
+harga_ramal <- data_ramal$`Adj Close`[nrow(data_ramal)]
+
 chart <- 
 ggplot() +
 # Akhir data
@@ -2398,7 +2401,7 @@ ggplot() +
   geom_richtext(
     data = data.frame(x = as.Date(max(nvda$Date)) - 30, 
                       y = max(data_ramal$`Adj Close`) *.9, 
-                      label = paste0("$ ",nvda$`Adj Close`[nrow(nvda)] %>% round(.,2)) ),
+                      label = paste0("$ ", harga_akhir %>% round(.,2)) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
@@ -2413,10 +2416,16 @@ ggplot() +
   geom_richtext(
     data = data.frame(x = as.Date(max(data_ramal$Date)) +30, 
                       y = max(data_ramal$`Adj Close`), 
-                      label = paste0("$ ",data_ramal$`Adj Close`[nrow(data_ramal)] %>% round(.,2)) ),
+                      label = paste0("$ ", harga_ramal %>% round(.,2)) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#4B75BA", box.color = "white", parse = TRUE
   ) +
+# Harga akhir data ramal beda brp persen
+  annotate( "text", color="green4",
+            x = as.Date(max(data_ramal$Date)) +30, 
+            y = max(data_ramal$`Adj Close`), 
+    label = paste0((harga_ramal-harga_akhir)/harga_akhir * 100
+                                     %>% round(.,2), "%") ) + 
 
 #Tanggal akhir ramal
   geom_segment(aes(x = as.Date(max(data_ramal$Date)), 
