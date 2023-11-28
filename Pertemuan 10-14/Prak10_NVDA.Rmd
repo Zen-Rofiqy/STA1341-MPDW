@@ -2423,10 +2423,10 @@ ggplot() +
 # Harga akhir data ramal beda brp persen
   annotate( "text", color="green4",
             x = as.Date(max(data_ramal$Date)) +30, 
-            y = max(data_ramal$`Adj Close`) *.9, 
+            y = max(data_ramal$`Adj Close`) *.95, 
     label = paste0(( (harga_ramal-harga_akhir)/harga_akhir * 100) %>% 
                      round(.,2), "%"), 
-    size=10 ) + 
+    size=8 ) + 
 
 #Tanggal akhir ramal
   geom_segment(aes(x = as.Date(max(data_ramal$Date)), 
