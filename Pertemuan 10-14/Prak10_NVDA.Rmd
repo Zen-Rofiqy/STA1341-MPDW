@@ -2442,7 +2442,7 @@ write.xlsx(list("Tentatif" = model.tentaif_nvda,
 
 ## Kesimpulan
 
-Kesimpulan yang dapat ditarik pada penelitian ini adalah model ARIMA(0,1,1)+ARCH(1) dengan intersep merupakan model terbaik yang dapat meramalkan adjusted close saham NVIDIA dalam kurung waktu 11 November 2023 hingga 31 Desember 2023. Nilai MAPE yang didapatkan dari model terbaik adalah sebesar 16,09%. Adjusted close saham NVIDIA diramalkan akan naik hingga menyentuh angka 555,96 USD atau naik sebesar 15,02%. Hal ini menunjukkan bahwa jika ingin membeli saham harian NVIDIA pada kurung waktu 11 November 2023 hingga 31 Desember 2023 merupakan hal yang tepat dikarenakan saham akan naik. 
+Kesimpulan yang dapat ditarik pada penelitian ini adalah model ARIMA(0,1,1)+ARCH(1) dengan intersep merupakan model terbaik yang dapat meramalkan adjusted close saham NVIDIA dalam kurung waktu 11 November 2023 hingga 31 Desember 2023. Nilai MAPE yang didapatkan dari model terbaik adalah sebesar 16,09%. Adjusted close saham NVIDIA diramalkan akan naik hingga menyentuh angka 555,96 USD atau naik sebesar 15,02%. Hal ini menunjukkan bahwa jika ingin membeli saham harian NVIDIA pada kurung waktu 11 November 2023 hingga 31 Desember 2023 merupakan hal yang tepat dikarenakan saham akan naik.
 
 ## Referensi
 
