@@ -1804,7 +1804,7 @@ Sehingga diperoleh model terbaik yakni **ARIMA(0,1,1)+ARCH(1)**.
 plot(model.arch_nvda1, which="all")
 ```
 
-Diperoleh mean model yaitu **ARIMA(0,1,1)** dan varian model yaitu **ARCH(1)** untuk digunakan dalam peralaman, pada uji dignostik model pada plot QQ-norm terlihat bahwa sebaran residual tidak mengikuti garis lurus sehingga dapat disimpulkan bahwa **residual tidak menyebar normal,** lalu untuk uji autokorelasi dapat dilihat plot ACF squared residual telah terlihat bahwa setiap lag berada dibawah batas, sehingga dapat dikatakan bahwa **ada autokorelasi antar residual**, diperkuat dengan nilai p-value pada uji L-jung Box yang lebih besar dari alpha=0.05.
+Diperoleh mean model yaitu **ARIMA(0,1,1)** dan varian model yaitu **ARCH(1)** untuk digunakan dalam peralaman, pada uji dignostik model pada plot QQ-norm terlihat bahwa sebaran residual tidak mengikuti garis lurus sehingga dapat disimpulkan bahwa **residual tidak menyebar normal.**
 
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
@@ -2139,7 +2139,7 @@ datatable(akurasi, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)** berkatergori *"Baik"* dengan nilai **MAPE** nya sebesar $12.3\%$ (kurang dari $20\%$).
+Dari tabel diatas terlihat bahwa model **ARIMA(0,1,1)-ARCH(1) dengan Intersep** berkatergori *"Baik"* dengan nilai **MAPE** nya sebesar $15.64\%$ (kurang dari $20\%$).
 
 # Peramalan
 
@@ -2292,29 +2292,6 @@ colnames(data_ramal) <- c("Date", "Adj Close", "BB", "BA", "Name")
 ```
 
 ## Plot
-
-```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
-plot(ramalan_nvda, which= 1)
-```
-
-```{r fig.align="center", fig.height=6, fig.width=11, message=FALSE, warning=FALSE, dpi=300}
-ts.plot(ramalan_nvda@forecast$sigmaFor)
-ts.plot(ramalan_nvda@forecast$seriesFor)
-ts.plot(-ramalan_nvda@forecast$sigmaFor)
-```
-
-```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
-ggplot()+
-  #BB
-  geom_line(data = data_ramal, linewidth=2,
-            aes(x = Date, y = `BB`, col = "Atas")) +
-  #BA
-  geom_line(data = data_ramal, linewidth=2,
-            aes(x = Date, y = `BA`, col = "Bawah")) +
-    geom_line(data = data_ramal, linewidth=2,
-            aes(x = Date, y = `Adj Close`, col = "NVDA")) 
-
-```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
 harga_akhir <- nvda$`Adj Close`[nrow(nvda)]
