@@ -2420,6 +2420,8 @@ ggsave("07_Ramalan.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
+Model **ARIMA(0,1,1)-ARCH(1)** dengan intersep digunakan untuk meramalkan hingga periode akhir tahun 2023. Pada Gambar 12 terlihat bahwa adjusted close saham NVIDIA diramalkan akan menyentuh angka seharga 555,95 USD atau naik sebesar 15,02% hingga akhir tahun 2023.
+
 # Penutup
 
 ```{r, warning=FALSE, message = FALSE}
@@ -2440,17 +2442,7 @@ write.xlsx(list("Tentatif" = model.tentaif_nvda,
 
 ## Kesimpulan
 
-karena dengan jika menggunakan model ARCH lag hingga 5 masih signifikan, lalu, dicobakan pada beberapa model GARCH dan dibandingkan nilai-nilai seperti AIC dan signifikansi parameter, maka akan digunakan model GARCH(1,2) yang memiliki nilai AIC kecil dan parameter yang hampir semua signifikan. Sehingga diperoleh model Mean yaitu ARIMA(0,1,2) dan model Varian yaitu GARCH(1,2).Dengan persamaan sebagai berikut :
-
-*Mean Model* ARIMA(0,1,2)
-
-Yt=0.0771+et−0.0192et−1−0.0460et−2��=0.0771+��−0.0192��−1−0.0460��−2
-
-*Varian Model*
-
-GARCH(1,2)
-
-σ2t=0.0829+0.0708ϵ2t−1+0.0057σ2t−1+0.9224σ2t−2
+Kesimpulan yang dapat ditarik pada penelitian ini adalah model ARIMA(0,1,1)+ARCH(1) dengan intersep merupakan model terbaik yang dapat meramalkan adjusted close saham NVIDIA dalam kurung waktu 11 November 2023 hingga 31 Desember 2023. Nilai MAPE yang didapatkan dari model terbaik adalah sebesar 16,09%. Adjusted close saham NVIDIA diramalkan akan naik hingga menyentuh angka 555,96 USD atau naik sebesar 15,02%. Hal ini menunjukkan bahwa jika ingin membeli saham harian NVIDIA pada kurung waktu 11 November 2023 hingga 31 Desember 2023 merupakan hal yang tepat dikarenakan saham akan naik. 
 
 ## Referensi
 
