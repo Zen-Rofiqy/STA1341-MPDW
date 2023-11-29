@@ -472,7 +472,7 @@ Ringkasan Data `Ajd CLose.`
 summary(nvda.ts)
 ```
 
-```{r fig.align=, fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align=, fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300, error=FALSE}
 install_load('ggtext')
 min_value <- min(nvda$`Adj Close`)
 min_date <- nvda$Date[which.min(nvda$`Adj Close`)]
