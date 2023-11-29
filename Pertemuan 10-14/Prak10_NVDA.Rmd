@@ -564,7 +564,7 @@ train_nvda.ts <- ts(train_nvda[,3])
 test_nvda.ts <- ts(test_nvda[,3])
 ```
 
-```{r fig.align=, fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300}
+```{r fig.align="center", fig.height=12, fig.width=27, message=FALSE, warning=FALSE, dpi=300}
 chart <-
 ggplot() + 
   #Label Data Asli 
@@ -1708,7 +1708,7 @@ datatable(model.arch1$arch.model, filter = 'top',
 ```
 
 ```{r}
-cat("Best Model:", model.arch$best_model)
+cat("Best Model:", model.arch1$best_model)
 ```
 
 Setelah mencoba iterasi lag 1 sampai lag 12, terlihat bahwa hanya ada satu model yang semua parameternya signifikan yakni **ARCH(1).** Karena itu tidak perlu membandingkan nilai **AIC**. Sehingga model terbaik adalah **ARIMA(0,1,1)+ARCH(1).**
@@ -1723,7 +1723,7 @@ datatable(model.arch2$arch.model, filter = 'top',
 ```
 
 ```{r}
-cat("Best Model:", model.arch$best_model)
+cat("Best Model:", model.arch2$best_model)
 ```
 
 Sama seperti model ARCH tanpa intersep, model terbaiknya adalah ARCH(1).
@@ -2107,7 +2107,7 @@ row.names(akurasi.nvda) <- "ARIMA"
 akurasi.nvda.arch1 <- accuracy(ts(ramal_nvda.arch1[-1]), 
                          head(test_nvda.ts, n=nrow(test_nvda) )) %>%
   as.data.frame() %>%
-  cbind(Model = model.arch$best_model) %>% 
+  cbind(Model = model.arch1$best_model) %>% 
   relocate(Model, .before = 1)
 row.names(akurasi.nvda.arch1) <- "ARCH+Intersep"
 
@@ -2115,7 +2115,7 @@ row.names(akurasi.nvda.arch1) <- "ARCH+Intersep"
 akurasi.nvda.arch2 <- accuracy(ts(ramal_nvda.arch2[-1]), 
                          head(test_nvda.ts, n=nrow(test_nvda) )) %>%
   as.data.frame() %>%
-  cbind(Model = model.arch$best_model) %>% 
+  cbind(Model = model.arch2$best_model) %>% 
   relocate(Model, .before = 1)
 row.names(akurasi.nvda.arch2) <- "ARCH-Intersep"
 ```
