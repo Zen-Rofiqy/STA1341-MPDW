@@ -318,7 +318,7 @@ theme.ts1 <- list(
         )
 ```
 
-### MAANG
+### AAANTI
 
 Melihat keseluruhan *Time Series* data saham.
 
@@ -2420,7 +2420,7 @@ ggsave("07_Ramalan.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
 ```
 
-Model **ARIMA(0,1,1)-ARCH(1)** dengan intersep digunakan untuk meramalkan hingga periode akhir tahun 2023. Pada Gambar 12 terlihat bahwa adjusted close saham NVIDIA diramalkan akan menyentuh angka seharga 555,95 USD atau naik sebesar 15,02% hingga akhir tahun 2023.
+Model **ARIMA(0,1,1)-ARCH(1)** dengan intersep digunakan untuk meramalkan hingga periode akhir tahun 2023. Pada Gambar 12 terlihat bahwa adjusted close saham NVIDIA diramalkan akan menyentuh angka seharga 555,95 USD atau naik sebesar $15,02\%$ hingga akhir tahun 2023.
 
 # Penutup
 
@@ -2442,7 +2442,7 @@ write.xlsx(list("Tentatif" = model.tentaif_nvda,
 
 ## Kesimpulan
 
-Kesimpulan yang dapat ditarik pada penelitian ini adalah model ARIMA(0,1,1)+ARCH(1) dengan intersep merupakan model terbaik yang dapat meramalkan adjusted close saham NVIDIA dalam kurung waktu 11 November 2023 hingga 31 Desember 2023. Nilai MAPE yang didapatkan dari model terbaik adalah sebesar 16,09%. Adjusted close saham NVIDIA diramalkan akan naik hingga menyentuh angka 555,96 USD atau naik sebesar 15,02%. Hal ini menunjukkan bahwa jika ingin membeli saham harian NVIDIA pada kurung waktu 11 November 2023 hingga 31 Desember 2023 merupakan hal yang tepat dikarenakan saham akan naik.
+Kesimpulan yang dapat ditarik pada penelitian ini adalah model **ARIMA(0,1,1)-ARCH(1)** **dengan intersep** merupakan model terbaik yang dapat meramalkan adjusted close saham NVIDIA dalam kurung waktu 11 November 2023 hingga 31 Desember 2023. Nilai MAPE yang didapatkan dari model terbaik adalah sebesar $15.64\%$. Adjusted close saham NVIDIA diramalkan akan naik hingga menyentuh angka $555.96$ USD atau naik sebesar $15.02\%$. Hal ini menunjukkan bahwa jika ingin membeli saham harian NVIDIA pada kurung waktu 11 November 2023 hingga 31 Desember 2023 merupakan hal yang tepat dikarenakan saham akan naik.
 
 ## Referensi
 
