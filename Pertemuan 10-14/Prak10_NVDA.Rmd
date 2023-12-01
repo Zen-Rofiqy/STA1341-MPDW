@@ -879,7 +879,7 @@ ragam <- data.frame(
 colnames(ragam) <- c("Date", "Asli", "Trans", "Name")
 ```
 
-```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
+```{r dpi=300,  fig.height = 12, fig.width = 28, fig.align = "center", warning=FALSE, message = FALSE}
 chart <- 
 ggplot() +
 # Akhir data
@@ -944,7 +944,7 @@ ggplot() +
 chart
 #Export Chart
 ggsave("03_Stas_4_Transform_1.png", chart, path = export.chart,
-        dpi = 300, height = 12, width = 27)
+        dpi = 300, height = 12, width = 28)
 ```
 
 ```{r}
