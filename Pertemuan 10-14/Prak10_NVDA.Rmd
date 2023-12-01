@@ -1210,9 +1210,9 @@ Referensi : [[University of South Carolina] Chapter 6: Model Specification for T
 
 Sebagai contoh :
 
-![](images/Screenshot%202023-10-15%20234003-01.png)
+![](images/Screenshot 2023-12-02 060410.png){width="296"}
 
-Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,1), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
+Dalam hal ini model tentatif yang terbentuk adalah ARIMA(0,1,0), ARIMA(1,1,1), ARIMA(2,1,2), ARIMA(3,1,3), dst.. Namun karena kemungkinannya sangat banyak, maka akan digunakan function agar menyingkat proses.
 
 Pemilihan model ARIMA terbaik dilakukan ketika memiliki nilai **AIC** yang terkecil, **Semua Parameter Signifikan**, dan **Tidak ada Parameter NA**. Kami akan mencoba untuk menggunakan function pemodelam model ARIMA berdasarkan tabel EACF. Namun dengan melakukan 2 pemodelan perbaris AR(p) nya, agar sekalian overfitting.
 
@@ -1240,7 +1240,7 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
             eacf_result$symbol[p + 1, q + 1] == "o" && 
             eacf_result$symbol[p + 2, q + 1] == "o") {
       
-          model <- Arima(data, order=c(p,d,q), method="ML", 
+          model <- Arima(data, order=c(p,d,q-1), method="ML", 
                          include.drift=drift)
           aic <- AIC(model)
           
