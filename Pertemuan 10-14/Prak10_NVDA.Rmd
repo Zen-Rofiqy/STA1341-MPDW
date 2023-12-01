@@ -1239,8 +1239,9 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
         if (eacf_result$symbol[p + 1, q ] == "o" && 
             eacf_result$symbol[p + 1, q + 1] == "o" && 
             eacf_result$symbol[p + 2, q + 1] == "o") {
+          if(q-1 == 0) next
       
-          model <- Arima(data, order=c(p,d,(q-1)), method="ML", 
+          model <- Arima(data, order=c(p,d,q-1), method="ML", 
                          include.drift=drift)
           aic <- AIC(model)
           
@@ -1266,7 +1267,7 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
           }
           
           models <- rbind(models, 
-                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", (q-1), ")", 
+                    data.frame(Model = paste("ARIMA(", p, ",", d, ",", q-1, ")", 
                                              sep = ""), 
                                AIC = aic, 
                                Signif = paste(significant_params, 
@@ -1298,7 +1299,7 @@ model_tentatif <- function(data, p_max, d, q_max, alpha=0.05, drift=FALSE) {
 
 ```{r message=FALSE, warning=FALSE}
 model.tentaif_nvda <- 
-  model_tentatif(train_nvda.diff, p_max = 1, d = 1, q_max = 1)
+  model_tentatif(train_nvda.diff, p_max = 6, d = 1, q_max = 12)
 datatable(model.tentaif_nvda, filter = 'top', 
           options = list(pageLength = 7))
 ```
