@@ -935,7 +935,7 @@ ggplot() +
                lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(train_nvda$Date)), 
-                      y = max(train_nvda$`Adj Close`)*.15, 
+                      y = max(ragam$Trans) /3000 *.15, 
                       label = max(train_nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
