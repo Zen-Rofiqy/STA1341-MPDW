@@ -1438,12 +1438,6 @@ datatable(head(model.tentaif_nvda, 3), filter = 'top',
 Terlihat bahwa hanya terdapat model `ARIMA(0,1,2)` dan `ARIMA(1,1,1)` tidak jauh lebih baik daripada model `ARIMA(0,1,1)` .
 
 ```{r}
-Arima(train_nvda.diff, order=c(1,1,1), method="ML") %>% summary() 
-```
-
-memiliki **AIC** yang lebih besar dan tidak semua parameternya signifikan. Sehingga tetap model terbaiknya adalah `ARIMA(0,1,1)`.
-
-```{r}
 arima.best_model_nvda <- model_nvda.da
 
 arma.order <- c(
