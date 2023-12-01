@@ -872,7 +872,7 @@ Setelah melalui proses transformasi, gambar dan tabel di atas mengindikasikan ba
 ragam <- data.frame(
   Date = train_nvda %>% dplyr::select(Date)  ,
   `Asli` = c(as.vector(train_nvda.ts) ),
-  `Trans` = c(as.vector(train_nvda.ts.new) ) *3000,
+  `Trans` = c(as.vector(train_nvda.ts.new) ) ,
   Name = rep(c("NVDA"), 
               each = nrow(train_nvda) )
 )
@@ -890,13 +890,13 @@ ggplot() +
 #Time Series
   #Data Transformasi
   geom_line(data = ragam, linewidth=2,
-            aes(x = Date, y = `Trans`/3000, col = "Trans")) +
+            aes(x = Date, y = `Trans`, col = "Trans")) +
 
-  scale_colour_manual(values = c("Asli"=col.nvda[2], "Trans"=col.nvda[1])) +
+  scale_colour_manual(values = c("Trans"=col.nvda[1])) +
   theme.ts + #THeme
   labs(x = "\nPeriode (Tahun)", y='Harga Saham (USD)',
        title = "Plot Transformasi NVDA",
-       subtitle = "Hasil Transformasi NVDA\n") +
+       subtitle = "Pola deret waktu hasil Transformasi\n") +
   #Axis
     coord_cartesian(clip = "off"
   ) +
@@ -920,7 +920,7 @@ ggplot() +
                lineend = "round", color = "#D02A49", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(train_nvda$Date)) +60, 
-                      y = ragam$Trans[nrow(ragam)] /3000, 
+                      y = ragam$Trans[nrow(ragam)], 
                       label = "Transformasi" ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "#D02A49", box.color = "white", parse = TRUE
@@ -930,12 +930,12 @@ ggplot() +
   geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
                    xend = as.Date(max(train_nvda$Date)), 
                    y = -Inf, 
-                   yend = max(ragam$Trans) /3000 *.15, 
+                   yend = max(train_nvda$`Adj Close`)*.15), 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
     data = data.frame(x = as.Date(max(train_nvda$Date)), 
-                      y = max(ragam$Trans) /3000 *.15, 
+                      y = max(train_nvda$`Adj Close`)*.15, 
                       label = max(train_nvda$Date) ),
     aes(x, y, label = label), size = 8, color = "white", 
     fill = "gray60", box.color = "white", parse = TRUE
@@ -945,6 +945,17 @@ chart
 #Export Chart
 ggsave("03_Stas_4_Transform_1.png", chart, path = export.chart,
         dpi = 300, height = 12, width = 27)
+```
+
+```{r}
+ragam <- data.frame(
+  Date = train_nvda %>% dplyr::select(Date)  ,
+  `Asli` = c(as.vector(train_nvda.ts) ),
+  `Trans` = c(as.vector(train_nvda.ts.new) ) *3000,
+  Name = rep(c("NVDA"), 
+              each = nrow(train_nvda) )
+)
+colnames(ragam) <- c("Date", "Asli", "Trans", "Name")
 ```
 
 ```{r dpi=300,  fig.height = 12, fig.width = 27, fig.align = "center", warning=FALSE, message = FALSE}
