@@ -909,6 +909,7 @@ ggplot() +
     scale_y_continuous( #Sumbu y
     labels = scales::dollar_format(prefix = "$") #tambahin dolar
   ) +
+  ylim(min(ragam$Trans), max(ragam$Trans)) +
 
 # Data Transformasi
   geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
