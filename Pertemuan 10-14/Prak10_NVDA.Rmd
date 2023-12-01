@@ -930,7 +930,7 @@ ggplot() +
   geom_segment(aes(x = as.Date(max(train_nvda$Date)), 
                    xend = as.Date(max(train_nvda$Date)), 
                    y = -Inf, 
-                   yend = max(train_nvda$`Adj Close`)*.15), 
+                   yend = max(ragam$Trans) /3000 *.15, 
                arrow = arrow(type = "closed", length = unit(.1, "inches")), 
                lineend = "round", color = "gray60", size=1.5) +
   geom_richtext(
