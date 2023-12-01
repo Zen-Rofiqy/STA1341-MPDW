@@ -1435,7 +1435,7 @@ datatable(head(model.tentaif_nvda, 3), filter = 'top',
           options = list(pageLength = 3))
 ```
 
-Terlihat bahwa hanya terdapat model `ARIMA(0,1,2)` saja. Itu dikarenakan model `ARIMA(1,1,1)` tidak tersedia di Tabel EACF, sehingga perlu dilakukan manual.
+Terlihat bahwa hanya terdapat model `ARIMA(0,1,2)` dan `ARIMA(1,1,1)` tidak jauh lebih baik daripada model `ARIMA(0,1,1)` .
 
 ```{r}
 Arima(train_nvda.diff, order=c(1,1,1), method="ML") %>% summary() 
