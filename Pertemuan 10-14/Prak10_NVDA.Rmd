@@ -1304,7 +1304,7 @@ datatable(model.tentaif_nvda, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-8917.35$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $-5873.08$ dimiliki oleh model `ARIMA(0,1,1)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(0,1,1)`.
 
 ```{r}
 model_nvda.da <- Arima(train_nvda.diff, order=c(0,1,1), method="ML")
@@ -1325,7 +1325,7 @@ datatable(drift1_nvda, filter = 'top',
           options = list(pageLength = 7))
 ```
 
-Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $5063.53$ dimiliki oleh model `ARIMA(4,1,4)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,4)`.
+Berdasarkan pendugaan parameter di atas, nilai AIC terkecil $3810.86$ dimiliki oleh model `ARIMA(4,1,4)` dan seluruh parameternya signifikan sehingga model yang dipilih adalah model `ARIMA(4,1,4)`.
 
 ```{r}
 model_nvda.drift1 <- Arima(train_nvda.ts, order=c(4,1,4), method="ML")
@@ -1431,8 +1431,8 @@ Overfitting dilakukan dilakukan dengan menaikkan orde **AR(p)** dan **MA(q)** da
 Perlu diingat bahwa sebelumnya saya menjelaskan bahwa fungsi `model_tentatif` yang kami buat itu sudah sekaligus overfitting, dan itu juga sudah membandingkan mana model terbaiknya. Sehingga sebenarnya tidak perlu dilakukan overfitting. Namun saya akan tunjukkan kembali.
 
 ```{r}
-datatable(model.tentaif_nvda, filter = 'top', 
-          options = list(pageLength = 2))
+datatable(head(model.tentaif_nvda, 3), filter = 'top', 
+          options = list(pageLength = 3))
 ```
 
 Terlihat bahwa hanya terdapat model `ARIMA(0,1,2)` saja. Itu dikarenakan model `ARIMA(1,1,1)` tidak tersedia di Tabel EACF, sehingga perlu dilakukan manual.
